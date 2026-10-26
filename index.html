@@ -2771,7 +2771,6 @@
                 <div style="display:flex; gap:0.5rem; border-bottom:1px solid var(--card-border); padding-bottom:0.5rem;">
                     <button class="net-tab-btn active" id="net-tab-browse-btn" onclick="switchNetTab('browse')">🌐 Online Tables</button>
                     <button class="net-tab-btn" id="net-tab-create-btn" onclick="switchNetTab('create')">➕ Create Table</button>
-                    <button class="net-tab-btn" id="net-tab-settings-btn" onclick="switchNetTab('settings')">⚙️ Ably Settings</button>
                 </div>
 
                 <!-- TAB 1: Browse Public Tables -->
@@ -2807,34 +2806,12 @@
                     <button class="btn btn-primary" onclick="submitCreateTable()" style="width:100%; padding:0.7rem; font-family:'Orbitron',sans-serif; letter-spacing:1px;">🚀 Create & Host Table</button>
                 </div>
 
-                <!-- TAB 3: Advanced Settings (Relay URL & Share link) -->
-                <div id="net-tab-settings" style="display:none; flex-direction:column; gap:1rem;">
-                    <div style="background:rgba(217,119,6,0.1); border:1px solid var(--accent-orange); border-radius:8px; padding:0.8rem; display:flex; justify-content:space-between; align-items:center; gap:0.8rem;">
-                        <div style="font-size:0.78rem;">
-                            <div style="font-weight:700; color:var(--accent-orange);">🔗 Share Table Invite Link</div>
-                            <div style="color:var(--text-muted); font-size:0.72rem;">Direct link to your current table for table mates.</div>
-                        </div>
-                        <button class="btn btn-sm" onclick="copyInviteLink()" style="border-color:var(--accent-orange); color:var(--accent-orange);">📋 Copy Link</button>
+                <div style="background:rgba(217,119,6,0.1); border:1px solid var(--accent-orange); border-radius:8px; padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; gap:0.8rem;">
+                    <div style="font-size:0.78rem;">
+                        <div style="font-weight:700; color:var(--accent-orange);">🔗 Share Table Invite Link</div>
+                        <div style="color:var(--text-muted); font-size:0.72rem;">Direct link to your current table for table mates.</div>
                     </div>
-
-                    <div class="input-group">
-                        <label for="net-ably-key-input">Ably Realtime API Key</label>
-                        <div style="display:flex; gap:0.5rem;">
-                            <input type="text" id="net-ably-key-input" placeholder="A8ZtLw.TuYjNQ:..." style="flex-grow:1; font-family:monospace; font-size:0.75rem;">
-                            <button class="btn btn-sm" onclick="saveAblyKey()">Save</button>
-                        </div>
-                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.3rem;">
-                            High-allowance Ably Realtime sync (6M msgs/month, 200 concurrent players).
-                        </div>
-                    </div>
-
-                    <div style="background:rgba(0,0,0,0.25); border:1px solid var(--card-border); border-radius:8px; padding:0.8rem; font-size:0.75rem; color:var(--text-muted);">
-                        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.3rem;">🔍 Device Network Diagnostics</div>
-                        <div id="net-diag-info">Checking IP & Auto-LAN room...</div>
-                        <div style="margin-top:0.4rem; font-size:0.7rem; color:var(--text-muted); line-height:1.4;">
-                            💡 If a phone on the same WiFi doesn't see your PC, its browser/carrier may be routing via Private Relay, VPN, or IPv4 while PC is on IPv6. You can create a named table above (e.g. "Game Night") with a 4-digit PIN to connect any device regardless of carrier network routing!
-                        </div>
-                    </div>
+                    <button class="btn btn-sm" onclick="copyInviteLink()" style="border-color:var(--accent-orange); color:var(--accent-orange);">📋 Copy Link</button>
                 </div>
 
                 <!-- Active Players List for current table -->
@@ -3274,7 +3251,7 @@ Thanks to Mike for being ace.</p>
         }
 
         function switchNetTab(tab) {
-            ['browse', 'create', 'settings'].forEach(t => {
+            ['browse', 'create'].forEach(t => {
                 const el = document.getElementById('net-tab-' + t);
                 const btn = document.getElementById('net-tab-' + t + '-btn');
                 if (el) el.style.display = (t === tab) ? 'flex' : 'none';
