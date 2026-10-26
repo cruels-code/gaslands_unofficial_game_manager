@@ -1,0 +1,3242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <title id="page-title">Game Manager</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Orbitron:wght@400;600;800;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 3D Dice: Three.js UMD + Cannon.js -->
+    <script src="three.min.js"></script>
+    <script src="cannon.min.js"></script>
+    <script src="sprites.js"></script>
+    <script src="d6_sprites.js"></script>
+
+    <!-- Ably Realtime SDK (Free: 6M msgs/month, 200 connections) -->
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+
+    <!-- Custom Rules & Equipment Library -->
+    <script src="custom-library.js"></script>
+
+    <!-- Realtime Sync -->
+    <script src="ably-sync.js"></script>
+</head>
+<body>
+    <header>
+        <div class="hazard-stripes"></div>
+        <div class="header-content">
+            <div class="logo">
+                <h1 id="header-logo"><span id="header-game-name">Game</span> <span id="header-app-label">Manager</span></h1>
+                <div class="tagline">Tabletop Dashboard</div>
+            </div>
+
+            <div class="controls-panel">
+                <button id="net-status-pill" class="net-status-pill" onclick="openNetworkModal()" title="Table Multiplayer Connection">
+                    <span class="net-status-dot offline" id="net-status-dot"></span>
+                    <span class="net-status-label" id="net-status-label">Table: Offline</span>
+                </button>
+
+                <div class="input-group">
+                    <label for="game-name-input">Game System</label>
+                    <input type="text" id="game-name-input" placeholder="e.g. Game Manager, Gaslands, Car Wars..." onchange="updateGameName()" value="" style="width: 140px;">
+                </div>
+
+                <div class="input-group">
+                    <label for="team-name-input">Team / Driver</label>
+                    <input type="text" id="team-name-input" placeholder="Enter Crew Name..." onchange="updateTeamName()" value="" style="width: 130px;">
+                </div>
+
+                <div class="input-group" id="sponsor-input-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label for="sponsor-select">Faction / Sponsor</label>
+                        <button onclick="openSponsorModal()" style="background:none; border:none; color:var(--glow-color); cursor:pointer; font-size:0.7rem; font-weight:700; text-transform:uppercase; padding:0 2px;" title="Create New Sponsor">+ Add</button>
+                    </div>
+                    <div style="display:flex; gap:4px; align-items:center;">
+                        <select id="sponsor-select" onchange="changeSponsor()" style="max-width: 140px;">
+                            <!-- Dynamically loaded from LibraryManager -->
+                        </select>
+                        <button class="btn btn-sm" onclick="editCurrentSponsor()" title="Edit Current Sponsor & Perks" style="padding:0.25rem 0.5rem; font-size:0.72rem;">✏️</button>
+                    </div>
+                </div>
+
+                <div class="input-group" id="budget-input-group">
+                    <label for="budget-input">Points Budget</label>
+                    <input type="number" id="budget-input" value="50" min="1" max="10000" onchange="changeBudget()" style="width: 75px;">
+                </div>
+
+                <div class="global-stat cans-tracker">
+                    <span class="label">Total Spent</span>
+                    <span class="value" id="cans-spent-display">0 / 50</span>
+                </div>
+
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="garage-mode-btn" onclick="switchMode('garage')">Garage</button>
+                    <button class="mode-btn" id="play-mode-btn" onclick="switchMode('play')">Play Mode</button>
+                    <button class="mode-btn" id="rivals-mode-btn" onclick="switchMode('rivals')">Rivals</button>
+                    <button class="mode-btn" id="library-mode-btn" onclick="switchMode('library')">⚙ Library</button>
+                    <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">Prompt / Export</button>
+                </div>
+
+                <!-- 3D Dice Roller Controls -->
+                <div style="display:flex; align-items:center; gap:0.4rem; margin-left:auto;">
+                    <div id="dice-toast-notification" class="dice-toast"></div>
+                    <select id="dice-type" style="width: 105px;">
+                        <option value="d6" selected>Standard D6</option>
+                        <option value="skid">Skid Dice</option>
+                    </select>
+                    <select id="throw-dice-count" style="width: 75px;">
+                        <option value="1">1 Die</option>
+                        <option value="2">2 Dice</option>
+                        <option value="3" selected>3 Dice</option>
+                        <option value="4">4 Dice</option>
+                        <option value="5">5 Dice</option>
+                        <option value="6">6 Dice</option>
+                    </select>
+                    <button id="api-key-btn" onclick="setRandomOrgApiKey()" class="btn btn-sm" title="Set Random.org TRNG API Key">🔑</button>
+                    <button id="dice-log-toggle-btn" onclick="toggleDiceLog()" class="btn btn-sm" title="Toggle Dice History">🕒</button>
+                    <button id="throw-dice-btn" onclick="throwDice3DAction()" class="btn btn-primary btn-sm">🎲 Roll</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ================= SPONSOR INFO BANNER ================= -->
+        <div id="sponsor-info-panel" style="display:none; background:rgba(0,0,0,0.45); border:1px solid var(--glow-color); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.2rem; box-shadow:0 0 15px var(--glow-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.8rem;">
+                <div style="flex-grow:1;">
+                    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:4px;">
+                        <span style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px; font-weight:700;">Team Sponsor</span>
+                        <h3 id="sponsor-banner-name" style="font-family:'Orbitron',sans-serif; color:var(--glow-color); font-size:1.15rem; margin:0;"></h3>
+                    </div>
+                    <p id="sponsor-banner-desc" style="font-size:0.82rem; color:var(--text-muted); margin:0 0 6px 0; max-width:850px;"></p>
+                    <div id="sponsor-banner-perks" style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:8px;"></div>
+                    <div id="sponsor-banner-rules" style="display:flex; flex-direction:column; gap:4px; font-size:0.82rem; color:var(--text-primary);"></div>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn btn-sm" onclick="editCurrentSponsor()">✏️ Edit Sponsor</button>
+                    <button class="btn btn-sm btn-primary" onclick="openSponsorModal()">+ New Sponsor</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= GARAGE VIEW ================= -->
+        <div id="garage-view" class="view-section active">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="addVehicle()">+ Add Vehicle</button>
+                    <button class="btn" onclick="exportRosterJSON()">⬇ Export Roster</button>
+                    <button class="btn" onclick="triggerImportRoster()">⬆ Import Roster</button>
+                    <input type="file" id="roster-import-input" accept=".json" style="display:none;" onchange="handleRosterImportFile(event)">
+                </div>
+                <div style="display:flex; gap:0.6rem;">
+                    <button class="btn btn-danger btn-sm" onclick="confirmResetRoster()">Reset Roster</button>
+                </div>
+            </div>
+
+            <div id="garage-vehicles-container" class="vehicles-grid">
+                <!-- Vehicle cards rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ================= PLAY MODE VIEW ================= -->
+        <div id="play-view" class="view-section">
+            <div class="turn-phase-tracker" style="margin-bottom: 1.5rem; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div class="tracker-group">
+                        <span class="tracker-label">Game Turn</span>
+                        <div class="turn-controls">
+                            <button class="turn-btn" onclick="adjustTurn(-1)">-</button>
+                            <span class="turn-value" id="turn-display-val">1</span>
+                            <button class="turn-btn" onclick="adjustTurn(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="tracker-group">
+                        <span class="tracker-label">Gear Phase</span>
+                        <div class="phase-selector">
+                            <button class="phase-btn active" id="phase-btn-1" onclick="setPhase(1)">1</button>
+                            <button class="phase-btn" id="phase-btn-2" onclick="setPhase(2)">2</button>
+                            <button class="phase-btn" id="phase-btn-3" onclick="setPhase(3)">3</button>
+                            <button class="phase-btn" id="phase-btn-4" onclick="setPhase(4)">4</button>
+                            <button class="phase-btn" id="phase-btn-5" onclick="setPhase(5)">5</button>
+                            <button class="phase-btn" id="phase-btn-6" onclick="setPhase(6)">6</button>
+                        </div>
+                    </div>
+                    <div class="tracker-group">
+                        <span class="tracker-label">Audience / Votes</span>
+                        <div class="turn-controls">
+                            <button class="turn-btn" onclick="adjustAudienceVotes(-1)">-</button>
+                            <span class="turn-value" id="votes-display-val">0</span>
+                            <button class="turn-btn" onclick="adjustAudienceVotes(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:0.6rem; align-items:center;">
+                    <button class="btn btn-sm" onclick="syncVehiclesToTable()">🔄 Sync Table</button>
+                    <button class="btn btn-danger btn-sm" onclick="confirmResetGame()">Reset Game</button>
+                </div>
+            </div>
+
+            <div id="play-vehicles-container" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Play cards rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ================= RIVALS VIEW ================= -->
+        <div id="rivals-view" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                <h2 style="font-family:'Orbitron',sans-serif; font-size:1.15rem; color:var(--glow-color); text-transform:uppercase;">Table Rivals & Opponents</h2>
+                <div style="display:flex; gap:0.6rem;">
+                    <button class="btn btn-sm" onclick="openNetworkModal()">Table Settings</button>
+                    <button class="btn btn-primary btn-sm" onclick="syncVehiclesToTable()">Broadcast My Vehicles</button>
+                </div>
+            </div>
+            <div id="rivals-container" class="vehicles-grid">
+                <!-- Rival player vehicles rendered here -->
+            </div>
+        </div>
+
+        <!-- ================= LIBRARY & CUSTOM RULES VIEW ================= -->
+        <div id="library-view" class="view-section">
+            <div class="lib-header-actions">
+                <div>
+                    <h2 style="font-family:'Orbitron',sans-serif; font-size:1.25rem; color:var(--glow-color); text-transform:uppercase;">Equipment & Rules Library</h2>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Configure weapons, attack dice, upgrades, vehicle chassis, and factions for your game.</p>
+                </div>
+                <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="openCreateItemModal()">+ Create New Item</button>
+                    <button class="btn" onclick="LibraryManager.exportJSON()">⬇ Export Library</button>
+                    <button class="btn" onclick="triggerImportLibrary()">⬆ Import Library</button>
+                    <input type="file" id="lib-import-input" accept=".json" style="display:none;" onchange="handleLibraryImportFile(event)">
+                    <button class="btn btn-danger btn-sm" onclick="confirmResetLibrary()">Reset Defaults</button>
+                </div>
+            </div>
+
+            <div class="lib-tabs">
+                <button class="lib-tab-btn active" id="lib-tab-weapons" onclick="switchLibTab('weapons')">Weapons</button>
+                <button class="lib-tab-btn" id="lib-tab-upgrades" onclick="switchLibTab('upgrades')">Upgrades</button>
+                <button class="lib-tab-btn" id="lib-tab-perks" onclick="switchLibTab('perks')">Perks / Skills</button>
+                <button class="lib-tab-btn" id="lib-tab-vehicles" onclick="switchLibTab('vehicles')">Vehicle Chassis</button>
+                <button class="lib-tab-btn" id="lib-tab-sponsors" onclick="switchLibTab('sponsors')">Factions / Sponsors</button>
+            </div>
+
+            <div style="margin-bottom:1rem; display:flex; gap:1rem;">
+                <input type="text" id="lib-search-input" placeholder="Search library items..." oninput="renderLibraryTable()" style="flex-grow:1; max-width:350px;">
+            </div>
+
+            <div id="lib-table-container">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+
+        <!-- ================= PROMPT & EXPORT VIEW ================= -->
+        <div id="prompt-view" class="view-section">
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:1.5rem; max-width:900px; margin:0 auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 style="font-family:'Orbitron',sans-serif; color:var(--glow-color); font-size:1.15rem; text-transform:uppercase;">AI Game Master Prompt & Roster</h2>
+                    <button class="btn btn-primary btn-sm" onclick="copyPromptText()">📋 Copy Prompt</button>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Copy this formatted game summary into any AI model to act as a referee, create campaign narrative, or run combat commentary.</p>
+                <textarea id="prompt-output-text" readonly style="width:100%; height:380px; font-family:'Courier New',monospace; font-size:0.85rem; padding:1rem; background:rgba(0,0,0,0.5);"></textarea>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. Equipment Selection Modal (Add to Vehicle) -->
+    <div id="selection-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="selection-modal-title">Select Item</h3>
+                <button class="btn btn-sm btn-danger" onclick="closeSelectionModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; gap:0.6rem; align-items:center;">
+                    <input type="text" id="selection-modal-search" placeholder="Filter items..." oninput="filterSelectionModalItems()" style="flex-grow:1;">
+                    <button class="btn btn-primary btn-sm" onclick="openInlineCustomItemForm()">+ Custom Item</button>
+                </div>
+
+                <!-- Weapon Mounting Location Selector -->
+                <div id="weapon-mount-selection-bar" style="display:none; background:rgba(0,0,0,0.45); border:1px solid var(--card-border); border-radius:8px; padding:0.6rem 0.8rem; margin:0.5rem 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                        <span style="font-family:'Special Elite',monospace; font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Mount Location:</span>
+                        <div style="display:flex; gap:0.35rem; flex-wrap:wrap;" id="modal-mount-buttons">
+                            <button class="mount-btn active" data-mount="Front" onclick="setModalWeaponMount('Front')">Front</button>
+                            <button class="mount-btn" data-mount="Back" onclick="setModalWeaponMount('Back')">Back</button>
+                            <button class="mount-btn" data-mount="Left side" onclick="setModalWeaponMount('Left side')">Left side</button>
+                            <button class="mount-btn" data-mount="Right side" onclick="setModalWeaponMount('Right side')">Right side</button>
+                            <button class="mount-btn" data-mount="Turret" onclick="setModalWeaponMount('Turret')" style="color:var(--glow-color); font-weight:bold;">Turret (x3 Cans)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inline Custom Item Creation Form -->
+                <div id="inline-custom-item-container" style="display:none; background:rgba(0,0,0,0.4); border:1px solid var(--glow-color); border-radius:8px; padding:1rem; flex-direction:column; gap:0.6rem; margin:0.5rem 0;">
+                    <div style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--glow-color); font-weight:700;">Create Custom Equipment</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                        <input type="text" id="inline-item-name" placeholder="Item Name (e.g. Plasma Gun)">
+                        <input type="text" id="inline-item-range" placeholder="Range (e.g. Medium, 24cm)">
+                        <input type="text" id="inline-item-dice" placeholder="Attack Dice (e.g. 2D6, 3D6)">
+                        <input type="number" id="inline-item-ammo" placeholder="Ammo Count (optional)" min="1" max="20">
+                        <input type="number" id="inline-item-slots" placeholder="Build Slots (0, 1, 2...)" min="0" max="10" value="1">
+                        <input type="number" id="inline-item-cost" placeholder="Points Cost (base)" min="0" max="100" value="2">
+                    </div>
+                    <div id="inline-weapon-mount-group" style="display:none; align-items:center; gap:0.6rem;">
+                        <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold;">Mount Location:</span>
+                        <select id="inline-item-facing" style="font-size:0.75rem; padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:var(--text-primary);">
+                            <option value="Front">Front (1x Cans)</option>
+                            <option value="Back">Back (1x Cans)</option>
+                            <option value="Left side">Left side (1x Cans)</option>
+                            <option value="Right side">Right side (1x Cans)</option>
+                            <option value="Turret">Turret (3x Cans)</option>
+                        </select>
+                    </div>
+                    <div id="inline-perk-class-group" style="display:none; align-items:center; gap:0.6rem;">
+                        <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold;">Perk Class:</span>
+                        <select id="inline-item-class" style="font-size:0.75rem; padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:var(--text-primary);">
+                            <option value="aggression">Aggression</option>
+                            <option value="badass">Badass</option>
+                            <option value="built">Built</option>
+                            <option value="daring">Daring</option>
+                            <option value="horror">Horror</option>
+                            <option value="military">Military</option>
+                            <option value="precision">Precision</option>
+                            <option value="pursuit">Pursuit</option>
+                            <option value="reckless">Reckless</option>
+                            <option value="speed">Speed</option>
+                            <option value="technology">Technology</option>
+                            <option value="tuning">Tuning</option>
+                        </select>
+                    </div>
+                    <textarea id="inline-item-notes" placeholder="Special rules, custom notes, or tooltip description..." style="height:60px;"></textarea>
+                    <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
+                        <button class="btn btn-sm" onclick="toggleInlineCustomForm(false)">Cancel</button>
+                        <button class="btn btn-primary btn-sm" onclick="saveAndEquipCustomItem()">Add to Vehicle & Library</button>
+                    </div>
+                </div>
+
+                <div id="selection-modal-items-list" style="display:flex; flex-direction:column; gap:0.5rem; max-height:420px; overflow-y:auto;">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeSelectionModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Library Item Creation / Edit Modal -->
+    <div id="custom-item-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="custom-item-modal-title">Item Editor</h3>
+                <button class="btn btn-sm btn-danger" onclick="closeCustomItemModal()">✕</button>
+            </div>
+            <div class="modal-body" id="custom-item-modal-body">
+                <!-- Form populated dynamically based on item type -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeCustomItemModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCustomLibraryItem()">Save Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Table Network Settings Modal -->
+    <div id="network-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Table & Realtime Settings</h3>
+                <button class="btn btn-sm btn-danger" onclick="closeNetworkModal()">✕</button>
+            </div>
+            <div class="modal-body" style="gap:1rem;">
+                <div style="background:rgba(217,119,6,0.1); border:1px solid rgba(217,119,6,0.3); border-radius:8px; padding:0.8rem; font-size:0.82rem; line-height:1.4;">
+                    <strong>High-Allowance Realtime Sync (Ably):</strong>
+                    <br>Connects all players at your table with live vehicle tracking and synchronized 3D dice rolls.
+                    <br>Free tier gives <strong>6,000,000 messages / month</strong> and <strong>200 concurrent players</strong>.
+                    <br><a href="https://ably.com/signup" target="_blank" style="color:var(--accent-cyan); text-decoration:underline;">Get a free Ably API Key here (No credit card needed)</a>.
+                </div>
+
+                <div class="input-group">
+                    <label for="net-ably-key-input">Ably API Key</label>
+                    <input type="text" id="net-ably-key-input" placeholder="e.g. xxxxx.yyyyy:zzzzz..." style="font-family:monospace; font-size:0.8rem;">
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+                    <div class="input-group">
+                        <label for="net-room-input">Room Code</label>
+                        <div style="display:flex; gap:0.4rem;">
+                            <input type="text" id="net-room-input" placeholder="e.g. TABLE-42" style="font-family:'Orbitron',sans-serif; text-transform:uppercase;">
+                            <button class="btn btn-sm" onclick="generateRandomRoomCode()">🎲</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="net-pin-input">4-Digit PIN (Optional)</label>
+                        <input type="text" id="net-pin-input" placeholder="e.g. 1234" maxlength="4" style="font-family:monospace;">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:0.6rem; align-items:center;">
+                    <button class="btn btn-primary" onclick="applyNetworkSettings()">Connect to Table</button>
+                    <button class="btn" onclick="copyShareableTableLink()">🔗 Copy Table Link</button>
+                    <button class="btn btn-danger btn-sm" onclick="disconnectNetwork()">Disconnect</button>
+                </div>
+
+                <div style="border-top:1px solid var(--card-border); padding-top:0.8rem;">
+                    <div style="font-family:'Orbitron',sans-serif; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.4rem;">Players at Table</div>
+                    <div id="net-table-roster" style="font-size:0.85rem; color:var(--text-primary); min-height:40px; background:rgba(0,0,0,0.3); border-radius:6px; padding:0.5rem;">
+                        No remote players connected yet.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeNetworkModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Sponsor & Perks Editor Modal -->
+    <div id="sponsor-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="sponsor-modal-title">Sponsor & Perks Editor</h3>
+                <button class="btn btn-sm btn-danger" onclick="closeSponsorModal()">✕</button>
+            </div>
+            <div class="modal-body" style="gap:1rem;">
+                <input type="hidden" id="sponsor-edit-id" value="">
+
+                <div class="input-group">
+                    <label for="sponsor-edit-name">Sponsor / Faction Name</label>
+                    <input type="text" id="sponsor-edit-name" placeholder="e.g. Rutherford, Miyazaki, Slime, Rusty's Bootleggers...">
+                </div>
+
+                <div class="input-group">
+                    <label for="sponsor-edit-desc">Overview & Philosophy</label>
+                    <textarea id="sponsor-edit-desc" placeholder="Brief background, doctrine, or theme for this sponsor..." style="height:60px;"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Allowed Perk Classes</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:6px; padding:0.6rem;">
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="offense"> Offense / Aggression</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="defense"> Defense / Built</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="maneuver"> Maneuver / Daring</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="tactical"> Tactical / Tuning</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="speed"> Speed</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="military"> Military</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="technology"> Technology</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; text-transform:none; cursor:pointer;"><input type="checkbox" class="sponsor-perk-class-chk" value="horror"> Horror / Weird</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="sponsor-edit-rules">Sponsor Perks & Special Rules (1 per line)</label>
+                    <textarea id="sponsor-edit-rules" placeholder="Enter custom perks or special rules for this sponsor, one per line:&#10;e.g. Nitro Booster upgrade available at half price&#10;e.g. Ram upgrade takes 0 build slots&#10;e.g. First Push It each activation is hazard-free" style="height:120px; font-size:0.85rem; line-height:1.45;"></textarea>
+                    <span style="font-size:0.72rem; color:var(--text-muted);">Each line appears as an active sponsor rule card on your team dashboard.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeSponsorModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSponsorModal()">Save Sponsor</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 3D DICE OVERLAYS & LOG ================= -->
+    <div id="dice3d-overlay" onclick="dismissDiceOverlay()">
+        <canvas id="dice3d-canvas"></canvas>
+        <div id="dice3d-result-strip" class="dice3d-result-strip"></div>
+    </div>
+
+    <!-- Floating Draggable Dice Log Window -->
+    <div id="dice-log" style="position:fixed; bottom:20px; left:20px; width:450px; background:rgba(0,5,0,0.95); border:1px solid var(--glow-color); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.8rem; color:var(--glow-color); z-index:1000; display:none; flex-direction:column; box-shadow:0 0 15px var(--glow-shadow); overflow:hidden;">
+        <div id="dice-log-header" style="background:var(--glow-color); color:#000; padding:4px 8px; font-weight:bold; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center; cursor:move;">
+            <span>DICE ROLL HISTORY</span>
+            <button onclick="toggleDiceLog()" style="background:none; border:none; color:#000; font-weight:bold; cursor:pointer; font-size:0.9rem;">✕</button>
+        </div>
+        <div id="dice-log-content" style="padding:10px; height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; font-size:0.75rem;">
+            <div>> Ready...</div>
+        </div>
+    </div>
+
+    <!-- Application Controller Logic -->
+    <script>
+    // ==========================================
+    // Core Application State
+    // ==========================================
+    let appState = {
+        gameName: localStorage.getItem("gm_game_name") || "Game Manager",
+        teamName: localStorage.getItem("gm_team_name") || "",
+        sponsor: localStorage.getItem("gm_sponsor") || "Sponsorless",
+        budget: parseInt(localStorage.getItem("gm_budget"), 10) || 50,
+        mode: "garage",
+        turn: 1,
+        phase: 1,
+        votes: 0,
+        vehicles: []
+    };
+
+    let activeModalTargetVehicleId = null;
+    let activeModalItemType = null; // "weapon", "upgrade", "perk"
+    let currentLibSubTab = "weapons";
+    let rollHistory = [];
+
+    // ==========================================
+    // IndexedDB Vehicle Image Store
+    // ==========================================
+    const DB_NAME = "GM_ImageStore";
+    const DB_VERSION = 1;
+    let dbInstance = null;
+
+    function initImageDB() {
+        return new Promise((resolve) => {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains("images")) {
+                    db.createObjectStore("images", { keyPath: "vehicleId" });
+                }
+            };
+            req.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
+            req.onerror = () => resolve(null);
+        });
+    }
+
+    async function saveVehicleImage(vehicleId, dataUrl) {
+        if (!dbInstance) await initImageDB();
+        if (!dbInstance) return;
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction("images", "readwrite");
+            const store = tx.objectStore("images");
+            store.put({ vehicleId, dataUrl });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+        });
+    }
+
+    async function getVehicleImage(vehicleId) {
+        if (!dbInstance) await initImageDB();
+        if (!dbInstance) return null;
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction("images", "readonly");
+            const store = tx.objectStore("images");
+            const req = store.get(vehicleId);
+            req.onsuccess = () => resolve(req.result ? req.result.dataUrl : null);
+            req.onerror = () => resolve(null);
+        });
+    }
+
+    // ==========================================
+    // Initialization & Lifecycle
+    // ==========================================
+    window.addEventListener("DOMContentLoaded", async () => {
+        await initImageDB();
+        loadSavedState();
+        populateSponsorSelect();
+        applyGameNameUI();
+        renderHeader();
+        renderSponsorInfo();
+        renderVehicles();
+        initDiceLogDrag();
+
+        // Connect Ably if credentials exist
+        if (window.AblySyncManager) {
+            window.AblySyncManager.onSyncCallback = (data) => {
+                showToast(`🔄 Table update from ${data.teamName || 'Rival'}`);
+            };
+            window.AblySyncManager.onDiceRollCallback = (data) => {
+                addDiceHistoryRemote(data);
+            };
+            window.AblySyncManager.onResetCallback = () => {
+                executeGameReset(false);
+                showToast(`🔄 Table state reset by host`);
+            };
+            window.AblySyncManager.onRivalsChangeCallback = () => {
+                if (appState.mode === "rivals") renderRivals();
+            };
+
+            // Check URL for ?room=XYZ
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get("room");
+            if (roomParam) {
+                window.AblySyncManager.setRoom(roomParam);
+            } else if (window.AblySyncManager.roomCode) {
+                window.AblySyncManager.connect();
+            }
+        }
+    });
+
+    function saveState() {
+        try {
+            localStorage.setItem("gm_state", JSON.stringify(appState.vehicles));
+            localStorage.setItem("gm_team_name", appState.teamName);
+            localStorage.setItem("gm_sponsor", appState.sponsor);
+            localStorage.setItem("gm_budget", appState.budget.toString());
+            localStorage.setItem("gm_game_name", appState.gameName);
+        } catch (e) {
+            console.error("Failed to save state to localStorage", e);
+        }
+        if (window.AblySyncManager && window.AblySyncManager.isConnected()) {
+            window.AblySyncManager.syncVehicles();
+        }
+    }
+
+    function loadSavedState() {
+        try {
+            const savedVehicles = localStorage.getItem("gm_state");
+            if (savedVehicles) {
+                appState.vehicles = JSON.parse(savedVehicles);
+            }
+        } catch (e) {
+            console.warn("Could not parse saved vehicles", e);
+        }
+        if (!appState.vehicles || appState.vehicles.length === 0) {
+            addVehicle(false);
+        }
+    }
+
+    // ==========================================
+    // Branding & Game Name Handling
+    // ==========================================
+    function updateGameName() {
+        const val = document.getElementById("game-name-input").value.trim() || "Game Manager";
+        appState.gameName = val;
+        applyGameNameUI();
+        saveState();
+    }
+
+    function applyGameNameUI() {
+        const gName = appState.gameName || "Game Manager";
+        document.getElementById("game-name-input").value = gName;
+        document.getElementById("page-title").textContent = `${gName} - Manager`;
+
+        const logoSpan = document.getElementById("header-game-name");
+        const appLabel = document.getElementById("header-app-label");
+        if (gName.toLowerCase() === "game manager") {
+            logoSpan.textContent = "Game";
+            appLabel.textContent = "Manager";
+        } else {
+            logoSpan.textContent = gName;
+            appLabel.textContent = "Manager";
+        }
+    }
+
+    function updateTeamName() {
+        appState.teamName = document.getElementById("team-name-input").value.trim();
+        saveState();
+    }
+
+    function changeBudget() {
+        const newBudget = parseInt(document.getElementById("budget-input").value, 10) || 50;
+        const totalSpent = getTotalCansSpent();
+        if (newBudget < totalSpent) {
+            alert(`Warning: Total spent (${totalSpent} pts) exceeds your new budget (${newBudget} pts). You will need to free up points before adding more items or vehicles.`);
+        }
+        appState.budget = newBudget;
+        renderHeader();
+        renderVehicles();
+        saveState();
+    }
+
+    function changeSponsor() {
+        const val = document.getElementById("sponsor-select").value;
+        if (val === "__ADD_NEW__") {
+            document.getElementById("sponsor-select").value = appState.sponsor;
+            openSponsorModal();
+            return;
+        }
+
+        const rosterCheck = validateRosterForSponsor(val);
+        if (!rosterCheck.valid) {
+            alert(`Cannot switch sponsor to '${val}':\n\nYour current roster contains equipment or vehicles not permitted by this sponsor:\n\n• ${rosterCheck.conflicts.join("\n• ")}\n\nPlease remove these items before selecting ${val}.`);
+            document.getElementById("sponsor-select").value = appState.sponsor;
+            return;
+        }
+
+        appState.sponsor = val;
+        renderSponsorInfo();
+        renderVehicles();
+        saveState();
+    }
+
+    function populateSponsorSelect() {
+        const select = document.getElementById("sponsor-select");
+        if (!select) return;
+        select.innerHTML = "";
+        const sponsors = (window.LibraryManager && window.LibraryManager.data.sponsors) || [];
+        if (!sponsors.some(s => s.name === appState.sponsor)) {
+            appState.sponsor = sponsors[0] ? sponsors[0].name : "Sponsorless";
+        }
+        sponsors.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.name;
+            opt.textContent = s.name;
+            if (s.name === appState.sponsor) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        // Add special "+ Add New Sponsor..." option
+        const addOpt = document.createElement("option");
+        addOpt.value = "__ADD_NEW__";
+        addOpt.textContent = "➕ + Add New Sponsor...";
+        select.appendChild(addOpt);
+    }
+
+    function renderSponsorInfo() {
+        const panel = document.getElementById("sponsor-info-panel");
+        if (!panel) return;
+
+        if (appState.mode === "rivals" || appState.mode === "prompt" || appState.mode === "library") {
+            panel.style.display = "none";
+            return;
+        }
+
+        const sp = (window.LibraryManager && window.LibraryManager.data.sponsors || []).find(s => s.name === appState.sponsor);
+        if (!sp) {
+            panel.style.display = "none";
+            return;
+        }
+
+        panel.style.display = "block";
+        document.getElementById("sponsor-banner-name").textContent = sp.name;
+        document.getElementById("sponsor-banner-desc").textContent = sp.desc || "Standard rules apply.";
+
+        const perksEl = document.getElementById("sponsor-banner-perks");
+        const rulesEl = document.getElementById("sponsor-banner-rules");
+
+        if (sp.perks && sp.perks.length > 0) {
+            perksEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; margin-right:4px;">Allowed Perk Classes:</span> ` +
+                sp.perks.map(p => `<span style="background:rgba(132,204,22,0.15); border:1px solid var(--accent-cyan); color:var(--accent-cyan); border-radius:4px; padding:1px 6px; font-size:0.7rem; text-transform:uppercase; font-weight:700;">${p}</span>`).join(' ');
+        } else {
+            perksEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">Allowed Perk Classes: All</span>`;
+        }
+
+        if (sp.sponsored && sp.sponsored.length > 0) {
+            rulesEl.innerHTML = sp.sponsored.map(rule => `
+                <div style="display:flex; align-items:flex-start; gap:6px; background:rgba(0,0,0,0.3); border-radius:5px; padding:5px 8px; border-left:3px solid var(--glow-color);">
+                    <span style="color:var(--glow-color); font-weight:bold;">⚡</span>
+                    <span>${escapeHtml(rule)}</span>
+                </div>
+            `).join('');
+        } else {
+            rulesEl.innerHTML = `<div style="color:var(--text-muted); font-style:italic; font-size:0.78rem;">No special sponsor rules or perks configured yet. Click 'Edit Sponsor' to add custom perks/rules.</div>`;
+        }
+    }
+
+    function editCurrentSponsor() {
+        const sp = (window.LibraryManager && window.LibraryManager.data.sponsors || []).find(s => s.name === appState.sponsor);
+        if (sp) {
+            openSponsorModal(sp.id || sp.name);
+        } else {
+            openSponsorModal();
+        }
+    }
+
+    function openSponsorModal(sponsorIdOrName = null) {
+        const modal = document.getElementById("sponsor-modal");
+        const title = document.getElementById("sponsor-modal-title");
+        const idInput = document.getElementById("sponsor-edit-id");
+        const nameInput = document.getElementById("sponsor-edit-name");
+        const descInput = document.getElementById("sponsor-edit-desc");
+        const rulesInput = document.getElementById("sponsor-edit-rules");
+        const chks = document.querySelectorAll(".sponsor-perk-class-chk");
+
+        if (sponsorIdOrName) {
+            const sp = (window.LibraryManager && window.LibraryManager.data.sponsors || []).find(s => s.id === sponsorIdOrName || s.name === sponsorIdOrName);
+            if (sp) {
+                title.textContent = `Edit Sponsor: ${sp.name}`;
+                idInput.value = sp.id || sp.name;
+                nameInput.value = sp.name;
+                descInput.value = sp.desc || "";
+                rulesInput.value = (sp.sponsored || []).join('\n');
+                chks.forEach(chk => {
+                    chk.checked = (sp.perks || []).includes(chk.value.toLowerCase());
+                });
+                modal.classList.add("active");
+                return;
+            }
+        }
+
+        title.textContent = "Create New Sponsor / Faction";
+        idInput.value = "";
+        nameInput.value = "";
+        descInput.value = "";
+        rulesInput.value = "";
+        chks.forEach(chk => chk.checked = true);
+        modal.classList.add("active");
+    }
+
+    function closeSponsorModal() {
+        document.getElementById("sponsor-modal").classList.remove("active");
+    }
+
+    function saveSponsorModal() {
+        const id = document.getElementById("sponsor-edit-id").value;
+        const name = document.getElementById("sponsor-edit-name").value.trim();
+        if (!name) {
+            alert("Please enter a name for the sponsor.");
+            return;
+        }
+
+        const desc = document.getElementById("sponsor-edit-desc").value.trim();
+        const rulesText = document.getElementById("sponsor-edit-rules").value;
+        const rules = rulesText.split('\n').map(r => r.trim()).filter(Boolean);
+
+        const chks = document.querySelectorAll(".sponsor-perk-class-chk");
+        const perks = Array.from(chks).filter(c => c.checked).map(c => c.value);
+
+        if (id) {
+            LibraryManager.updateSponsor(id, {
+                name,
+                desc,
+                perks,
+                sponsored: rules
+            });
+        } else {
+            const newSponsor = {
+                id: "sp_custom_" + Date.now(),
+                name,
+                desc,
+                perks,
+                sponsored: rules
+            };
+            LibraryManager.addSponsor(newSponsor);
+        }
+
+        appState.sponsor = name;
+        populateSponsorSelect();
+        renderSponsorInfo();
+        if (appState.mode === "library") renderLibraryTable();
+        saveState();
+        closeSponsorModal();
+        showToast(`Saved sponsor: ${name}`);
+    }
+
+    function getTotalCansSpent() {
+        return appState.vehicles.reduce((total, v) => total + (v.cost || 0), 0);
+    }
+
+    function renderHeader() {
+        document.getElementById("team-name-input").value = appState.teamName || "";
+        const spent = getTotalCansSpent();
+        const display = document.getElementById("cans-spent-display");
+        display.textContent = `${spent} / ${appState.budget}`;
+        if (spent > appState.budget) {
+            display.classList.add("over-budget");
+        } else {
+            display.classList.remove("over-budget");
+        }
+    }
+
+    // ==========================================
+    // Mode Navigation
+    // ==========================================
+    function switchMode(mode) {
+        appState.mode = mode;
+        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".view-section").forEach(v => v.classList.remove("active"));
+
+        const btn = document.getElementById(`${mode}-mode-btn`);
+        const view = document.getElementById(`${mode}-view`);
+        if (btn) btn.classList.add("active");
+        if (view) view.classList.add("active");
+
+        if (mode === "garage" || mode === "play") {
+            renderSponsorInfo();
+            renderVehicles();
+        } else if (mode === "rivals") {
+            renderSponsorInfo();
+            renderRivals();
+        } else if (mode === "library") {
+            renderSponsorInfo();
+            renderLibraryTable();
+        } else if (mode === "prompt") {
+            renderSponsorInfo();
+            generatePromptText();
+        }
+    }
+
+    // ==========================================
+    // Vehicle & Equipment Validation Logic
+    // ==========================================
+    function isVehicleAllowedBySponsor(vehicleType, sponsorName) {
+        if (!sponsorName || sponsorName === "Sponsorless") return { allowed: true };
+        const base = LibraryManager.data.vehicles.find(b => b.name === vehicleType);
+        if (!base) return { allowed: true };
+
+        if (sponsorName === "Rutherford") {
+            if (base.weight === "Lightweight") {
+                return { allowed: false, reason: "Rutherford cannot purchase Lightweight vehicles (Might Is Right)" };
+            }
+        } else {
+            // Military Hardware: Rutherford only
+            if (base.name === "Tank" || base.name === "Helicopter") {
+                return { allowed: false, reason: "Tank and Helicopter are restricted to Rutherford only (Military Hardware)" };
+            }
+        }
+
+        if (sponsorName === "Miyazaki") {
+            if (base.handling <= 2) {
+                return { allowed: false, reason: "Miyazaki cannot purchase vehicles with base Handling 2 or less (Elegance)" };
+            }
+        }
+
+        if (sponsorName === "Idris") {
+            if (base.name === "Gyrocopter") {
+                return { allowed: false, reason: "Idris cannot purchase Gyrocopters (Kiss My Asphalt)" };
+            }
+        }
+
+        return { allowed: true };
+    }
+
+    function checkCanEquipItem(vehicle, item, itemType, mountFacing = "Front") {
+        const vBase = (LibraryManager.data.vehicles.find(t => t.name === vehicle.type) || LibraryManager.data.vehicles[0]);
+        const currentSlots = calculateVehicleSlots(vehicle);
+        const maxSlots = vBase ? (parseInt(vBase.slots, 10) || 0) : 2;
+        const totalSpent = getTotalCansSpent();
+        const sponsorName = appState.sponsor;
+        const sponsorInfo = LibraryManager.data.sponsors.find(s => s.name === sponsorName);
+
+        const lockReasons = [];
+        const isWeapon = itemType === "weapon";
+        const isUpgrade = itemType === "upgrade";
+        const isPerk = itemType === "perk";
+
+        // 1. Calculate Slots
+        let effectiveSlots = parseInt(item.slots, 10) || 0;
+        if (isWeapon) {
+            // Gyrocopter / Helicopter: Bombs Away (dropped weapons take 0 slots)
+            if ((vehicle.type === "Gyrocopter" || vehicle.type === "Helicopter") && item.category === "Dropped") {
+                effectiveSlots = 0;
+            }
+        } else if (isUpgrade) {
+            // Slime: Spiked Fist (Ram takes 0 slots)
+            if (sponsorName === "Slime" && item.name === "Ram") {
+                effectiveSlots = 0;
+            }
+        } else if (isPerk) {
+            effectiveSlots = 0;
+        }
+
+        // 2. Check Build Slots Limit
+        if (!isPerk && (currentSlots + effectiveSlots > maxSlots)) {
+            lockReasons.push(`No slots (${effectiveSlots} needed, ${Math.max(0, maxSlots - currentSlots)} left)`);
+        }
+
+        // 3. Calculate Cost
+        const baseCost = parseInt(item.cost, 10) || 0;
+        let effectiveCost = baseCost;
+        if (isWeapon) {
+            if (mountFacing === "Turret") {
+                effectiveCost = baseCost * 3;
+            }
+        } else if (isUpgrade) {
+            if (sponsorName === "Idris" && item.name === "Nitro Booster") {
+                effectiveCost = 3; // N2O Addict half cost
+            } else if (sponsorName === "Scarlett" && item.name === "Extra Crewmember") {
+                effectiveCost = 2; // Crew Quarters half cost
+            }
+        }
+
+        // 4. Check Point / Can Budget Limit
+        if (totalSpent + effectiveCost > appState.budget) {
+            lockReasons.push(`Over budget (${effectiveCost} pts${mountFacing === 'Turret' && isWeapon ? ' [Turret x3]' : ''}, ${Math.max(0, appState.budget - totalSpent)} left)`);
+        }
+
+        // 5. Check Sponsor & Equipment Restrictions
+        if (isPerk) {
+            // Sponsor perk class restrictions
+            if (sponsorName && sponsorName !== "Sponsorless") {
+                const allowedClasses = (sponsorInfo && sponsorInfo.perks) ? sponsorInfo.perks.map(p => p.toLowerCase()) : [];
+                const itemClass = (item.class || "").toLowerCase();
+                if (itemClass && !allowedClasses.includes(itemClass)) {
+                    lockReasons.push(`Not sponsored: ${sponsorName} does not permit '${item.class}' perks`);
+                }
+            }
+            // Duplicate perk restriction
+            if (vehicle.perks && vehicle.perks.some(p => p.name.toLowerCase() === item.name.toLowerCase())) {
+                lockReasons.push("Already equipped on this vehicle");
+            }
+        } else if (isWeapon) {
+            // Electrical weapon sponsor restriction (Mishkin only)
+            if (item.electrical && sponsorName !== "Mishkin") {
+                lockReasons.push("Not sponsored: Mishkin only (Electrical weapon)");
+            }
+            // BFG front mount restriction
+            if (item.name === "BFG" && mountFacing !== "Front") {
+                lockReasons.push("BFG must be Front mounted");
+            }
+            // Exploding Ram weight restriction
+            if (item.name === "Exploding Ram" && vBase && vBase.weight === "Lightweight") {
+                lockReasons.push("Exploding Ram cannot be equipped on Lightweight vehicles");
+            }
+        } else if (isUpgrade) {
+            // Electrical upgrade sponsor restriction (Mishkin only)
+            if (item.electrical && sponsorName !== "Mishkin") {
+                lockReasons.push("Not sponsored: Mishkin only (Electrical upgrade)");
+            }
+            // Louder Siren sponsor restriction (Highway Patrol only)
+            if (item.name === "Louder Siren" && sponsorName !== "Highway Patrol") {
+                lockReasons.push("Not sponsored: Highway Patrol only");
+            }
+            // Tank tracks restriction
+            if (item.name === "Tank Tracks" && ["Tank", "Helicopter", "Gyrocopter"].includes(vehicle.type)) {
+                lockReasons.push("Cannot be mounted on Tank, Helicopter, or Gyrocopter");
+            }
+            // Extra Crewmember restriction (double base crew)
+            if (item.name === "Extra Crewmember") {
+                const currentCrew = vehicle.crew || (vBase ? vBase.crew : 1);
+                const maxCrew = (vBase ? vBase.crew : 1) * 2;
+                if (currentCrew >= maxCrew) {
+                    lockReasons.push(`Maximum crew limit reached (${maxCrew} crew)`);
+                }
+            }
+        }
+
+        return {
+            allowed: lockReasons.length === 0,
+            lockReasons,
+            effectiveCost,
+            effectiveSlots
+        };
+    }
+
+    function validateRosterForSponsor(newSponsorName) {
+        if (!newSponsorName || newSponsorName === "Sponsorless") return { valid: true, conflicts: [] };
+        const sp = LibraryManager.data.sponsors.find(s => s.name === newSponsorName);
+        const conflicts = [];
+        const allowedClasses = (sp && sp.perks) ? sp.perks.map(p => p.toLowerCase()) : [];
+
+        appState.vehicles.forEach((v, vIdx) => {
+            const vLabel = v.name || `Vehicle #${vIdx + 1}`;
+            // 1. Vehicle chassis check
+            const vCheck = isVehicleAllowedBySponsor(v.type, newSponsorName);
+            if (!vCheck.allowed) {
+                conflicts.push(`${vLabel} (${v.type}): ${vCheck.reason}`);
+            }
+            // 2. Weapons check
+            (v.weapons || []).forEach(w => {
+                if (w.electrical && newSponsorName !== "Mishkin") {
+                    conflicts.push(`${vLabel}: Electrical weapon '${w.name}' is only permitted for Mishkin`);
+                }
+            });
+            // 3. Upgrades check
+            (v.upgrades || []).forEach(u => {
+                if (u.electrical && newSponsorName !== "Mishkin") {
+                    conflicts.push(`${vLabel}: Electrical upgrade '${u.name}' is only permitted for Mishkin`);
+                }
+                if (u.name === "Louder Siren" && newSponsorName !== "Highway Patrol") {
+                    conflicts.push(`${vLabel}: '${u.name}' is exclusive to Highway Patrol`);
+                }
+            });
+            // 4. Perks check
+            (v.perks || []).forEach(p => {
+                const pClass = (p.class || "").toLowerCase();
+                if (pClass && !allowedClasses.includes(pClass)) {
+                    conflicts.push(`${vLabel}: Perk '${p.name}' (${p.class}) not permitted by ${newSponsorName}`);
+                }
+            });
+        });
+
+        return {
+            valid: conflicts.length === 0,
+            conflicts
+        };
+    }
+
+    // ==========================================
+    // Vehicle Builder Logic
+    // ==========================================
+    function calculateVehicleSlots(v) {
+        const weaponSlots = (v.weapons || []).reduce((sum, w) => sum + (parseInt(w.slots, 10) || 0), 0);
+        const upgradeSlots = (v.upgrades || []).reduce((sum, u) => sum + (parseInt(u.slots, 10) || 0), 0);
+        return weaponSlots + upgradeSlots;
+    }
+
+    function recalculateVehicleCost(v) {
+        const vBase = (LibraryManager.data.vehicles.find(t => t.name === v.type) || LibraryManager.data.vehicles[0]);
+        let total = vBase ? (parseInt(vBase.cost, 10) || 0) : 0;
+        (v.weapons || []).forEach(w => {
+            const baseCost = parseInt(w.cost, 10) || 0;
+            const multiplier = (w.facing === "Turret") ? 3 : 1;
+            total += (baseCost * multiplier);
+        });
+        (v.upgrades || []).forEach(u => total += (parseInt(u.cost, 10) || 0));
+        (v.perks || []).forEach(p => total += (parseInt(p.cost, 10) || 0));
+        v.cost = total;
+        return total;
+    }
+
+    function addVehicle(shouldRender = true) {
+        let base = LibraryManager.data.vehicles.find(b => b.name === "Car" && isVehicleAllowedBySponsor(b.name, appState.sponsor).allowed);
+        if (!base) {
+            base = LibraryManager.data.vehicles.find(b => isVehicleAllowedBySponsor(b.name, appState.sponsor).allowed);
+        }
+        if (!base) {
+            base = LibraryManager.data.vehicles[0];
+        }
+        const sponsorCheck = isVehicleAllowedBySponsor(base.name, appState.sponsor);
+        if (!sponsorCheck.allowed) {
+            alert(`Cannot add vehicle: ${sponsorCheck.reason}`);
+            return;
+        }
+
+        const totalSpent = getTotalCansSpent();
+        if (appState.vehicles.length > 0 && totalSpent + base.cost > appState.budget) {
+            alert(`Cannot add vehicle: base cost for ${base.name} (${base.cost} pts) would exceed your Can/Point budget (${totalSpent + base.cost} / ${appState.budget} pts).`);
+            return;
+        }
+        const id = "v_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        const newV = {
+            id: id,
+            name: `${base.name} #${appState.vehicles.length + 1}`,
+            type: base.name,
+            hull: base.hull,
+            handling: base.handling,
+            maxGear: base.maxGear,
+            crew: base.crew,
+            slots: base.slots,
+            cost: base.cost,
+            damage: 0,
+            hazard: 0,
+            gear: 1,
+            onFire: false,
+            wrecked: false,
+            distracted: false,
+            ghostRider: false,
+            ammoStates: {},
+            weapons: [],
+            upgrades: [],
+            perks: []
+        };
+        appState.vehicles.push(newV);
+        if (shouldRender) {
+            saveState();
+            renderHeader();
+            renderVehicles();
+        }
+    }
+
+    function duplicateVehicle(id) {
+        const src = appState.vehicles.find(v => v.id === id);
+        if (!src) return;
+
+        const sponsorCheck = isVehicleAllowedBySponsor(src.type, appState.sponsor);
+        if (!sponsorCheck.allowed) {
+            alert(`Cannot duplicate vehicle: ${sponsorCheck.reason}`);
+            return;
+        }
+
+        const totalSpent = getTotalCansSpent();
+        if (totalSpent + src.cost > appState.budget) {
+            alert(`Cannot duplicate ${src.name}: would exceed your Can/Point budget (${totalSpent + src.cost} / ${appState.budget} pts).`);
+            return;
+        }
+        const copy = JSON.parse(JSON.stringify(src));
+        copy.id = "v_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        copy.name = src.name + " (Copy)";
+        copy.damage = 0;
+        copy.hazard = 0;
+        copy.gear = 1;
+        copy.wrecked = false;
+        copy.onFire = false;
+        copy.distracted = false;
+        copy.ghostRider = false;
+        if (!copy.ammoStates) copy.ammoStates = {};
+        appState.vehicles.push(copy);
+        saveState();
+        renderHeader();
+        renderVehicles();
+    }
+
+    function removeVehicle(id) {
+        if (!confirm("Are you sure you want to delete this vehicle?")) return;
+        appState.vehicles = appState.vehicles.filter(v => v.id !== id);
+        saveState();
+        renderHeader();
+        renderVehicles();
+    }
+
+    function updateVehicleType(id, newType) {
+        const v = appState.vehicles.find(x => x.id === id);
+        if (!v) return;
+        const oldBase = LibraryManager.data.vehicles.find(b => b.name === v.type) || LibraryManager.data.vehicles[0];
+        const newBase = LibraryManager.data.vehicles.find(b => b.name === newType);
+        if (!newBase) return;
+
+        // 1. Sponsor restriction check
+        const sponsorCheck = isVehicleAllowedBySponsor(newType, appState.sponsor);
+        if (!sponsorCheck.allowed) {
+            alert(`Cannot switch chassis to ${newType}: ${sponsorCheck.reason}.`);
+            renderVehicles();
+            return;
+        }
+
+        // 2. Check build slots limit
+        const currentSlots = calculateVehicleSlots(v);
+        if (currentSlots > newBase.slots) {
+            alert(`Cannot switch chassis to ${newType}: this vehicle currently has ${currentSlots} build slots equipped, but a ${newType} only has ${newBase.slots} slots. Remove some weapons/upgrades first.`);
+            renderVehicles();
+            return;
+        }
+
+        // 3. Check budget limit
+        const costDiff = newBase.cost - (oldBase ? oldBase.cost : 0);
+        const totalSpent = getTotalCansSpent();
+        if (totalSpent + costDiff > appState.budget) {
+            alert(`Cannot switch chassis to ${newType}: the cost difference (${costDiff > 0 ? '+' : ''}${costDiff} pts) would exceed your Can/Point budget (${totalSpent + costDiff} / ${appState.budget} pts).`);
+            renderVehicles();
+            return;
+        }
+
+        v.type = newBase.name;
+        v.hull = newBase.hull;
+        v.handling = newBase.handling;
+        v.maxGear = newBase.maxGear;
+        v.crew = newBase.crew;
+        v.slots = newBase.slots;
+        recalculateVehicleCost(v);
+        saveState();
+        renderHeader();
+        renderVehicles();
+    }
+
+    function updateVehicleName(id, newName) {
+        const v = appState.vehicles.find(x => x.id === id);
+        if (v) {
+            v.name = newName.trim() || v.type;
+            saveState();
+        }
+    }
+
+    // ==========================================
+    // WebGL Shaders (Fire & Glitch)
+    // ==========================================
+    const FIRE_SHADER_VS = `
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
+
+    const FIRE_SHADER_FS = `
+        precision highp float;
+        uniform vec2 u_resolution;
+        uniform float u_time;
+
+        float rand(vec2 n) {
+            return fract(sin(cos(dot(n, vec2(12.9898,12.1414)))) * 83758.5453);
+        }
+
+        float noise(vec2 n) {
+            const vec2 d = vec2(0.0, 1.0);
+            vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+            return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
+        }
+
+        float fbm(vec2 n) {
+            float total = 0.0, amplitude = 1.0;
+            for (int i = 0; i < 5; i++) {
+                total += noise(n) * amplitude;
+                n += n * 1.7;
+                amplitude *= 0.47;
+            }
+            return total;
+        }
+
+        void main() {
+            float iTime = u_time;
+            vec2 iResolution = u_resolution;
+            vec2 fragCoord = gl_FragCoord.xy;
+            
+            const vec3 c1 = vec3(0.5, 0.0, 0.1);
+            const vec3 c2 = vec3(0.9, 0.1, 0.0);
+            const vec3 c3 = vec3(0.2, 0.1, 0.7);
+            const vec3 c4 = vec3(1.0, 0.9, 0.1);
+            const vec3 c5 = vec3(0.1);
+            const vec3 c6 = vec3(0.9);
+
+            vec2 speed = vec2(0.1, 0.9);
+            float shift = 1.327 + sin(iTime * 2.0) / 2.4;
+            float dist = 3.5 - sin(iTime * 0.4) / 1.89;
+            
+            vec2 uv = fragCoord.xy / iResolution.xy;
+            vec2 p = fragCoord.xy * dist / iResolution.xx;
+            p += sin(p.yx * 4.0 + vec2(0.2, -0.3) * iTime) * 0.04;
+            p += sin(p.yx * 8.0 + vec2(0.6, 0.1) * iTime) * 0.01;
+            
+            p.x -= iTime / 1.1;
+            float q = fbm(p - iTime * 0.3 + 1.0 * sin(iTime + 0.5) / 2.0);
+            float qb = fbm(p - iTime * 0.4 + 0.1 * cos(iTime) / 2.0);
+            float q2 = fbm(p - iTime * 0.44 - 5.0 * cos(iTime) / 2.0) - 6.0;
+            float q3 = fbm(p - iTime * 0.9 - 10.0 * cos(iTime) / 15.0) - 4.0;
+            float q4 = fbm(p - iTime * 1.4 - 20.0 * sin(iTime) / 14.0) + 2.0;
+            q = (q + qb - 0.4 * q2 - 2.0 * q3 + 0.6 * q4) / 3.8;
+            vec2 r = vec2(fbm(p + q / 2.0 + iTime * speed.x - p.x - p.y), fbm(p + q - iTime * speed.y));
+            vec3 c = mix(c1, c2, fbm(p + r)) + mix(c3, c4, r.x) - mix(c5, c6, r.y);
+            vec3 color = vec3(1.0 / (pow(c + 1.61, vec3(4.0))) * cos(shift * fragCoord.y / iResolution.y));
+            
+            color = vec3(1.0, 0.2, 0.05) / (pow((r.y + r.y) * max(0.0, p.y) + 0.1, 4.0));
+            
+            vec3 texColor = vec3(noise(uv * 15.0));
+            color += (texColor * 0.01 * pow((r.y + r.y) * 0.65, 5.0) + 0.055) * mix(vec3(0.9, 0.4, 0.3), vec3(0.7, 0.5, 0.2), uv.y);
+            color = color / (1.0 + max(vec3(0.0), color));
+            
+            float luma = dot(color, vec3(0.299, 0.587, 0.114));
+            float fade = smoothstep(1.0, 0.3, uv.y);
+            float alpha = min(1.0, luma * 2.0 * fade);
+            
+            gl_FragColor = vec4(color * alpha, alpha);
+        }
+    `;
+
+    function startFireShader(canvas, id) {
+        if (!canvas || canvas.dataset.active) return;
+        const canvasId = canvas.id || (id ? `fire-canvas-${id}` : "");
+        const gl = canvas.getContext("webgl");
+        if (!gl) return;
+
+        function createShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(s));
+                gl.deleteShader(s);
+                return null;
+            }
+            return s;
+        }
+
+        const vs = createShader(gl, gl.VERTEX_SHADER, FIRE_SHADER_VS);
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, FIRE_SHADER_FS);
+        if (!vs || !fs) return;
+
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(prog));
+            return;
+        }
+
+        gl.useProgram(prog);
+
+        const posAttr = gl.getAttribLocation(prog, "position");
+        const resUniform = gl.getUniformLocation(prog, "u_resolution");
+        const timeUniform = gl.getUniformLocation(prog, "u_time");
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+            -1,  1,
+             1, -1,
+             1,  1,
+        ]), gl.STATIC_DRAW);
+
+        gl.enableVertexAttribArray(posAttr);
+        gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        const startTime = Date.now();
+
+        function render() {
+            const currentCanvas = canvasId ? document.getElementById(canvasId) : null;
+            if (!currentCanvas || currentCanvas.dataset.active !== "true") {
+                gl.deleteProgram(prog);
+                gl.deleteShader(vs);
+                gl.deleteShader(fs);
+                gl.deleteBuffer(buf);
+                return;
+            }
+
+            const dpr = window.devicePixelRatio || 1;
+            const r = currentCanvas.getBoundingClientRect();
+            const targetW = Math.floor(r.width * dpr);
+            const targetH = Math.floor(r.height * dpr);
+            if (currentCanvas.width !== targetW || currentCanvas.height !== targetH) {
+                currentCanvas.width = targetW;
+                currentCanvas.height = targetH;
+                gl.viewport(0, 0, currentCanvas.width, currentCanvas.height);
+            }
+
+            const time = (Date.now() - startTime) / 1000.0;
+            gl.uniform2f(resUniform, currentCanvas.width, currentCanvas.height);
+            gl.uniform1f(timeUniform, time);
+
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            requestAnimationFrame(render);
+        }
+
+        canvas.dataset.active = "true";
+        requestAnimationFrame(render);
+    }
+
+    const GLITCH_SHADER_VS = `
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
+
+    const GLITCH_SHADER_FS = `
+        precision mediump float;
+        uniform vec2 u_resolution;
+        uniform float u_time;
+
+        float rand(vec2 p) {
+            float t = floor(u_time * 20.0) / 10.0;
+            return fract(sin(dot(p, vec2(t * 12.9898, t * 78.233))) * 43758.5453);
+        }
+
+        float noise(vec2 uv, float blockiness) {   
+            vec2 lv = fract(uv);
+            vec2 id = floor(uv);
+            
+            float n1 = rand(id);
+            float n2 = rand(id + vec2(1.0, 0.0));
+            float n3 = rand(id + vec2(0.0, 1.0));
+            float n4 = rand(id + vec2(1.0, 1.0));
+            
+            vec2 u = smoothstep(0.0, 1.0 + blockiness, lv);
+            return mix(mix(n1, n2, u.x), mix(n3, n4, u.x), u.y);
+        }
+
+        float fbm(vec2 uv, float blockiness, float complexity) {
+            float val = 0.0;
+            float amp = 0.5;
+            for (int i = 0; i < 6; i++) {
+                val += amp * noise(uv, blockiness);
+                amp *= 0.5;
+                uv *= complexity;
+            }
+            return val;
+        }
+
+        const float glitchAmplitude = 0.2;
+        const float glitchNarrowness = 4.0;
+        const float glitchBlockiness = 2.0;
+        const float glitchMinimizer = 5.0;
+
+        void main() {
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            vec2 a = vec2(uv.x * (u_resolution.x / u_resolution.y), uv.y);
+            vec2 uv2 = vec2(a.x / u_resolution.x, exp(a.y));
+            vec2 id = floor(uv * 8.0);
+
+            float shift = glitchAmplitude * pow(fbm(uv2, glitchBlockiness, glitchNarrowness), glitchMinimizer);
+            float scanline = abs(cos(uv.y * 400.0));
+            scanline = smoothstep(0.0, 2.0, scanline);
+            shift = smoothstep(0.00001, 0.2, shift);
+            
+            vec3 glitchColor = vec3(0.0);
+            float alpha = 0.0;
+            
+            if (shift > 0.05) {
+                float r = rand(id + vec2(u_time * 0.1, 0.0));
+                if (r < 0.33) {
+                    glitchColor = vec3(0.9, 0.05, 0.05);
+                } else if (r < 0.66) {
+                    glitchColor = vec3(0.05, 0.85, 0.85);
+                } else {
+                    glitchColor = vec3(0.95, 0.85, 0.05);
+                }
+                alpha = 0.35;
+            }
+            
+            glitchColor -= vec3(0.12 * scanline);
+            alpha = max(alpha, 0.15 * scanline);
+            
+            gl_FragColor = vec4(glitchColor * alpha, alpha);
+        }
+    `;
+
+    function startGlitchShader(canvas, id) {
+        if (!canvas || canvas.dataset.active) return;
+        const canvasId = canvas.id || (id ? `glitch-canvas-${id}` : "");
+        const gl = canvas.getContext("webgl");
+        if (!gl) return;
+
+        function createShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(s));
+                gl.deleteShader(s);
+                return null;
+            }
+            return s;
+        }
+
+        const vs = createShader(gl, gl.VERTEX_SHADER, GLITCH_SHADER_VS);
+        const fs = createShader(gl, gl.FRAGMENT_SHADER, GLITCH_SHADER_FS);
+        if (!vs || !fs) return;
+
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(prog));
+            return;
+        }
+
+        gl.useProgram(prog);
+
+        const posAttr = gl.getAttribLocation(prog, "position");
+        const resUniform = gl.getUniformLocation(prog, "u_resolution");
+        const timeUniform = gl.getUniformLocation(prog, "u_time");
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+            -1,  1,
+             1, -1,
+             1,  1,
+        ]), gl.STATIC_DRAW);
+
+        gl.enableVertexAttribArray(posAttr);
+        gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        const startTime = Date.now();
+
+        function render() {
+            const currentCanvas = canvasId ? document.getElementById(canvasId) : null;
+            if (!currentCanvas || currentCanvas.dataset.active !== "true") {
+                gl.deleteProgram(prog);
+                gl.deleteShader(vs);
+                gl.deleteShader(fs);
+                gl.deleteBuffer(buf);
+                return;
+            }
+
+            const dpr = window.devicePixelRatio || 1;
+            const r = currentCanvas.getBoundingClientRect();
+            const targetW = Math.floor(r.width * dpr);
+            const targetH = Math.floor(r.height * dpr);
+            if (currentCanvas.width !== targetW || currentCanvas.height !== targetH) {
+                currentCanvas.width = targetW;
+                currentCanvas.height = targetH;
+                gl.viewport(0, 0, currentCanvas.width, currentCanvas.height);
+            }
+
+            const time = (Date.now() - startTime) / 1000.0;
+            gl.uniform2f(resUniform, currentCanvas.width, currentCanvas.height);
+            gl.uniform1f(timeUniform, time);
+
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            requestAnimationFrame(render);
+        }
+
+        canvas.dataset.active = "true";
+        requestAnimationFrame(render);
+    }
+
+    // ==========================================
+    // Render Vehicles (Garage & Play)
+    // ==========================================
+    async function renderVehicles() {
+        const garageContainer = document.getElementById("garage-vehicles-container");
+        const playContainer = document.getElementById("play-vehicles-container");
+        if (!garageContainer || !playContainer) return;
+
+        garageContainer.innerHTML = "";
+        playContainer.innerHTML = "";
+
+        for (const v of appState.vehicles) {
+            recalculateVehicleCost(v);
+            const vBase = (LibraryManager.data.vehicles.find(t => t.name === v.type) || LibraryManager.data.vehicles[0]);
+            const currentSlots = calculateVehicleSlots(v);
+            const maxSlots = vBase ? vBase.slots : 2;
+
+            // 1. Garage Card
+            const card = document.createElement("div");
+            card.className = "vehicle-card";
+            card.id = `garage-card-${v.id}`;
+
+            const photoData = await getVehicleImage(v.id);
+
+            card.innerHTML = `
+                <div class="vehicle-card-header">
+                    <div class="vehicle-title-area">
+                        <input type="text" class="vehicle-name-input" value="${escapeHtml(v.name)}" onchange="updateVehicleName('${v.id}', this.value)">
+                        <select class="vehicle-type-select" onchange="updateVehicleType('${v.id}', this.value)">
+                            ${LibraryManager.data.vehicles.map(b => {
+                                const vCheck = isVehicleAllowedBySponsor(b.name, appState.sponsor);
+                                const costDiff = b.cost - (vBase ? vBase.cost : 0);
+                                const totalSpent = getTotalCansSpent();
+                                const overBudget = (totalSpent + costDiff > appState.budget) && b.name !== v.type;
+                                const overSlots = (currentSlots > b.slots) && b.name !== v.type;
+                                const disabled = (!vCheck.allowed || overBudget || overSlots) && b.name !== v.type;
+                                let note = "";
+                                if (!vCheck.allowed) note = ` [🔒 ${vCheck.reason}]`;
+                                else if (overSlots) note = ` [🔒 Needs ${currentSlots} slots, has ${b.slots}]`;
+                                else if (overBudget) note = ` [🔒 Over budget]`;
+                                return `<option value="${b.name}" ${b.name === v.type ? 'selected' : ''} ${disabled ? 'disabled style="color:rgba(255,255,255,0.3);"' : ''}>${b.name} (${b.cost} pts)${note}</option>`;
+                            }).join('')}
+                        </select>
+                        <div style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:0.5rem; align-items:center; margin-top:3px; flex-wrap:wrap;">
+                            <span>Chassis: ${escapeHtml(v.type)}</span>
+                            <span style="color:var(--accent-cyan); font-weight:700; background:rgba(56, 189, 248, 0.12); padding:1px 6px; border-radius:4px; border:1px solid rgba(56, 189, 248, 0.25);">HANDLING: ${v.handling}</span>
+                            <span style="color:var(--glow-color); font-weight:700; background:rgba(245, 158, 11, 0.12); padding:1px 6px; border-radius:4px; border:1px solid rgba(245, 158, 11, 0.25);">CREW: ${v.crew}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span style="font-family:'Orbitron',sans-serif; font-weight:800; color:var(--glow-color); font-size:1.05rem;">${v.cost} pts</span>
+                        <button class="btn btn-sm" onclick="duplicateVehicle('${v.id}')" title="Duplicate Vehicle">⧉</button>
+                        <button class="remove-btn" onclick="removeVehicle('${v.id}')" title="Delete Vehicle">✕</button>
+                    </div>
+                </div>
+
+                ${photoData ? `<div style="width:100%; height:130px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); margin-bottom:0.4rem; position:relative;"><img src="${photoData}" style="width:100%; height:100%; object-fit:cover;"><button onclick="clearVehiclePhoto('${v.id}')" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); border:none; color:#fff; border-radius:4px; padding:2px 6px; cursor:pointer;">✕</button></div>` : `
+                    <div style="border:1px dashed rgba(255,255,255,0.15); border-radius:8px; padding:0.5rem; text-align:center; font-size:0.75rem; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('img-upload-${v.id}').click()">
+                        📷 Click to Upload Vehicle Photo
+                        <input type="file" id="img-upload-${v.id}" accept="image/*" style="display:none;" onchange="handleVehiclePhotoUpload('${v.id}', event)">
+                    </div>
+                `}
+
+                <div class="vehicle-stats-row">
+                    <div class="stat-box"><span class="stat-label">Hull</span><span class="stat-value">${v.hull}</span></div>
+                    <div class="stat-box"><span class="stat-label">Handling</span><span class="stat-value">${v.handling}</span></div>
+                    <div class="stat-box"><span class="stat-label">Max Gear</span><span class="stat-value">${v.maxGear}</span></div>
+                    <div class="stat-box"><span class="stat-label">Crew</span><span class="stat-value">${v.crew}</span></div>
+                </div>
+
+                <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+                    <span>Build Slots: <strong style="color:${currentSlots > maxSlots ? 'var(--danger-red)' : 'var(--text-primary)'}">${currentSlots} / ${maxSlots}</strong></span>
+                </div>
+
+                <!-- Weapons -->
+                <div class="equipment-section">
+                    <div class="equipment-header">
+                        <span>Weapons (${(v.weapons || []).length})</span>
+                        <button class="btn btn-sm" onclick="openSelectionModal('${v.id}', 'weapon')">+ Weapon</button>
+                    </div>
+                    <div class="item-badge-list">
+                        ${(v.weapons || []).map((w, idx) => `
+                            <div class="equipped-item-row">
+                                <div class="item-info">
+                                    <span class="item-name">${escapeHtml(w.name)} <small style="color:${w.facing === 'Turret' ? 'var(--glow-color)' : 'var(--accent-cyan)'}; font-weight:700;">[${w.facing || 'Front'}${w.facing === 'Turret' ? ' • x3 Cans' : ''}]</small></span>
+                                    <span class="item-sub">${w.range} • ${w.dice || 'No dice'} • ${w.slots} slots • <strong style="color:${w.facing === 'Turret' ? 'var(--glow-color)' : 'var(--text-primary)'};">${w.facing === 'Turret' ? (w.cost * 3) : w.cost} pts</strong>${w.facing === 'Turret' ? ` <small style="color:var(--text-muted);">(base: ${w.cost})</small>` : ''}</span>
+                                    ${w.special ? `<span style="font-size:0.7rem; color:var(--text-muted);">${escapeHtml(w.special)}</span>` : ''}
+                                </div>
+                                <div class="item-actions">
+                                    <select onchange="updateWeaponFacing('${v.id}', ${idx}, this.value)" style="font-size:0.72rem; padding:2px 4px; border-radius:4px; background:rgba(0,0,0,0.4); border:1px solid var(--card-border); color:var(--text-primary);">
+                                        <option value="Front" ${w.facing==='Front'?'selected':''}>Front</option>
+                                        <option value="Back" ${w.facing==='Back' || w.facing==='Rear'?'selected':''}>Back</option>
+                                        <option value="Left side" ${w.facing==='Left side' || w.facing==='Left'?'selected':''}>Left side</option>
+                                        <option value="Right side" ${w.facing==='Right side' || w.facing==='Right'?'selected':''}>Right side</option>
+                                        <option value="Turret" ${w.facing==='Turret'?'selected':''}>Turret (x3)</option>
+                                    </select>
+                                    <button class="remove-btn" onclick="removeItem('${v.id}', 'weapon', ${idx})" title="Remove Weapon">✕</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Upgrades -->
+                <div class="equipment-section">
+                    <div class="equipment-header">
+                        <span>Upgrades (${(v.upgrades || []).length})</span>
+                        <button class="btn btn-sm" onclick="openSelectionModal('${v.id}', 'upgrade')">+ Upgrade</button>
+                    </div>
+                    <div class="item-badge-list">
+                        ${(v.upgrades || []).map((u, idx) => `
+                            <div class="equipped-item-row">
+                                <div class="item-info">
+                                    <span class="item-name">${escapeHtml(u.name)}</span>
+                                    <span class="item-sub">${u.slots} slots • ${u.cost} pts</span>
+                                    ${u.special ? `<span style="font-size:0.7rem; color:var(--text-muted);">${escapeHtml(u.special)}</span>` : ''}
+                                </div>
+                                <div class="item-actions">
+                                    <button class="remove-btn" onclick="removeItem('${v.id}', 'upgrade', ${idx})">✕</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Perks -->
+                <div class="equipment-section">
+                    <div class="equipment-header">
+                        <span>Perks (${(v.perks || []).length})</span>
+                        <button class="btn btn-sm" onclick="openSelectionModal('${v.id}', 'perk')">+ Perk</button>
+                    </div>
+                    <div class="item-badge-list">
+                        ${(v.perks || []).map((p, idx) => `
+                            <div class="equipped-item-row">
+                                <div class="item-info">
+                                    <span class="item-name">${escapeHtml(p.name)}</span>
+                                    <span class="item-sub">${p.cost} pts</span>
+                                    ${p.desc ? `<span style="font-size:0.7rem; color:var(--text-muted);">${escapeHtml(p.desc)}</span>` : ''}
+                                </div>
+                                <div class="item-actions">
+                                    <button class="remove-btn" onclick="removeItem('${v.id}', 'perk', ${idx})">✕</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            garageContainer.appendChild(card);
+
+            // 2. Play Mode Dashboard Card (Full parity with original layout & effects)
+            let hullBoxesHtml = "";
+            for (let i = 1; i <= v.hull; i++) {
+                const isDamaged = i <= (v.damage || 0);
+                hullBoxesHtml += `<div class="hull-point-box ${isDamaged ? 'damaged' : 'filled'}" onclick="toggleHullDamage('${v.id}', ${i})" title="Hull point ${i}"></div>`;
+            }
+
+            let hazardLimit = 6;
+            const sp = LibraryManager.data.sponsors.find(s => s.name === appState.sponsor);
+            if (sp && sp.name && sp.name.toLowerCase().includes("bootlegger")) {
+                hazardLimit = 8;
+            }
+            let hazardDotsHtml = "";
+            for (let i = 1; i <= hazardLimit; i++) {
+                let dotClass = "";
+                if (i <= (v.hazard || 0)) {
+                    dotClass = "active";
+                    if ((v.hazard || 0) >= hazardLimit) dotClass = "active warning";
+                }
+                hazardDotsHtml += `<div class="hazard-dot ${dotClass}" onclick="toggleHazard('${v.id}', ${i})" title="Hazard token ${i}"></div>`;
+            }
+            const isWipeout = (v.hazard || 0) >= hazardLimit;
+
+            let gearButtonsHtml = "";
+            for (let i = 1; i <= 6; i++) {
+                const disabled = i > v.maxGear ? "disabled" : "";
+                const active = i === v.gear ? "class='gear-btn active'" : "class='gear-btn'";
+                gearButtonsHtml += `<button ${active} ${disabled} onclick="setGear('${v.id}', ${i})">${i}</button>`;
+            }
+
+            let playWeaponsHtml = "";
+            (v.weapons || []).forEach((w, index) => {
+                let ammoHtml = "";
+                if (w.ammo !== undefined && w.ammo !== null && w.ammo > 0) {
+                    if (!v.ammoStates) v.ammoStates = {};
+                    const ammoKey = `w_${index}`;
+                    if (v.ammoStates[ammoKey] === undefined) v.ammoStates[ammoKey] = 0;
+                    const spent = v.ammoStates[ammoKey];
+                    ammoHtml += `<div class="ammo-spent-tracker" title="Spent Ammo Tracker">`;
+                    for (let a = 1; a <= w.ammo; a++) {
+                        const checked = a <= spent ? "checked" : "";
+                        ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${v.id}', '${ammoKey}', ${a}, this.checked)" title="Ammo token ${a}">`;
+                    }
+                    ammoHtml += `</div>`;
+                }
+
+                const facingDisplay = w.slots === 0 ? "360°" : (w.facing || "Front");
+                const isTurret = w.facing === "Turret";
+                playWeaponsHtml += `
+                    <div class="ref-item">
+                        <div class="ref-item-header">
+                            <span><strong>${escapeHtml(w.name)}</strong> <span style="font-size:0.75rem; color:${isTurret ? 'var(--glow-color)' : 'var(--text-muted)'}; font-weight:${isTurret ? '700' : 'normal'};">(${facingDisplay}${isTurret ? ' • Turret' : ''})</span></span>
+                            <span style="display:flex; align-items:center; gap:0.5rem;">
+                                ${ammoHtml}
+                                ${w.dice ? `<button class="btn btn-sm btn-primary" onclick="rollWeaponDice('${escapeHtml(w.dice)}', '${escapeHtml(w.name)}')" title="Roll Attack Dice">🎲 ${escapeHtml(w.dice)}</button>` : ''}
+                            </span>
+                        </div>
+                        <div class="ref-item-desc">${w.range} range ${w.dice ? `• ${w.dice} attack ` : ''}• ${escapeHtml(w.special || 'No special rules.')}</div>
+                    </div>
+                `;
+            });
+
+            let playRefsHtml = "";
+            if (vBase && vBase.special) {
+                playRefsHtml += `
+                    <div class="ref-item">
+                        <div class="ref-item-header"><strong>${escapeHtml(v.type)} Chassis Rule</strong></div>
+                        <div class="ref-item-desc">${escapeHtml(vBase.special)}</div>
+                    </div>
+                `;
+            }
+
+            (v.upgrades || []).forEach((u, index) => {
+                let ammoHtml = "";
+                if (u.ammo !== undefined && u.ammo !== null && u.ammo > 0) {
+                    if (!v.ammoStates) v.ammoStates = {};
+                    const ammoKey = `u_${index}`;
+                    if (v.ammoStates[ammoKey] === undefined) v.ammoStates[ammoKey] = 0;
+                    const spent = v.ammoStates[ammoKey];
+                    ammoHtml += `<div class="ammo-spent-tracker" title="Spent Ammo Tracker">`;
+                    for (let a = 1; a <= u.ammo; a++) {
+                        const checked = a <= spent ? "checked" : "";
+                        ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${v.id}', '${ammoKey}', ${a}, this.checked)" title="Ammo token ${a}">`;
+                    }
+                    ammoHtml += `</div>`;
+                }
+                const facingDisplay = u.facing ? ` (${u.facing})` : '';
+                playRefsHtml += `
+                    <div class="ref-item">
+                        <div class="ref-item-header">
+                            <span><strong>${escapeHtml(u.name)}${facingDisplay}</strong></span>
+                            <span>${ammoHtml}</span>
+                        </div>
+                        <div class="ref-item-desc">${escapeHtml(u.special || 'No rules listed.')}</div>
+                    </div>
+                `;
+            });
+
+            (v.perks || []).forEach(p => {
+                playRefsHtml += `
+                    <div class="ref-item">
+                        <div class="ref-item-header"><strong>${escapeHtml(p.name)}</strong> <span style="font-size:0.75rem; color:var(--glow-color);">${escapeHtml(p.class || 'Perk')}</span></div>
+                        <div class="ref-item-desc">${escapeHtml(p.desc || 'No rules listed.')}</div>
+                    </div>
+                `;
+            });
+
+            if (sp && sp.rules && sp.rules.length > 0) {
+                sp.rules.forEach(rule => {
+                    playRefsHtml += `
+                        <div class="ref-item">
+                            <div class="ref-item-header"><strong>${escapeHtml(rule.name || 'Sponsor Rule')}</strong> <span style="font-size:0.75rem; color:var(--accent-cyan);">Sponsored</span></div>
+                            <div class="ref-item-desc">${escapeHtml(rule.desc || '')}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            let playImageHtml = `
+                <div style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--card-border); background: rgba(0,0,0,0.15); z-index: 2;">
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">NO IMAGE</span>
+                </div>`;
+            if (photoData) {
+                playImageHtml = `
+                    <div style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); z-index: 2;">
+                        <img src="${photoData}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                `;
+            }
+
+            let gearWarningHtml = "";
+            if ((appState.phase || 1) > (v.gear || 1)) {
+                gearWarningHtml = `
+                    <div class="gear-phase-warning">
+                        ⚠️ OUT OF GEAR RANGE FOR CURRENT PHASE
+                    </div>
+                `;
+            }
+
+            const playCard = document.createElement("div");
+            playCard.id = `play-card-${v.id}`;
+            let cardClasses = ["vehicle-card", "play-dashboard-card"];
+            if (v.wrecked) cardClasses.push("wrecked");
+            if (v.onFire) cardClasses.push("on-fire-card");
+            if (v.distracted) cardClasses.push("distracted-card");
+            if (v.ghostRider) cardClasses.push("ghost-card");
+            playCard.className = cardClasses.join(" ");
+
+            playCard.innerHTML = `
+                <!-- WebGL Glitch overlay covering card when distracted -->
+                ${v.distracted ? `
+                <canvas id="glitch-canvas-${v.id}" class="glitch-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; z-index: 100;"></canvas>
+                ` : ''}
+
+                <!-- Left Column: Info, Crew, Handling, Hull, Hazards, Gearbox -->
+                <div class="play-dashboard-left">
+                    <div class="card-header" style="border-bottom: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: 100%;">
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex: 1; min-width: 120px;">
+                            <div class="vehicle-name-block">
+                                <span style="font-family:'Orbitron', sans-serif; font-size: 1.15rem; font-weight:800; letter-spacing:0.5px; color:var(--text-primary);">${escapeHtml(v.name)}</span>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                                    <span>${escapeHtml(v.type)}</span>
+                                    <span style="color: var(--accent-cyan); font-weight: 700; background: rgba(56, 189, 248, 0.15); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">HANDLING: ${v.handling}</span>
+                                    <span style="color: var(--glow-color); font-weight: 700; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.3);">CREW: ${v.crew}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${playImageHtml}
+                    </div>
+
+                    ${gearWarningHtml}
+
+                    <!-- Status Toggles -->
+                    <div class="status-bar">
+                        <div class="status-chip on-fire ${v.onFire ? 'active' : ''}" onclick="toggleStatus('${v.id}', 'onFire')">🔥 On Fire</div>
+                        <div class="status-chip ghost-rider ${v.ghostRider ? 'active' : ''}" onclick="toggleStatus('${v.id}', 'ghostRider')">👻 Ghost</div>
+                        <div class="status-chip distracted ${v.distracted ? 'active' : ''}" onclick="toggleStatus('${v.id}', 'distracted')">⚠️ Distracted</div>
+                        <div class="status-chip wrecked-chip ${v.wrecked ? 'active' : ''}" onclick="toggleStatus('${v.id}', 'wrecked')">💥 Wrecked</div>
+                    </div>
+
+                    <!-- Damage Bar (Hull) -->
+                    <div class="hull-tracker">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight:bold;">
+                            <span>HULL INTEGRITY</span>
+                            <span style="color: ${(v.damage || 0) >= v.hull ? 'var(--danger-red)' : 'var(--accent-cyan)'};">${Math.max(0, v.hull - (v.damage || 0))} / ${v.hull} HP</span>
+                        </div>
+                        <div class="hull-points-grid">${hullBoxesHtml}</div>
+                    </div>
+
+                    <!-- Hazard Tracker -->
+                    <div class="hazard-tracker">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; font-weight:bold;">HAZARD TOKENS</span>
+                            <div style="display:flex; align-items:center; gap:0.4rem;">
+                                <button style="background: transparent; border:none; color: var(--text-muted); cursor:pointer; font-size:0.8rem;" onclick="toggleHazard('${v.id}', 0)">[Clear]</button>
+                                <span style="font-family:'Orbitron', sans-serif; font-size:0.9rem; font-weight:bold; color: var(--glow-color);">${v.hazard || 0} / ${hazardLimit}</span>
+                            </div>
+                        </div>
+                        <div class="hazard-dots-row">
+                            <div class="hazard-dots">${hazardDotsHtml}</div>
+                            ${isWipeout ? `<div class="wipeout-alert">WIPEOUT!</div>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Active Gearbox -->
+                    <div class="gearbox">
+                        <span style="font-size: 0.75rem; font-weight:bold;">ACTIVE GEAR SHIFT</span>
+                        <div class="gear-selector">${gearButtonsHtml}</div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Weapons, Upgrades & Perks -->
+                <div class="play-dashboard-right">
+                    <div>
+                        <div class="play-section-title">Weapons & Ammo</div>
+                        <div class="play-list-container">
+                            ${playWeaponsHtml || '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No weapons fitted.</div>'}
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <div class="play-section-title">Upgrades & Perks</div>
+                        <div class="play-list-container play-list-2col">
+                            ${playRefsHtml || '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No upgrades or perks equipped.</div>'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WebGL Fire overlay when on fire -->
+                ${v.onFire ? `
+                <canvas id="fire-canvas-${v.id}" class="fire-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; z-index: 10; opacity: 0.30;"></canvas>
+                ` : ''}
+            `;
+            playContainer.appendChild(playCard);
+        }
+
+        // Initialize WebGL fire canvases for active on-fire cards
+        playContainer.querySelectorAll(".fire-canvas").forEach(canvas => {
+            const id = canvas.id.replace("fire-canvas-", "");
+            startFireShader(canvas, id);
+        });
+
+        // Initialize WebGL glitch canvases for active distracted cards
+        playContainer.querySelectorAll(".glitch-canvas").forEach(canvas => {
+            const id = canvas.id.replace("glitch-canvas-", "");
+            startGlitchShader(canvas, id);
+        });
+    }
+
+    // Play Mode Operations
+    function toggleHullDamage(id, index) {
+        const v = appState.vehicles.find(car => car.id === id);
+        if (!v) return;
+        if (index <= (v.damage || 0)) {
+            v.damage = index - 1;
+        } else {
+            v.damage = index;
+        }
+        if (v.damage >= v.hull) {
+            v.wrecked = true;
+        } else if (v.damage < v.hull && v.wrecked) {
+            v.wrecked = false;
+        }
+        saveState();
+        renderVehicles();
+    }
+
+    function toggleHazard(id, val) {
+        const v = appState.vehicles.find(car => car.id === id);
+        if (!v) return;
+        if (val === 0) {
+            v.hazard = 0;
+        } else if (val <= (v.hazard || 0)) {
+            v.hazard = val - 1;
+        } else {
+            v.hazard = val;
+        }
+        saveState();
+        renderVehicles();
+    }
+
+    function setGear(id, gearVal) {
+        const v = appState.vehicles.find(car => car.id === id);
+        if (!v) return;
+        v.gear = gearVal;
+        saveState();
+        renderVehicles();
+    }
+
+    function toggleStatus(id, prop) {
+        const v = appState.vehicles.find(car => car.id === id);
+        if (!v) return;
+        v[prop] = !v[prop];
+        saveState();
+        renderVehicles();
+    }
+
+    function toggleWeaponAmmo(vehicleId, ammoKey, bulletIndex, isChecked) {
+        const v = appState.vehicles.find(car => car.id === vehicleId);
+        if (!v) return;
+        if (!v.ammoStates) v.ammoStates = {};
+        if (isChecked) {
+            v.ammoStates[ammoKey] = Math.max(v.ammoStates[ammoKey] || 0, bulletIndex);
+        } else {
+            v.ammoStates[ammoKey] = Math.min(v.ammoStates[ammoKey] || 0, bulletIndex - 1);
+        }
+        saveState();
+    }
+
+    function rollWeaponDice(diceStr, weaponName) {
+        let count = 2;
+        let type = "d6";
+        if (diceStr) {
+            const match = diceStr.match(/(\d+)\s*d/i);
+            if (match) count = parseInt(match[1], 10) || 2;
+            if (/skid/i.test(diceStr)) type = "skid";
+        }
+        throwDice(count, type, `${weaponName} Attack`);
+    }
+
+    function adjustTurn(val) {
+        appState.turn = Math.max(1, (appState.turn || 1) + val);
+        const turnVal = document.getElementById("turn-display-val");
+        if (turnVal) turnVal.textContent = appState.turn;
+        const playTurn = document.getElementById("play-turn-display");
+        if (playTurn) playTurn.textContent = appState.turn;
+        saveState();
+    }
+
+    function setPhase(val) {
+        appState.phase = val;
+        for (let p = 1; p <= 6; p++) {
+            const btn = document.getElementById(`phase-btn-${p}`);
+            if (btn) {
+                if (p === val) btn.classList.add("active");
+                else btn.classList.remove("active");
+            }
+        }
+        const playPhase = document.getElementById("play-phase-display");
+        if (playPhase) playPhase.textContent = val;
+        renderVehicles();
+        saveState();
+    }
+
+    function adjustAudienceVotes(val) {
+        appState.votes = Math.max(0, (appState.votes || 0) + val);
+        const votesVal = document.getElementById("votes-display-val");
+        if (votesVal) votesVal.textContent = appState.votes;
+        const playVotes = document.getElementById("play-votes-display");
+        if (playVotes) playVotes.textContent = appState.votes;
+        saveState();
+    }
+
+    function confirmResetGame() {
+        if (confirm("Reset game state back to Turn 1, Phase 1 for all vehicles?")) {
+            executeGameReset(true);
+        }
+    }
+
+    function executeGameReset(broadcast = true) {
+        appState.turn = 1;
+        appState.phase = 1;
+        appState.votes = 0;
+        const turnVal = document.getElementById("turn-display-val");
+        if (turnVal) turnVal.textContent = "1";
+        const playTurn = document.getElementById("play-turn-display");
+        if (playTurn) playTurn.textContent = "1";
+
+        const votesVal = document.getElementById("votes-display-val");
+        if (votesVal) votesVal.textContent = "0";
+        const playVotes = document.getElementById("play-votes-display");
+        if (playVotes) playVotes.textContent = "0";
+
+        setPhase(1);
+
+        appState.vehicles.forEach(v => {
+            v.damage = 0;
+            v.hazard = 0;
+            v.gear = 1;
+            v.onFire = false;
+            v.wrecked = false;
+            v.distracted = false;
+            v.ghostRider = false;
+            v.ammoStates = {};
+        });
+
+        saveState();
+        renderVehicles();
+        if (broadcast && window.AblySyncManager) {
+            window.AblySyncManager.broadcastResetGame();
+        }
+        showToast("🔄 Table game state reset.");
+    }
+
+    // ==========================================
+    // Rivals View Rendering
+    // ==========================================
+    function renderRivals() {
+        const container = document.getElementById("rivals-container");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const rivals = (window.AblySyncManager && window.AblySyncManager.rivals) || {};
+        const playerIds = Object.keys(rivals);
+
+        if (playerIds.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:3rem; background:rgba(0,0,0,0.3); border-radius:12px; border:1px solid var(--card-border);">
+                    <div style="font-family:'Orbitron',sans-serif; font-size:1.1rem; color:var(--text-muted); margin-bottom:0.5rem;">No Opponents Detected at Table</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); max-width:500px; margin:0 auto 1.2rem auto;">
+                        Click <strong>Table Settings</strong> to enter your free Ably API Key and share your Room Code with friends. Opponents on other devices will appear here automatically in real time!
+                    </p>
+                    <button class="btn btn-primary" onclick="openNetworkModal()">Configure Table Room</button>
+                </div>
+            `;
+            return;
+        }
+
+        playerIds.forEach(pId => {
+            const rival = rivals[pId];
+            (rival.vehicles || []).forEach(v => {
+                const currentHull = Math.max(0, v.hull - (v.damage || 0));
+                const card = document.createElement("div");
+                card.className = "play-card";
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size:0.72rem; color:var(--accent-cyan); text-transform:uppercase; font-weight:700;">${escapeHtml(rival.teamName || 'Opponent')}</span>
+                            <h3 style="font-family:'Orbitron',sans-serif; font-size:1.1rem; color:var(--glow-color);">${escapeHtml(v.name)}</h3>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${v.type} • Gear ${v.gear} • ⚠️ ${v.hazard || 0} Hazards</div>
+                        </div>
+                        <div style="display:flex; gap:0.3rem;">
+                            ${v.onFire ? '<span style="color:var(--danger-red); font-weight:bold;">🔥 FIRE</span>' : ''}
+                            ${v.wrecked ? '<span style="color:var(--danger-red); font-weight:bold;">💥 WRECKED</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="hull-bar-container">
+                        <div class="hull-bar-fill" style="width:${Math.round((currentHull / v.hull) * 100)}%;"></div>
+                        <div class="hull-bar-text">${currentHull} / ${v.hull} HP</div>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">
+                        Weapons: ${(v.weapons || []).map(w => `${w.name} (${w.dice || '-'})`).join(', ') || 'None'}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    // ==========================================
+    // Selection Modal & Inline Custom Creator
+    // ==========================================
+    let activeModalWeaponMount = "Front";
+
+    function setModalWeaponMount(mount) {
+        activeModalWeaponMount = mount;
+        document.querySelectorAll("#modal-mount-buttons .mount-btn").forEach(btn => {
+            if (btn.getAttribute("data-mount") === mount) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+        filterSelectionModalItems();
+    }
+
+    function openSelectionModal(vehicleId, itemType) {
+        activeModalTargetVehicleId = vehicleId;
+        activeModalItemType = itemType;
+        activeModalWeaponMount = "Front";
+
+        const title = document.getElementById("selection-modal-title");
+        title.textContent = `Add ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`;
+        document.getElementById("selection-modal-search").value = "";
+
+        const mountBar = document.getElementById("weapon-mount-selection-bar");
+        if (mountBar) {
+            mountBar.style.display = itemType === "weapon" ? "block" : "none";
+        }
+        setModalWeaponMount("Front");
+
+        toggleInlineCustomForm(false);
+        document.getElementById("selection-modal").classList.add("active");
+        filterSelectionModalItems();
+    }
+
+    function closeSelectionModal() {
+        document.getElementById("selection-modal").classList.remove("active");
+        activeModalTargetVehicleId = null;
+        activeModalItemType = null;
+    }
+
+    function toggleInlineCustomForm(show) {
+        const form = document.getElementById("inline-custom-item-container");
+        if (form) form.style.display = show ? "flex" : "none";
+    }
+
+    function openInlineCustomItemForm() {
+        toggleInlineCustomForm(true);
+        document.getElementById("inline-item-name").value = "";
+        document.getElementById("inline-item-range").value = "Medium";
+        document.getElementById("inline-item-dice").value = "2D6";
+        document.getElementById("inline-item-ammo").value = "";
+        document.getElementById("inline-item-slots").value = (activeModalItemType === "perk") ? "0" : "1";
+        document.getElementById("inline-item-cost").value = "2";
+        document.getElementById("inline-item-notes").value = "";
+
+        const isWeapon = activeModalItemType === "weapon";
+        const isPerk = activeModalItemType === "perk";
+
+        document.getElementById("inline-item-range").style.display = isWeapon ? "block" : "none";
+        document.getElementById("inline-item-dice").style.display = isWeapon ? "block" : "none";
+        document.getElementById("inline-item-ammo").style.display = isWeapon ? "block" : "none";
+        document.getElementById("inline-item-slots").style.display = isPerk ? "none" : "block";
+
+        const mountGroup = document.getElementById("inline-weapon-mount-group");
+        if (mountGroup) {
+            mountGroup.style.display = isWeapon ? "flex" : "none";
+            const facingElem = document.getElementById("inline-item-facing");
+            if (facingElem) facingElem.value = activeModalWeaponMount || "Front";
+        }
+
+        const perkClassGroup = document.getElementById("inline-perk-class-group");
+        if (perkClassGroup) {
+            perkClassGroup.style.display = isPerk ? "flex" : "none";
+        }
+    }
+
+    function saveAndEquipCustomItem() {
+        const name = document.getElementById("inline-item-name").value.trim();
+        if (!name) {
+            alert("Please enter a name for the item.");
+            return;
+        }
+
+        const v = appState.vehicles.find(x => x.id === activeModalTargetVehicleId);
+        if (!v) return;
+
+        const slots = (activeModalItemType === "perk") ? 0 : (parseInt(document.getElementById("inline-item-slots").value, 10) || 0);
+        const cost = parseInt(document.getElementById("inline-item-cost").value, 10) || 0;
+        const notes = document.getElementById("inline-item-notes").value.trim();
+
+        let facing = "Front";
+        if (activeModalItemType === "weapon") {
+            const facingElem = document.getElementById("inline-item-facing");
+            if (facingElem) facing = facingElem.value || "Front";
+        }
+
+        let customItem = null;
+        if (activeModalItemType === "weapon") {
+            const range = document.getElementById("inline-item-range").value.trim() || "Medium";
+            const dice = document.getElementById("inline-item-dice").value.trim();
+            const ammoVal = parseInt(document.getElementById("inline-item-ammo").value, 10);
+            customItem = {
+                id: "w_custom_" + Date.now(),
+                name,
+                range,
+                dice,
+                slots,
+                cost,
+                ammo: ammoVal || null,
+                special: notes,
+                category: "Custom"
+            };
+        } else if (activeModalItemType === "upgrade") {
+            customItem = {
+                id: "u_custom_" + Date.now(),
+                name,
+                slots,
+                cost,
+                special: notes
+            };
+        } else if (activeModalItemType === "perk") {
+            const classElem = document.getElementById("inline-item-class");
+            const perkClass = (classElem ? classElem.value : "aggression").toLowerCase();
+            customItem = {
+                id: "p_custom_" + Date.now(),
+                name,
+                cost,
+                class: perkClass,
+                desc: notes
+            };
+        }
+
+        // Validate using centralized rules check
+        const check = checkCanEquipItem(v, customItem, activeModalItemType, facing);
+        if (!check.allowed) {
+            alert(`Cannot equip custom ${activeModalItemType} (${name}):\n\n• ${check.lockReasons.join("\n• ")}`);
+            return;
+        }
+
+        if (activeModalItemType === "weapon") {
+            LibraryManager.addWeapon(customItem);
+            if (!v.weapons) v.weapons = [];
+            v.weapons.push({ ...customItem, facing: facing });
+        } else if (activeModalItemType === "upgrade") {
+            LibraryManager.addUpgrade(customItem);
+            if (!v.upgrades) v.upgrades = [];
+            v.upgrades.push(customItem);
+        } else if (activeModalItemType === "perk") {
+            LibraryManager.addPerk(customItem);
+            if (!v.perks) v.perks = [];
+            v.perks.push(customItem);
+        }
+
+        recalculateVehicleCost(v);
+        saveState();
+        renderHeader();
+        renderVehicles();
+        closeSelectionModal();
+        showToast(`Equipped custom ${activeModalItemType}: ${name} (${facing})`);
+    }
+
+    function filterSelectionModalItems() {
+        const query = (document.getElementById("selection-modal-search").value || "").toLowerCase();
+        const list = document.getElementById("selection-modal-items-list");
+        list.innerHTML = "";
+
+        const v = appState.vehicles.find(x => x.id === activeModalTargetVehicleId);
+        if (!v) return;
+
+        let items = [];
+        if (activeModalItemType === "weapon") items = LibraryManager.data.weapons;
+        else if (activeModalItemType === "upgrade") items = LibraryManager.data.upgrades;
+        else if (activeModalItemType === "perk") items = LibraryManager.data.perks;
+
+        const isWeapon = activeModalItemType === "weapon";
+        const isTurret = isWeapon && activeModalWeaponMount === "Turret";
+
+        items.filter(item => {
+            const name = (item.name || "").toLowerCase();
+            const desc = (item.special || item.desc || "").toLowerCase();
+            const cat = (item.category || item.class || "").toLowerCase();
+            return name.includes(query) || desc.includes(query) || cat.includes(query);
+        }).forEach(item => {
+            const check = checkCanEquipItem(v, item, activeModalItemType, activeModalWeaponMount);
+            const isLocked = !check.allowed;
+            const lockReasons = check.lockReasons;
+            const effectiveCost = check.effectiveCost;
+            const effectiveSlots = check.effectiveSlots;
+
+            const row = document.createElement("div");
+            row.className = "equipped-item-row selection-item" + (isLocked ? " locked-item" : "");
+            row.style.cursor = isLocked ? "not-allowed" : "pointer";
+
+            const costDisplay = isWeapon
+                ? `<strong style="color:${isTurret ? 'var(--glow-color)' : 'var(--text-primary)'};">${effectiveCost} pts</strong> <span style="font-size:0.75rem; color:${isTurret ? 'var(--glow-color)' : 'var(--accent-cyan)'}; font-weight:700;">[${activeModalWeaponMount}${isTurret ? ' • x3 Cans' : ''}]</span>`
+                : `${effectiveCost} pts`;
+
+            const lockBadge = isLocked
+                ? ` <span style="font-size:0.75rem; color:var(--danger-red); font-weight:700; background:rgba(239, 68, 68, 0.15); padding:1px 6px; border-radius:4px; border:1px solid rgba(239, 68, 68, 0.35);">🔒 ${lockReasons.join(" • ")}</span>`
+                : '';
+
+            row.innerHTML = `
+                <div class="item-info">
+                    <span class="item-name">${escapeHtml(item.name)}${lockBadge}</span>
+                    <span class="item-sub">
+                        ${item.range ? `${item.range} • ` : ''}
+                        ${item.dice ? `${item.dice} • ` : ''}
+                        ${effectiveSlots !== undefined && activeModalItemType !== 'perk' ? `${effectiveSlots} slots • ` : ''}
+                        ${item.class ? `<span style="text-transform:uppercase; color:var(--accent-cyan); font-weight:bold;">${item.class}</span> • ` : ''}
+                        ${costDisplay}
+                    </span>
+                    ${item.special || item.desc ? `<span style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(item.special || item.desc)}</span>` : ''}
+                </div>
+                <button class="btn btn-sm ${isLocked ? 'btn-danger' : 'btn-primary'}" ${isLocked ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>${isLocked ? 'Locked' : 'Add'}</button>
+            `;
+
+            if (isLocked) {
+                row.onclick = (e) => {
+                    e.stopPropagation();
+                    alert(`Cannot equip ${item.name}:\n\n• ${lockReasons.join("\n• ")}`);
+                };
+            } else {
+                row.onclick = () => {
+                    // Re-validate right before equipping
+                    const finalCheck = checkCanEquipItem(v, item, activeModalItemType, activeModalWeaponMount);
+                    if (!finalCheck.allowed) {
+                        alert(`Cannot equip ${item.name}:\n\n• ${finalCheck.lockReasons.join("\n• ")}`);
+                        filterSelectionModalItems();
+                        return;
+                    }
+
+                    if (activeModalItemType === "weapon") {
+                        if (!v.weapons) v.weapons = [];
+                        v.weapons.push({ ...item, facing: activeModalWeaponMount });
+                    } else if (activeModalItemType === "upgrade") {
+                        if (!v.upgrades) v.upgrades = [];
+                        v.upgrades.push({ ...item });
+                    } else if (activeModalItemType === "perk") {
+                        if (!v.perks) v.perks = [];
+                        v.perks.push({ ...item });
+                    }
+                    recalculateVehicleCost(v);
+                    saveState();
+                    renderHeader();
+                    renderVehicles();
+                    closeSelectionModal();
+                    showToast(`Equipped ${item.name}`);
+                };
+            }
+            list.appendChild(row);
+        });
+    }
+
+    function removeItem(vehicleId, itemType, index) {
+        const v = appState.vehicles.find(x => x.id === vehicleId);
+        if (!v) return;
+        if (itemType === "weapon") v.weapons.splice(index, 1);
+        else if (itemType === "upgrade") v.upgrades.splice(index, 1);
+        else if (itemType === "perk") v.perks.splice(index, 1);
+        recalculateVehicleCost(v);
+        saveState();
+        renderHeader();
+        renderVehicles();
+    }
+
+    function updateWeaponFacing(vehicleId, index, newFacing) {
+        const v = appState.vehicles.find(x => x.id === vehicleId);
+        if (!v || !v.weapons || !v.weapons[index]) return;
+        const w = v.weapons[index];
+        const oldFacing = w.facing;
+
+        // BFG front mount restriction
+        if (w.name === "BFG" && newFacing !== "Front") {
+            alert("Cannot mount BFG in " + newFacing + ": BFG must be Front mounted.");
+            renderVehicles();
+            return;
+        }
+
+        // If switching to Turret from a non-turret mount, it triples cost (+ w.cost * 2)
+        if (newFacing === "Turret" && oldFacing !== "Turret") {
+            const costDiff = (parseInt(w.cost, 10) || 0) * 2;
+            const totalSpent = getTotalCansSpent();
+            if (totalSpent + costDiff > appState.budget) {
+                alert(`Cannot mount ${w.name} in Turret: triples cost to ${w.cost * 3} Cans, which would exceed your Can budget (${totalSpent + costDiff} / ${appState.budget} Cans).`);
+                renderVehicles();
+                return;
+            }
+        }
+
+        w.facing = newFacing;
+        recalculateVehicleCost(v);
+        saveState();
+        renderHeader();
+        renderVehicles();
+    }
+
+    // ==========================================
+    // Library & Custom Rules Manager View
+    // ==========================================
+    function switchLibTab(tab) {
+        currentLibSubTab = tab;
+        document.querySelectorAll(".lib-tab-btn").forEach(b => b.classList.remove("active"));
+        const btn = document.getElementById(`lib-tab-${tab}`);
+        if (btn) btn.classList.add("active");
+        renderLibraryTable();
+    }
+
+    function renderLibraryTable() {
+        const container = document.getElementById("lib-table-container");
+        if (!container) return;
+        const query = (document.getElementById("lib-search-input").value || "").toLowerCase();
+
+        let html = "";
+        if (currentLibSubTab === "weapons") {
+            const filtered = LibraryManager.data.weapons.filter(w => (w.name + " " + (w.special||'')).toLowerCase().includes(query));
+            html = `
+                <table class="lib-table">
+                    <thead><tr><th>Name</th><th>Range</th><th>Dice</th><th>Slots</th><th>Cost</th><th>Ammo</th><th>Notes</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${filtered.map(w => `
+                            <tr>
+                                <td><strong>${escapeHtml(w.name)}</strong></td>
+                                <td>${w.range}</td>
+                                <td>${w.dice || '-'}</td>
+                                <td>${w.slots}</td>
+                                <td>${w.cost} pts</td>
+                                <td>${w.ammo || '-'}</td>
+                                <td style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(w.special || '-')}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="LibraryManager.removeWeapon('${w.id}'); renderLibraryTable();">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else if (currentLibSubTab === "upgrades") {
+            const filtered = LibraryManager.data.upgrades.filter(u => (u.name + " " + (u.special||'')).toLowerCase().includes(query));
+            html = `
+                <table class="lib-table">
+                    <thead><tr><th>Name</th><th>Slots</th><th>Cost</th><th>Notes</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${filtered.map(u => `
+                            <tr>
+                                <td><strong>${escapeHtml(u.name)}</strong></td>
+                                <td>${u.slots}</td>
+                                <td>${u.cost} pts</td>
+                                <td style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(u.special || '-')}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="LibraryManager.removeUpgrade('${u.id}'); renderLibraryTable();">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else if (currentLibSubTab === "perks") {
+            const filtered = LibraryManager.data.perks.filter(p => (p.name + " " + (p.desc||'')).toLowerCase().includes(query));
+            html = `
+                <table class="lib-table">
+                    <thead><tr><th>Name</th><th>Class</th><th>Cost</th><th>Description</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${filtered.map(p => `
+                            <tr>
+                                <td><strong>${escapeHtml(p.name)}</strong></td>
+                                <td>${p.class || '-'}</td>
+                                <td>${p.cost} pts</td>
+                                <td style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(p.desc || '-')}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="LibraryManager.removePerk('${p.id}'); renderLibraryTable();">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else if (currentLibSubTab === "vehicles") {
+            const filtered = LibraryManager.data.vehicles.filter(v => (v.name + " " + (v.special||'')).toLowerCase().includes(query));
+            html = `
+                <table class="lib-table">
+                    <thead><tr><th>Chassis Name</th><th>Weight</th><th>Hull</th><th>Handling</th><th>Gear</th><th>Crew</th><th>Slots</th><th>Cost</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${filtered.map(v => `
+                            <tr>
+                                <td><strong>${escapeHtml(v.name)}</strong></td>
+                                <td>${v.weight || '-'}</td>
+                                <td>${v.hull}</td>
+                                <td>${v.handling}</td>
+                                <td>${v.maxGear}</td>
+                                <td>${v.crew}</td>
+                                <td>${v.slots}</td>
+                                <td>${v.cost} pts</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="LibraryManager.removeVehicleType('${v.id}'); renderLibraryTable();">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else if (currentLibSubTab === "sponsors") {
+            const filtered = LibraryManager.data.sponsors.filter(s => (s.name + " " + (s.desc||'') + " " + (s.sponsored||[]).join(' ')).toLowerCase().includes(query));
+            html = `
+                <table class="lib-table">
+                    <thead><tr><th>Faction / Sponsor</th><th>Description</th><th>Allowed Perks</th><th>Special Rules & Perks</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${filtered.map(s => `
+                            <tr>
+                                <td><strong style="color:var(--glow-color);">${escapeHtml(s.name)}</strong></td>
+                                <td style="font-size:0.78rem; color:var(--text-muted);">${escapeHtml(s.desc || '-')}</td>
+                                <td style="font-size:0.75rem;">${(s.perks || []).map(p => `<span style="background:rgba(255,255,255,0.08); padding:1px 4px; border-radius:3px; margin-right:2px;">${p}</span>`).join('') || 'All'}</td>
+                                <td style="font-size:0.78rem;">
+                                    ${(s.sponsored || []).length > 0 ? (s.sponsored || []).map(r => `<div>⚡ ${escapeHtml(r)}</div>`).join('') : '<span style="color:var(--text-muted); font-style:italic;">None</span>'}
+                                </td>
+                                <td style="white-space:nowrap;">
+                                    <button class="btn btn-sm" onclick="openSponsorModal('${s.id}')" title="Edit Sponsor & Perks">✏️ Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="LibraryManager.removeSponsor('${s.id}'); populateSponsorSelect(); renderSponsorInfo(); renderLibraryTable();" title="Delete Sponsor">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    function openCreateItemModal() {
+        const body = document.getElementById("custom-item-modal-body");
+        const title = document.getElementById("custom-item-modal-title");
+        title.textContent = `Create New ${currentLibSubTab.slice(0, -1).toUpperCase()}`;
+
+        if (currentLibSubTab === "weapons") {
+            body.innerHTML = `
+                <div class="input-group"><label>Weapon Name</label><input type="text" id="m-name" placeholder="e.g. Heavy Gauss Rifle"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                    <div class="input-group"><label>Range</label><input type="text" id="m-range" value="Medium"></div>
+                    <div class="input-group"><label>Attack Dice</label><input type="text" id="m-dice" value="3D6"></div>
+                    <div class="input-group"><label>Build Slots</label><input type="number" id="m-slots" value="1"></div>
+                    <div class="input-group"><label>Points Cost</label><input type="number" id="m-cost" value="3"></div>
+                    <div class="input-group"><label>Ammo (Optional)</label><input type="number" id="m-ammo" placeholder="Unlimited"></div>
+                    <div class="input-group"><label>Category</label><input type="text" id="m-cat" value="Custom"></div>
+                </div>
+                <div class="input-group"><label>Special Rules / Tooltip</label><textarea id="m-special" placeholder="Description and rules benefits..."></textarea></div>
+            `;
+        } else if (currentLibSubTab === "upgrades") {
+            body.innerHTML = `
+                <div class="input-group"><label>Upgrade Name</label><input type="text" id="m-name" placeholder="e.g. Reinforced Bumper"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                    <div class="input-group"><label>Build Slots</label><input type="number" id="m-slots" value="1"></div>
+                    <div class="input-group"><label>Points Cost</label><input type="number" id="m-cost" value="3"></div>
+                </div>
+                <div class="input-group"><label>Special Rules / Tooltip</label><textarea id="m-special" placeholder="Description and mechanical benefits..."></textarea></div>
+            `;
+        } else if (currentLibSubTab === "perks") {
+            body.innerHTML = `
+                <div class="input-group"><label>Perk Name</label><input type="text" id="m-name" placeholder="e.g. Sharpshooter"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                    <div class="input-group"><label>Class / Category</label><input type="text" id="m-class" value="General"></div>
+                    <div class="input-group"><label>Points Cost</label><input type="number" id="m-cost" value="2"></div>
+                </div>
+                <div class="input-group"><label>Description / Rules</label><textarea id="m-special" placeholder="Perk effects and rules text..."></textarea></div>
+            `;
+        } else if (currentLibSubTab === "vehicles") {
+            body.innerHTML = `
+                <div class="input-group"><label>Chassis Name</label><input type="text" id="m-name" placeholder="e.g. Hovercraft"></div>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.6rem;">
+                    <div class="input-group"><label>Weight</label><input type="text" id="m-weight" value="Middleweight"></div>
+                    <div class="input-group"><label>Hull Points</label><input type="number" id="m-hull" value="10"></div>
+                    <div class="input-group"><label>Handling</label><input type="number" id="m-handling" value="3"></div>
+                    <div class="input-group"><label>Max Gear</label><input type="number" id="m-gear" value="5"></div>
+                    <div class="input-group"><label>Crew</label><input type="number" id="m-crew" value="2"></div>
+                    <div class="input-group"><label>Build Slots</label><input type="number" id="m-slots" value="2"></div>
+                    <div class="input-group"><label>Base Cost</label><input type="number" id="m-cost" value="12"></div>
+                </div>
+                <div class="input-group"><label>Special Rules</label><textarea id="m-special" placeholder="Chassis special abilities..."></textarea></div>
+            `;
+        } else if (currentLibSubTab === "sponsors") {
+            openSponsorModal();
+            return;
+        }
+
+        document.getElementById("custom-item-modal").classList.add("active");
+    }
+
+    function closeCustomItemModal() {
+        document.getElementById("custom-item-modal").classList.remove("active");
+    }
+
+    function saveCustomLibraryItem() {
+        const name = (document.getElementById("m-name").value || "").trim();
+        if (!name) {
+            alert("Name is required.");
+            return;
+        }
+
+        if (currentLibSubTab === "weapons") {
+            LibraryManager.addWeapon({
+                name,
+                range: document.getElementById("m-range").value,
+                dice: document.getElementById("m-dice").value,
+                slots: parseInt(document.getElementById("m-slots").value, 10) || 0,
+                cost: parseInt(document.getElementById("m-cost").value, 10) || 0,
+                ammo: parseInt(document.getElementById("m-ammo").value, 10) || null,
+                special: document.getElementById("m-special").value,
+                category: document.getElementById("m-cat").value
+            });
+        } else if (currentLibSubTab === "upgrades") {
+            LibraryManager.addUpgrade({
+                name,
+                slots: parseInt(document.getElementById("m-slots").value, 10) || 0,
+                cost: parseInt(document.getElementById("m-cost").value, 10) || 0,
+                special: document.getElementById("m-special").value
+            });
+        } else if (currentLibSubTab === "perks") {
+            LibraryManager.addPerk({
+                name,
+                class: document.getElementById("m-class").value,
+                cost: parseInt(document.getElementById("m-cost").value, 10) || 0,
+                desc: document.getElementById("m-special").value
+            });
+        } else if (currentLibSubTab === "vehicles") {
+            LibraryManager.addVehicleType({
+                name,
+                weight: document.getElementById("m-weight").value,
+                hull: parseInt(document.getElementById("m-hull").value, 10) || 10,
+                handling: parseInt(document.getElementById("m-handling").value, 10) || 3,
+                maxGear: parseInt(document.getElementById("m-gear").value, 10) || 5,
+                crew: parseInt(document.getElementById("m-crew").value, 10) || 2,
+                slots: parseInt(document.getElementById("m-slots").value, 10) || 2,
+                cost: parseInt(document.getElementById("m-cost").value, 10) || 10,
+                special: document.getElementById("m-special").value
+            });
+        } else if (currentLibSubTab === "sponsors") {
+            LibraryManager.addSponsor({
+                name,
+                desc: document.getElementById("m-special").value,
+                perks: []
+            });
+            populateSponsorSelect();
+        }
+
+        closeCustomItemModal();
+        renderLibraryTable();
+        showToast(`Created ${name} in library`);
+    }
+
+    function confirmResetLibrary() {
+        if (confirm("Reset the library back to clean defaults? All custom weapons and equipment will be restored.")) {
+            LibraryManager.resetToDefaults();
+            populateSponsorSelect();
+            renderLibraryTable();
+            showToast("Library restored to defaults");
+        }
+    }
+
+    function triggerImportLibrary() {
+        document.getElementById("lib-import-input").click();
+    }
+
+    function handleLibraryImportFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const res = LibraryManager.importJSON(event.target.result);
+            if (res.success) {
+                populateSponsorSelect();
+                renderLibraryTable();
+                showToast("Library successfully imported!");
+            } else {
+                alert("Failed to import library: " + res.error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // ==========================================
+    // Roster Export & Import
+    // ==========================================
+    function exportRosterJSON() {
+        const data = {
+            gameName: appState.gameName,
+            teamName: appState.teamName,
+            sponsor: appState.sponsor,
+            budget: appState.budget,
+            vehicles: appState.vehicles
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${(appState.teamName || 'roster').replace(/\s+/g, '_')}_roster.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function triggerImportRoster() {
+        document.getElementById("roster-import-input").click();
+    }
+
+    function handleRosterImportFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const parsed = JSON.parse(event.target.result);
+                if (parsed.vehicles && Array.isArray(parsed.vehicles)) {
+                    appState.vehicles = parsed.vehicles;
+                    if (parsed.teamName) appState.teamName = parsed.teamName;
+                    if (parsed.gameName) appState.gameName = parsed.gameName;
+                    if (parsed.sponsor) appState.sponsor = parsed.sponsor;
+                    if (parsed.budget) appState.budget = parsed.budget;
+                    applyGameNameUI();
+                    renderHeader();
+                    renderVehicles();
+                    saveState();
+                    showToast("Roster imported successfully!");
+                } else {
+                    alert("Invalid roster format");
+                }
+            } catch (err) {
+                alert("Could not parse file: " + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function confirmResetRoster() {
+        if (confirm("Reset the vehicle roster? All vehicles will be removed.")) {
+            appState.vehicles = [];
+            addVehicle(false);
+            saveState();
+            renderHeader();
+            renderVehicles();
+        }
+    }
+
+    // ==========================================
+    // Vehicle Photo Handlers
+    // ==========================================
+    async function handleVehiclePhotoUpload(vehicleId, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const dataUrl = e.target.result;
+            await saveVehicleImage(vehicleId, dataUrl);
+            renderVehicles();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function clearVehiclePhoto(vehicleId) {
+        await saveVehicleImage(vehicleId, null);
+        renderVehicles();
+    }
+
+    // ==========================================
+    // AI Prompt View Generator
+    // ==========================================
+    function generatePromptText() {
+        const total = getTotalCansSpent();
+        let txt = `=== ${appState.gameName.toUpperCase()} ROSTER: ${appState.teamName || 'UNNAMED TEAM'} ===\n`;
+        txt += `Faction / Sponsor: ${appState.sponsor}\n`;
+        txt += `Total Points: ${total} / ${appState.budget} pts\n`;
+        txt += `Active Turn: ${appState.turn} | Gear Phase: ${appState.phase} | Table Points: ${appState.votes}\n\n`;
+
+        appState.vehicles.forEach((v, idx) => {
+            txt += `--- VEHICLE #${idx + 1}: ${v.name} (${v.type}) ---\n`;
+            txt += `Stats: Hull ${v.hull - (v.damage || 0)}/${v.hull} HP | Handling ${v.handling} | Max Gear ${v.maxGear} | Crew ${v.crew} | Cost ${v.cost} pts\n`;
+            if (v.weapons && v.weapons.length > 0) {
+                txt += `Weapons:\n`;
+                v.weapons.forEach(w => {
+                    txt += `  * ${w.name} [Facing: ${w.facing || 'Front'}, Range: ${w.range}, Dice: ${w.dice || 'None'}] - ${w.special || ''}\n`;
+                });
+            }
+            if (v.upgrades && v.upgrades.length > 0) {
+                txt += `Upgrades:\n`;
+                v.upgrades.forEach(u => {
+                    txt += `  * ${u.name} - ${u.special || ''}\n`;
+                });
+            }
+            if (v.perks && v.perks.length > 0) {
+                txt += `Perks:\n`;
+                v.perks.forEach(p => {
+                    txt += `  * ${p.name} - ${p.desc || ''}\n`;
+                });
+            }
+            txt += `\n`;
+        });
+
+        txt += `=== INSTRUCTION ===\n`;
+        txt += `You are an AI Tabletop Referee and Narrative Announcer for ${appState.gameName}. Analyze this roster and describe tactical options, narrative combat events, and rule rulings as the action unfolds!`;
+
+        document.getElementById("prompt-output-text").value = txt;
+    }
+
+    function copyPromptText() {
+        const el = document.getElementById("prompt-output-text");
+        el.select();
+        navigator.clipboard.writeText(el.value).then(() => {
+            showToast("📋 Roster prompt copied to clipboard!");
+        });
+    }
+
+    // ==========================================
+    // Table Network Modal & Ably Configuration
+    // ==========================================
+    function openNetworkModal() {
+        document.getElementById("net-ably-key-input").value = (window.AblySyncManager && window.AblySyncManager.apiKey) || "";
+        document.getElementById("net-room-input").value = (window.AblySyncManager && window.AblySyncManager.roomCode) || "";
+        document.getElementById("net-pin-input").value = (window.AblySyncManager && window.AblySyncManager.pin) || "";
+        updateTableRosterUI();
+        document.getElementById("network-modal").classList.add("active");
+    }
+
+    function closeNetworkModal() {
+        document.getElementById("network-modal").classList.remove("active");
+    }
+
+    function generateRandomRoomCode() {
+        const words = ["ALPHA", "TURBO", "VIPER", "TITAN", "APEX", "DELTA", "OMEGA", "RAZOR"];
+        const num = Math.floor(10 + Math.random() * 90);
+        const code = words[Math.floor(Math.random() * words.length)] + "-" + num;
+        document.getElementById("net-room-input").value = code;
+    }
+
+    function applyNetworkSettings() {
+        const key = document.getElementById("net-ably-key-input").value.trim();
+        const room = document.getElementById("net-room-input").value.trim();
+        const pin = document.getElementById("net-pin-input").value.trim();
+
+        if (window.AblySyncManager) {
+            window.AblySyncManager.setApiKey(key);
+            window.AblySyncManager.setRoom(room, pin);
+        }
+        closeNetworkModal();
+        showToast(`Table connection updated for room: ${room}`);
+    }
+
+    function disconnectNetwork() {
+        if (window.AblySyncManager) {
+            window.AblySyncManager.disconnect();
+            window.AblySyncManager.updateUI("offline", "Table: Offline", 0);
+        }
+        closeNetworkModal();
+        showToast("Disconnected from table.");
+    }
+
+    function syncVehiclesToTable() {
+        if (window.AblySyncManager) {
+            window.AblySyncManager.syncVehicles();
+            showToast("Vehicles re-synchronized to table");
+        }
+    }
+
+    function copyShareableTableLink() {
+        const room = document.getElementById("net-room-input").value.trim();
+        if (!room) {
+            alert("Please enter a room code first.");
+            return;
+        }
+        const url = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(room)}`;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast("🔗 Shareable room link copied to clipboard!");
+        });
+    }
+
+    function updateTableRosterUI() {
+        const el = document.getElementById("net-table-roster");
+        if (!el) return;
+        const roster = (window.AblySyncManager && window.AblySyncManager.tableRoster) || {};
+        const names = Object.values(roster);
+        if (names.length === 0) {
+            el.textContent = "No remote players connected yet.";
+        } else {
+            el.innerHTML = `<strong>Connected Players (${names.length}):</strong><br>${names.map(n => `• ${escapeHtml(n)}`).join('<br>')}`;
+        }
+    }
+
+    // ==========================================
+    // 3D Physics Dice Roller (Three.js + Cannon.js)
+    // ==========================================
+    let dice3dScene = null;
+    let dice3dCamera = null;
+    let dice3dRenderer = null;
+    let dice3dPhysics = null;
+    let dice3dObjects = [];
+    let dice3dReady = false;
+    let dice3dCanvas = null;
+
+    const RANDOM_ORG_URL = "https://api.random.org/json-rpc/4/invoke";
+    const RANDOM_ORG_KEY = "gm_randomorg_apikey";
+
+    function setRandomOrgApiKey() {
+        const curr = localStorage.getItem(RANDOM_ORG_KEY) || "";
+        const key = prompt("Enter your free Random.org API Key for True Random Number Generation (TRNG):\n(Leave empty to use browser PRNG)", curr);
+        if (key !== null) {
+            localStorage.setItem(RANDOM_ORG_KEY, key.trim());
+            alert(key.trim() ? "Random.org API Key saved! Rolls will now use atmospheric TRNG." : "Using local cryptographic PRNG.");
+        }
+    }
+
+    function toggleDiceLog() {
+        const log = document.getElementById("dice-log");
+        if (log.style.display === "none") {
+            log.style.display = "flex";
+            const content = document.getElementById("dice-log-content");
+            content.scrollTop = content.scrollHeight;
+        } else {
+            log.style.display = "none";
+        }
+    }
+
+    function addDiceHistory(entryText) {
+        rollHistory.push(entryText);
+        if (rollHistory.length > 40) rollHistory.shift();
+        const content = document.getElementById("dice-log-content");
+        if (content) {
+            content.innerHTML = rollHistory.map(r => `<div>> ${r}</div>`).join('') + `<div>><span style="animation:pulse 1s infinite">_</span></div>`;
+            content.scrollTop = content.scrollHeight;
+        }
+    }
+
+    function addDiceHistoryRemote(data) {
+        const resultStr = `${data.rollerName}: rolled ${data.diceCount} ${data.diceType.toUpperCase()} = [${data.results.join(', ')}] (Total: ${data.total})`;
+        addDiceHistory(resultStr);
+        showToast(`🎲 ${data.rollerName} rolled: [${data.results.join(', ')}]`);
+    }
+
+    function rollWeaponDice(diceStr, weaponName) {
+        const match = diceStr.match(/(\d+)[dD](\d+)?/);
+        let count = 2;
+        if (match) {
+            count = parseInt(match[1], 10);
+        }
+        count = Math.max(1, Math.min(10, count));
+        document.getElementById("dice-type").value = "d6";
+        document.getElementById("throw-dice-count").value = Math.min(6, count);
+        throwDice(count, "d6", weaponName);
+    }
+
+    function throwDice3DAction() {
+        const type = document.getElementById("dice-type").value;
+        const count = parseInt(document.getElementById("throw-dice-count").value, 10) || 1;
+        throwDice(count, type, "Dice Check");
+    }
+
+    async function throwDice(count, type, label = "Dice Roll") {
+        const overlay = document.getElementById("dice3d-overlay");
+        const strip = document.getElementById("dice3d-result-strip");
+        overlay.style.display = "block";
+        strip.innerHTML = `Rolling ${count} ${type.toUpperCase()}...`;
+
+        // Roll numbers
+        let nums = [];
+        const apiKey = (localStorage.getItem(RANDOM_ORG_KEY) || "").trim();
+        if (apiKey) {
+            try {
+                const res = await fetch(RANDOM_ORG_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0', method: 'generateIntegers',
+                        params: { apiKey, n: count, min: 1, max: 6, replacement: true },
+                        id: Date.now()
+                    })
+                });
+                const d = await res.json();
+                if (d.result && d.result.random && d.result.random.data) {
+                    nums = d.result.random.data;
+                }
+            } catch (e) {
+                console.warn("Random.org failed, fallback to crypto", e);
+            }
+        }
+
+        if (nums.length === 0) {
+            const buf = new Uint8Array(count);
+            crypto.getRandomValues(buf);
+            nums = Array.from(buf).map(b => (b % 6) + 1);
+        }
+
+        // Render 3D physics if available, otherwise instant result
+        if (typeof THREE !== 'undefined' && typeof CANNON !== 'undefined') {
+            run3DPhysicsAnimation(count, nums, type);
+        }
+
+        setTimeout(() => {
+            const total = nums.reduce((a, b) => a + b, 0);
+            const entry = `${label}: [${nums.join(', ')}] = Total ${total}`;
+            strip.innerHTML = `<span><strong>${label}:</strong> [ ${nums.join(' • ')} ] = Total: <strong>${total}</strong> (Tap to dismiss)</span>`;
+            addDiceHistory(entry);
+
+            if (window.AblySyncManager && window.AblySyncManager.isConnected()) {
+                window.AblySyncManager.broadcastDiceRoll({
+                    diceType: type,
+                    diceCount: count,
+                    results: nums,
+                    total: total
+                });
+            }
+        }, 1200);
+    }
+
+    function dismissDiceOverlay() {
+        document.getElementById("dice3d-overlay").style.display = "none";
+    }
+
+    function run3DPhysicsAnimation(count, results, type) {
+        if (!dice3dReady) init3DScene();
+        if (!dice3dReady) return;
+
+        // Clear existing dice
+        dice3dObjects.forEach(d => {
+            dice3dScene.remove(d.mesh);
+            dice3dPhysics.remove(d.body);
+        });
+        dice3dObjects = [];
+
+        // Spawn dice with physics impulses
+        for (let i = 0; i < count; i++) {
+            const size = 1.1;
+            const geo = new THREE.BoxGeometry(size, size, size);
+
+            // Canvas face colors
+            const mats = [1, 2, 3, 4, 5, 6].map(faceVal => {
+                const cvs = document.createElement("canvas");
+                cvs.width = 128; cvs.height = 128;
+                const ctx = cvs.getContext("2d");
+                ctx.fillStyle = type === 'skid' ? '#111' : '#f5eedc';
+                ctx.fillRect(0, 0, 128, 128);
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(4, 4, 120, 120);
+
+                ctx.fillStyle = type === 'skid' ? '#84cc16' : '#0d1109';
+                ctx.font = 'bold 54px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(faceVal.toString(), 64, 64);
+
+                const tex = new THREE.CanvasTexture(cvs);
+                return new THREE.MeshBasicMaterial({ map: tex });
+            });
+
+            const mesh = new THREE.Mesh(geo, mats);
+            mesh.position.set((i - count / 2) * 1.5, 6 + Math.random() * 2, (Math.random() - 0.5) * 2);
+            dice3dScene.add(mesh);
+
+            const body = new CANNON.Body({
+                mass: 1.0,
+                shape: new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2))
+            });
+            body.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+            body.velocity.set((Math.random() - 0.5) * 4, -4, (Math.random() - 0.5) * 4);
+            body.angularVelocity.set(Math.random() * 15, Math.random() * 15, Math.random() * 15);
+            dice3dPhysics.add(body);
+
+            dice3dObjects.push({ mesh, body });
+        }
+    }
+
+    function init3DScene() {
+        try {
+            dice3dCanvas = document.getElementById("dice3d-canvas");
+            dice3dRenderer = new THREE.WebGLRenderer({ canvas: dice3dCanvas, alpha: true, antialias: true });
+            dice3dRenderer.setSize(window.innerWidth, window.innerHeight);
+
+            dice3dScene = new THREE.Scene();
+            dice3dCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+            dice3dCamera.position.set(0, 14, 10);
+            dice3dCamera.lookAt(0, 0, 0);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+            dice3dScene.add(ambient);
+
+            dice3dPhysics = new CANNON.World();
+            dice3dPhysics.gravity.set(0, -25, 0);
+
+            const floorBody = new CANNON.Body({ mass: 0 });
+            floorBody.addShape(new CANNON.Plane());
+            floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            dice3dPhysics.add(floorBody);
+
+            dice3dReady = true;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if (dice3dPhysics && dice3dOverlayVisible()) {
+                    dice3dPhysics.step(1 / 60);
+                    dice3dObjects.forEach(d => {
+                        d.mesh.position.copy(d.body.position);
+                        d.mesh.quaternion.copy(d.body.quaternion);
+                    });
+                    dice3dRenderer.render(dice3dScene, dice3dCamera);
+                }
+            }
+            animate();
+
+        } catch (e) {
+            console.warn("Could not start 3D dice physics:", e);
+        }
+    }
+
+    function dice3dOverlayVisible() {
+        const el = document.getElementById("dice3d-overlay");
+        return el && el.style.display === "block";
+    }
+
+    function initDiceLogDrag() {
+        const log = document.getElementById("dice-log");
+        const header = document.getElementById("dice-log-header");
+        if (!log || !header) return;
+
+        let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+        header.onmousedown = (e) => {
+            e.preventDefault();
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            document.onmouseup = () => {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            };
+            document.onmousemove = (e) => {
+                e.preventDefault();
+                posX = mouseX - e.clientX;
+                posY = mouseY - e.clientY;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                log.style.top = (log.offsetTop - posY) + "px";
+                log.style.left = (log.offsetLeft - posX) + "px";
+                log.style.bottom = "auto";
+            };
+        };
+    }
+
+    // ==========================================
+    // Utilities
+    // ==========================================
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById("dice-toast-notification");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.style.display = "block";
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 3200);
+    }
+    </script>
+
+    <!-- Footer: Version & Badge -->
+    <footer class="app-footer">
+        <span class="footer-version">v1.0.0</span>
+        <span class="footer-badge">Friend of Gaslands</span>
+    </footer>
+</body>
+</html>
