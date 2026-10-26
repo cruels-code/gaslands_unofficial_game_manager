@@ -4435,7 +4435,7 @@ Thanks to Mike for being ace.</p>
             applySponsorTheme();
             renderHeader();
             renderSponsorInfo();
-            renderVehicles();
+            switchMode(appState.mode || "garage");
         });
 
         let diceToastTimer = null;
@@ -4535,10 +4535,6 @@ Thanks to Mike for being ace.</p>
                     });
                 }
             });
-            
-            if (checkCount === 0) {
-                renderVehicles();
-            }
         }
 
         function applySponsorTheme() {
