@@ -2199,15 +2199,98 @@
             height: 10px;
         }
 
-        body.play-mode-active .play-dashboard-card .sponsor-logo {
-            transform: scale(0.65);
-            transform-origin: right center;
-            margin: -8px 0 -8px auto;
+        /* Base reduction for Hull and Hazard buttons by 35% */
+        .hull-point-box {
+            aspect-ratio: 1.5;
+            max-width: 28px;
+            max-height: 18px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .hazard-dot {
+            aspect-ratio: 1.5;
+            max-width: 28px;
+            max-height: 18px;
+            margin: 0 auto;
+            width: 100%;
         }
 
+        /* Play mode Hull and Hazard buttons reduced by 35% */
+        body.play-mode-active .play-dashboard-card .hull-point-box {
+            aspect-ratio: 1.8;
+            max-width: 20px !important;
+            max-height: 11px !important;
+            border-radius: 2px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        body.play-mode-active .play-dashboard-card .hazard-dot {
+            aspect-ratio: 1.8;
+            max-width: 20px !important;
+            max-height: 11px !important;
+            border-radius: 2px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Vehicle image aligned flush with the bottom of status chips */
+        .play-dashboard-left {
+            position: relative;
+        }
+        .play-header-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            align-items: stretch;
+            gap: 0.6rem;
+            width: 100%;
+        }
+        .play-header-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.25rem;
+            min-width: 0;
+        }
+        .play-card-img-wrap {
+            height: 100% !important;
+            min-height: 72px;
+            max-height: 82px;
+            width: 110px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: stretch;
+        }
         body.play-mode-active .play-dashboard-card .play-card-img-wrap {
-            max-width: 100px !important;
-            height: 52px !important;
+            height: 100% !important;
+            min-height: 72px;
+            max-height: 82px;
+            width: 110px !important;
+            max-width: 110px !important;
+            align-self: stretch;
+        }
+
+        /* Sponsor image matching vehicle image height */
+        .play-dashboard-card .sponsor-logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 72px;
+            max-height: 82px;
+            width: 72px;
+            flex-shrink: 0;
+            align-self: stretch;
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        body.play-mode-active .play-dashboard-card .sponsor-logo {
+            transform: scale(0.9);
+            transform-origin: center center;
+            margin: 0;
         }
     </style>
 </head>
@@ -5400,8 +5483,8 @@
 
                         <!-- Left side: Info, Status, Hull, Hazards, Gear -->
                         <div class="play-dashboard-left">
-                            <div class="card-header" style="border-bottom: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; width: 100%;">
-                                <div style="display: flex; gap: 0.5rem; align-items: center; flex: 1; min-width: 120px;">
+                            <div class="play-header-grid">
+                                <div class="play-header-details">
                                     <div class="vehicle-name-block">
                                         <span style="font-family:'Orbitron', sans-serif; font-size: 1.15rem; font-weight:800; letter-spacing:0.5px;">${vehicle.name}</span>
                                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
@@ -5410,19 +5493,21 @@
                                             <span style="color: var(--glow-color); font-weight: 700; background: rgba(245, 158, 11, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.25);">CREW: ${currentCrew}</span>
                                         </div>
                                     </div>
+
+                                    <!-- Status Toggles (Flush inline with bottom of vehicle & sponsor images) -->
+                                    <div class="status-bar" style="margin-top: 0.2rem;">
+                                        <div class="status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 On Fire</div>
+                                        <div class="status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</div>
+                                        <div class="status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</div>
+                                    </div>
+                                </div>
+                                <div class="sponsor-logo-wrap" title="${appState.sponsor}">
                                     ${sponsorLogoHtml}
                                 </div>
                                 ${playImageHtml}
                             </div>
 
                             ${gearWarningHtml}
-
-                            <!-- Status Toggles -->
-                            <div class="status-bar">
-                                <div class="status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 On Fire</div>
-                                <div class="status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</div>
-                                <div class="status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</div>
-                            </div>
 
                             <!-- Damage Bar (Hull) -->
                             <div class="hull-tracker">
