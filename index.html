@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏎️</text></svg>">
-    <title>Gaslands Refuelled: Car Manager</title>
+    <title>Unofficial Gaslands Game Manager</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1920,6 +1920,37 @@
             background: rgba(255,255,255,0.02) !important;
             box-shadow: 0 0 5px var(--glow-color-glow);
         }
+
+        /* Background watermark badges */
+        .bg-watermark-left {
+            position: fixed;
+            bottom: 12px;
+            left: 16px;
+            font-family: 'Orbitron', monospace, sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            opacity: 0.55;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+            user-select: none;
+        }
+
+        .bg-watermark-right {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            font-family: 'Orbitron', monospace, sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            opacity: 0.55;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -1941,7 +1972,7 @@
         <div class="hazard-stripes"></div>
         <div class="header-content">
             <div class="logo">
-                <h1 id="header-logo">Gaslands <span>Refuelled</span></h1>
+                <h1 id="header-logo">Unofficial Gaslands <span>Game Manager</span></h1>
                 <div class="tagline">Tabletop Dashboard & Vehicle Builder</div>
             </div>
             
@@ -6816,6 +6847,9 @@
     });
     
     </script>
+    <!-- Background Watermarks -->
+    <div class="bg-watermark-left">v1.0.0 (Public)</div>
+    <div class="bg-watermark-right">FRIEND OF GASLANDS</div>
 </body>
 </html>
 
