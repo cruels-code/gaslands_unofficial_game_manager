@@ -2420,8 +2420,8 @@
                         </button>
                     </div>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end;">
-
+                <div style="display:flex; flex-direction:row; gap:0.5rem; align-items:center;">
+                    <button class="btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.6); color: #fca5a5;" onclick="confirmResetTeamStats()">Reset Team Stats</button>
                     <button class="btn btn-danger" onclick="confirmResetGame()">Reset Game Stats</button>
                 </div>
             </div>
@@ -5713,26 +5713,25 @@ Thanks to Mike for being ace.</p>
                         <canvas id="glitch-canvas-${vehicle.id}" class="glitch-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; z-index: 100;"></canvas>
                         ` : ''}
 
-                        <!-- Header: Car Name, Chassis Type, Sponsor, Cans/Gear Info & Status Buttons -->
+                        <!-- Header: Sponsor logo top-left, Car Name, half-size weight/type, Status Buttons (Cans removed) -->
                         <div class="card-header">
-                            <div style="display: flex; gap: 0.5rem; align-items: flex-start; flex: 1; min-width: 120px;">
+                            <div style="display: flex; gap: 0.6rem; align-items: flex-start; flex: 1; min-width: 120px;">
+                                ${sponsorLogoHtml}
                                 <div class="vehicle-name-block" style="flex: 1;">
                                     <span style="font-family:'Orbitron', sans-serif; font-size: 1.25rem; font-weight:800; letter-spacing:0.5px; color: var(--text-primary);">${vehicle.name}</span>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                                    <div style="font-size: 0.38rem; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; letter-spacing: 0.5px;">
                                         <span>${baseInfo.weight} • ${vehicle.type}</span>
                                     </div>
 
-                                    <!-- Status Buttons (On Fire, Ghost, Distracted) -->
+                                    <!-- Status Buttons (On Fire, Ghost, Distracted in a line) -->
                                     <div class="play-status-bar">
                                         <button type="button" class="play-status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 On Fire</button>
                                         <button type="button" class="play-status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</button>
                                         <button type="button" class="play-status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</button>
                                     </div>
                                 </div>
-                                ${sponsorLogoHtml}
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; margin-left: 0.5rem; justify-content: center;">
-                                <span class="selection-item-cost" style="font-size: 1.1rem;">${cans} Cans</span>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; margin-left: 0.5rem; justify-content: flex-start;">
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">${slotsUsed} / ${slotsMax} Slots</span>
                             </div>
                         </div>
@@ -5820,9 +5819,9 @@ Thanks to Mike for being ace.</p>
                             </div>
                         </div>
 
-                        <!-- WebGL Fire shader overlay when on fire -->
+                        <!-- WebGL Fire shader overlay when on fire (covers bottom 35% of the card) -->
                         ${vehicle.onFire ? `
-                        <canvas id="fire-canvas-${vehicle.id}" class="fire-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; z-index: 10; opacity: 0.30;"></canvas>
+                        <canvas id="fire-canvas-${vehicle.id}" class="fire-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; pointer-events: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 10; opacity: 0.30;"></canvas>
                         ` : ''}
                     `;
                     playContainer.appendChild(card);
@@ -6894,6 +6893,25 @@ Thanks to Mike for being ace.</p>
                 renderVehicles();
                 renderHeader();
                 saveState();
+            }
+        }
+
+        function confirmResetTeamStats() {
+            const warningMsg = "This will reset all damage, hazard tokens, gears, status effects, and ammo counters for your team's vehicles.\n\nProceed?";
+            if (confirm(warningMsg)) {
+                appState.vehicles.forEach(v => {
+                    v.damage = 0;
+                    v.hazard = 0;
+                    v.gear = 1;
+                    v.onFire = false;
+                    v.ghostRider = false;
+                    v.distracted = false;
+                    v.wrecked = false;
+                    v.ammoStates = {};
+                });
+                renderVehicles();
+                saveState();
+                showNetworkToast("🔄 Your team's stats have been reset.");
             }
         }
 
