@@ -2070,12 +2070,13 @@
             line-height: 1.2;
         }
 
-        /* Status chips in header / action area */
+        /* Status chips in header / action area in a single clean row */
         .play-status-bar {
             display: flex;
             gap: 0.4rem;
-            flex-wrap: wrap;
-            margin-top: 0.4rem;
+            flex-wrap: nowrap;
+            align-items: center;
+            margin-top: 0.5rem;
         }
 
         .play-status-chip {
@@ -2091,6 +2092,8 @@
             user-select: none;
             transition: all 0.25s ease;
             color: var(--text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .play-status-chip:hover {
@@ -5568,18 +5571,18 @@ Thanks to Mike for being ace.</p>
 
                     let isWipeout = vehicle.hazard >= hazardLimit;
 
-                    // Play Mode image slot matching Garage card
+                    // Play Mode image slot reduced by 20%
                     let playImageSlotHtml = "";
                     if (vehicle.imageUrl && vehicle.imageUrl !== "db_stored") {
                         playImageSlotHtml = `
-                            <div style="position: relative; width: 100%; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border);">
-                                <img src="${vehicle.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">
+                            <div style="position: relative; width: 100%; height: 128px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15);">
+                                <img src="${vehicle.imageUrl}" style="width: 80%; height: 100%; object-fit: contain;">
                             </div>
                         `;
                     } else {
                         playImageSlotHtml = `
-                            <div style="width: 100%; height: 100px; border: 1px dashed var(--card-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; background: rgba(0,0,0,0.15);">
-                                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Image</span>
+                            <div style="width: 100%; height: 80px; border: 1px dashed var(--card-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem; background: rgba(0,0,0,0.15);">
+                                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Image</span>
                             </div>
                         `;
                     }
