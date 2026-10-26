@@ -1951,6 +1951,262 @@
             z-index: 10;
             user-select: none;
         }
+
+        /* ============================================================== */
+        /* PLAY MODE: COMPACT 4-VEHICLE NO-SCROLL 2x2 SCREEN LAYOUT       */
+        /* ============================================================== */
+        body.play-mode-active header {
+            padding: 0.5rem 1rem 0.4rem 1rem;
+        }
+        body.play-mode-active header .logo h1 {
+            font-size: 1.0rem;
+            letter-spacing: 1px;
+        }
+        body.play-mode-active header .logo .tagline {
+            display: none;
+        }
+        body.play-mode-active main {
+            max-width: 98vw;
+            margin: 0.5rem auto 1rem auto;
+            padding: 0 0.8rem;
+        }
+        body.play-mode-active .turn-phase-tracker {
+            padding: 0.35rem 0.8rem;
+            margin-bottom: 0.4rem;
+            gap: 0.6rem;
+            border-radius: 8px;
+        }
+        body.play-mode-active .votes-hub {
+            padding: 0.35rem 0.8rem;
+            margin-bottom: 0.5rem;
+            gap: 0.6rem;
+            border-radius: 8px;
+        }
+        body.play-mode-active .votes-hud-left {
+            gap: 0.8rem;
+        }
+        body.play-mode-active .votes-counter-big {
+            padding-right: 0.6rem;
+        }
+        body.play-mode-active .votes-counter-big .val {
+            font-size: 1.25rem;
+        }
+        body.play-mode-active .votes-actions-grid {
+            gap: 0.3rem;
+        }
+        body.play-mode-active .vote-action-btn {
+            padding: 0.2rem 0.45rem;
+            min-width: 85px;
+            font-size: 0.68rem;
+        }
+        body.play-mode-active .turn-value {
+            font-size: 1.05rem;
+        }
+        body.play-mode-active .turn-btn {
+            font-size: 0.95rem;
+            padding: 0 0.25rem;
+        }
+        body.play-mode-active .phase-btn {
+            padding: 0.25rem 0.55rem;
+            font-size: 0.75rem;
+        }
+        body.play-mode-active .turn-controls {
+            padding: 0.15rem 0.4rem;
+            gap: 0.4rem;
+        }
+
+        /* 2x2 Grid for 4 vehicles */
+        body.play-mode-active #play-vehicles-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.6rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 900px) {
+            body.play-mode-active #play-vehicles-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Compact play vehicle card */
+        body.play-mode-active .play-dashboard-card {
+            padding: 0.65rem 0.8rem !important;
+            gap: 0.7rem !important;
+            border-radius: 8px !important;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: row !important;
+            overflow: hidden;
+        }
+
+        body.play-mode-active .play-dashboard-left {
+            flex: 1.15;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            border-right: 1px solid var(--card-border);
+            padding-right: 0.7rem;
+            min-width: 0;
+        }
+
+        body.play-mode-active .play-dashboard-right {
+            flex: 1.0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            min-width: 0;
+            overflow-y: auto;
+            max-height: 250px;
+            padding-right: 0.2rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .card-header {
+            padding-bottom: 0;
+            gap: 0.4rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .vehicle-name-block span:first-child {
+            font-size: 0.95rem !important;
+            line-height: 1.2;
+        }
+
+        body.play-mode-active .play-dashboard-card .vehicle-name-block div {
+            font-size: 0.68rem !important;
+            margin-top: 1px;
+            gap: 0.3rem;
+        }
+
+        /* Compact status chips */
+        body.play-mode-active .play-dashboard-card .status-bar {
+            gap: 0.3rem;
+            margin: 0.1rem 0;
+        }
+
+        body.play-mode-active .play-dashboard-card .status-chip {
+            padding: 0.15rem 0.45rem;
+            font-size: 0.68rem;
+            border-radius: 3px;
+        }
+
+        /* Compact damage tracker */
+        body.play-mode-active .play-dashboard-card .hull-tracker {
+            gap: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .hull-tracker span {
+            font-size: 0.68rem !important;
+        }
+
+        body.play-mode-active .play-dashboard-card .hull-points-grid {
+            gap: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .hull-point-box {
+            aspect-ratio: 1.8;
+            border-radius: 2px;
+        }
+
+        body.play-mode-active .play-dashboard-card .hull-point-box.damaged::after {
+            font-size: 0.6rem;
+        }
+
+        /* Compact hazard tracker */
+        body.play-mode-active .play-dashboard-card .hazard-tracker {
+            gap: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .hazard-tracker span {
+            font-size: 0.68rem !important;
+        }
+
+        body.play-mode-active .play-dashboard-card .hazard-dots-row {
+            padding: 0.15rem 0.3rem;
+            gap: 0.25rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .hazard-dots {
+            gap: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .hazard-dot {
+            aspect-ratio: 1.8;
+            border-radius: 2px;
+        }
+
+        /* Compact gearbox */
+        body.play-mode-active .play-dashboard-card .gearbox {
+            margin-top: 0.1rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .gearbox span {
+            font-size: 0.68rem !important;
+        }
+
+        body.play-mode-active .play-dashboard-card .gear-selector {
+            gap: 0.25rem;
+            margin-top: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .gear-btn {
+            padding: 0.2rem 0;
+            font-size: 0.72rem;
+            border-radius: 4px;
+        }
+
+        /* Compact Weapons & Upgrades lists */
+        body.play-mode-active .play-dashboard-card .play-section-title {
+            font-size: 0.68rem;
+            padding-bottom: 0.15rem;
+            margin-bottom: 0.25rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .play-list-container {
+            gap: 0.25rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .play-list-2col {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .ref-item {
+            font-size: 0.72rem;
+            padding-bottom: 0.15rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .ref-item-header {
+            font-size: 0.72rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .ref-item-desc {
+            font-size: 0.68rem;
+            line-height: 1.25;
+            margin-top: 0.05rem;
+        }
+
+        body.play-mode-active .play-dashboard-card .ammo-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+
+        body.play-mode-active .play-dashboard-card .ammo-checkbox:checked::after {
+            top: 2px;
+            left: 2px;
+            width: 10px;
+            height: 10px;
+        }
+
+        body.play-mode-active .play-dashboard-card .sponsor-logo {
+            transform: scale(0.65);
+            transform-origin: right center;
+            margin: -8px 0 -8px auto;
+        }
+
+        body.play-mode-active .play-dashboard-card .play-card-img-wrap {
+            max-width: 100px !important;
+            height: 52px !important;
+        }
     </style>
 </head>
 <body>
@@ -3880,6 +4136,7 @@
 
         function switchMode(mode) {
             appState.mode = mode;
+            document.body.classList.toggle("play-mode-active", mode === "play");
             document.getElementById("garage-mode-btn").classList.toggle("active", mode === "garage");
             document.getElementById("play-mode-btn").classList.toggle("active", mode === "play");
             const rivalsBtn = document.getElementById("rivals-mode-btn");
@@ -4907,12 +5164,12 @@
 
                     // Play Mode image header if exists (styled for floating right next to name)
                     let playImageHtml = `
-                        <div style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--card-border); background: rgba(0,0,0,0.15); z-index: 2;">
+                        <div class="play-card-img-wrap" style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--card-border); background: rgba(0,0,0,0.15); z-index: 2;">
                             <span style="font-size: 0.65rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">NO IMAGE</span>
                         </div>`;
                     if (vehicle.imageUrl) {
                         playImageHtml = `
-                            <div style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); z-index: 2;">
+                            <div class="play-card-img-wrap" style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); z-index: 2;">
                                 <img src="${vehicle.imageUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                             </div>
                         `;
