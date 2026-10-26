@@ -14,6 +14,7 @@
         <script src="three.min.js"></script>
     <script src="cannon.min.js"></script>
     <script src="pdf.min.js"></script>
+    <script src="ably.min.js"></script>
     <script src="sprites.js"></script>
     <script src="d6_sprites.js"></script>
     
@@ -2600,7 +2601,7 @@
                 <div style="display:flex; gap:0.5rem; border-bottom:1px solid var(--card-border); padding-bottom:0.5rem;">
                     <button class="net-tab-btn active" id="net-tab-browse-btn" onclick="switchNetTab('browse')">🌐 Online Tables</button>
                     <button class="net-tab-btn" id="net-tab-create-btn" onclick="switchNetTab('create')">➕ Create Table</button>
-                    <button class="net-tab-btn" id="net-tab-settings-btn" onclick="switchNetTab('settings')">⚙️ Relay URL</button>
+                    <button class="net-tab-btn" id="net-tab-settings-btn" onclick="switchNetTab('settings')">⚙️ Ably Settings</button>
                 </div>
 
                 <!-- TAB 1: Browse Public Tables -->
@@ -2647,13 +2648,13 @@
                     </div>
 
                     <div class="input-group">
-                        <label for="net-worker-url-input">Cloudflare Worker Relay URL</label>
+                        <label for="net-ably-key-input">Ably Realtime API Key</label>
                         <div style="display:flex; gap:0.5rem;">
-                            <input type="text" id="net-worker-url-input" placeholder="https://gaslands-relay.<your-name>.workers.dev" style="flex-grow:1; font-family:monospace; font-size:0.75rem;">
-                            <button class="btn btn-sm" onclick="saveWorkerUrl()">Save</button>
+                            <input type="text" id="net-ably-key-input" placeholder="A8ZtLw.TuYjNQ:..." style="flex-grow:1; font-family:monospace; font-size:0.75rem;">
+                            <button class="btn btn-sm" onclick="saveAblyKey()">Save</button>
                         </div>
                         <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.3rem;">
-                            Saved locally in your browser. Default: gaslands-relay.cruelenquiries.workers.dev
+                            High-allowance Ably Realtime sync (6M msgs/month, 200 concurrent players).
                         </div>
                     </div>
 
@@ -3058,89 +3059,34 @@
         async function fetchPublicTables() {
             const listEl = document.getElementById('net-tables-list');
             if (!listEl) return;
-            listEl.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted); font-size:0.85rem;">Scanning online tables...</div>';
-
-            let base = (window.NetworkManager && window.NetworkManager.workerUrl) ? window.NetworkManager.workerUrl : "https://gaslands-relay.cruelenquiries.workers.dev";
-            base = base.replace(/^ws:\/\//i, "http://").replace(/^wss:\/\//i, "https://").replace(/\/ws\/?$/i, "");
-
-            try {
-                const res = await fetch(base + "/tables");
-                const data = await res.json();
-                const tables = (data && data.tables) ? data.tables : [];
-                renderPublicTablesList(tables);
-            } catch (err) {
-                listEl.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--danger-red); font-size:0.85rem;">Failed to fetch table list. Please check relay connection.</div>';
-            }
-        }
-
-        function renderPublicTablesList(tables) {
-            const listEl = document.getElementById('net-tables-list');
-            if (!listEl) return;
-
-            if (!tables || tables.length === 0) {
-                listEl.innerHTML = `
-                    <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:rgba(0,0,0,0.2); border-radius:6px; font-size:0.85rem;">
-                        No active online WAN tables found.<br>
-                        <span style="font-size:0.75rem; color:var(--glow-color);">Click "Create Table" above to host a new game table!</span>
-                    </div>
-                `;
-                return;
-            }
-
             const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
-            listEl.innerHTML = tables.map(t => {
+            
+            // Standard Ably shared tables
+            const defaultTables = [
+                { roomCode: "table-1", tableName: "Death Highway Arena (Table 1)", playerCount: 1, hasPin: false },
+                { roomCode: "table-2", tableName: "Rust Crater Stadium (Table 2)", playerCount: 1, hasPin: false },
+                { roomCode: "table-3", tableName: "Smackdown Raceway (Table 3)", playerCount: 1, hasPin: false }
+            ];
+
+            let html = defaultTables.map(t => {
                 const isCurrent = (t.roomCode === currentRoom);
-                const safeName = (t.tableName || t.roomCode).replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 return `
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid ${isCurrent ? 'var(--accent-cyan)' : 'var(--card-border)'}; border-radius:6px; padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center; gap:0.8rem;">
-                        <div style="min-width:0; flex-grow:1;">
-                            <div style="display:flex; align-items:center; gap:0.4rem;">
-                                <strong style="font-size:0.88rem; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${safeName}</strong>
-                                ${t.hasPin ? '<span title="4-Digit PIN Required" style="font-size:0.75rem;">🔒</span>' : ''}
-                                ${isCurrent ? '<span style="font-size:0.65rem; color:var(--accent-cyan); border:1px solid var(--accent-cyan); border-radius:3px; padding:0 0.3rem;">CURRENT</span>' : ''}
-                            </div>
-                            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem;">
-                                🏎️ ${t.playerCount || 1} Driver${t.playerCount === 1 ? '' : 's'} • Code: <code style="color:var(--glow-color);">${t.roomCode}</code>
-                            </div>
-                        </div>
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid ${isCurrent ? 'var(--glow-color)' : 'var(--card-border)'}; border-radius:6px; padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            ${isCurrent ? 
-                                '<div style="display:flex; gap:0.3rem;"><button class="btn btn-sm" disabled style="opacity:0.6; font-size:0.75rem;">Joined</button><button class="btn btn-sm btn-danger" onclick="leaveTable()" style="font-size:0.75rem; padding:0.25rem 0.45rem;">Leave</button></div>' : 
-                                `<button class="btn btn-sm btn-primary" onclick="promptJoinTable('${t.roomCode}', '${encodeURIComponent(t.tableName || t.roomCode)}', ${t.hasPin})" style="font-size:0.75rem;">Join</button>`
-                            }
+                            <div style="font-weight:700; font-size:0.85rem; color:${isCurrent ? 'var(--glow-color)' : 'var(--text-primary)'};">
+                                ${t.tableName}
+                                ${isCurrent ? '<span style="font-size:0.65rem; background:var(--glow-color); color:#000; padding:1px 5px; border-radius:3px; margin-left:6px; font-weight:700;">ACTIVE</span>' : ''}
+                            </div>
+                            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
+                                Room: <code>${t.roomCode}</code> • Realtime Ably Mesh
+                            </div>
                         </div>
+                        ${isCurrent ? '' : `<button class="btn btn-sm btn-primary" onclick="joinTableDirect('${t.roomCode}', '${t.tableName}', '')" style="font-size:0.72rem; padding:0.3rem 0.65rem;">Join</button>`}
                     </div>
                 `;
-            }).join('');
-        }
+            }).join("");
 
-        function promptJoinTable(roomCode, encodedName, hasPin) {
-            const tableName = decodeURIComponent(encodedName || roomCode);
-            if (!hasPin) {
-                joinTableDirect(roomCode, tableName, "");
-                return;
-            }
-            pendingJoinRoom = roomCode;
-            pendingJoinTableName = tableName;
-            const promptModal = document.getElementById("pin-prompt-modal");
-            const subTitle = document.getElementById("pin-prompt-subtitle");
-            const pinInput = document.getElementById("join-table-pin-input");
-            const errDiv = document.getElementById("pin-prompt-error");
-            if (subTitle) subTitle.textContent = "Enter 4-digit PIN for " + tableName + ":";
-            if (pinInput) { pinInput.value = ""; }
-            if (errDiv) errDiv.textContent = "";
-            if (promptModal) promptModal.classList.add("active");
-            if (pinInput) setTimeout(() => pinInput.focus(), 150);
-        }
-
-        function closePinPromptModal(event) {
-            if (event && event.target && event.target.id !== "pin-prompt-modal" && !event.target.classList.contains("close-modal-btn")) {
-                return;
-            }
-            const promptModal = document.getElementById("pin-prompt-modal");
-            if (promptModal) promptModal.classList.remove("active");
-            pendingJoinRoom = null;
-            pendingJoinTableName = null;
+            listEl.innerHTML = html;
         }
 
         function submitJoinWithPin() {
@@ -3280,8 +3226,8 @@
                 leaveBtn.style.display = currentRoom ? "inline-block" : "none";
             }
             
-            const urlInput = document.getElementById("net-worker-url-input");
-            if (urlInput) urlInput.value = (window.NetworkManager && window.NetworkManager.workerUrl) ? window.NetworkManager.workerUrl : "";
+            const keyInput = document.getElementById("net-ably-key-input");
+            if (keyInput) keyInput.value = (window.NetworkManager && window.NetworkManager.apiKey) ? window.NetworkManager.apiKey : "";
             
             const statusText = document.getElementById("net-modal-status-text");
             if (statusText) {
@@ -3303,8 +3249,8 @@
             const roomInput = document.getElementById("net-room-input");
             if (roomInput) roomInput.value = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
             
-            const urlInput = document.getElementById("net-worker-url-input");
-            if (urlInput) urlInput.value = (window.NetworkManager && window.NetworkManager.workerUrl) ? window.NetworkManager.workerUrl : "";
+            const keyInput = document.getElementById("net-ably-key-input");
+            if (keyInput) keyInput.value = (window.NetworkManager && window.NetworkManager.apiKey) ? window.NetworkManager.apiKey : "";
             
             const statusText = document.getElementById("net-modal-status-text");
             if (statusText) {
@@ -3361,18 +3307,16 @@
             closeNetworkModal();
         }
 
-        function saveWorkerUrl() {
-            const input = document.getElementById("net-worker-url-input");
+        function saveAblyKey() {
+            const input = document.getElementById("net-ably-key-input");
             const val = input ? input.value.trim() : "";
             if (!val) {
-                alert("Please enter your Cloudflare Worker URL (e.g. wss://gaslands-relay.yourname.workers.dev/ws)");
+                alert("Please enter a valid Ably API Key.");
                 return;
             }
             if (window.NetworkManager) {
-                window.NetworkManager.workerUrl = val;
-                localStorage.setItem("gaslands_worker_url", val);
-                showNetworkToast("Cloudflare Worker URL saved!");
-                window.NetworkManager.connect();
+                window.NetworkManager.setApiKey(val);
+                showNetworkToast("Ably API Key updated!");
             }
             closeNetworkModal();
         }
@@ -3589,17 +3533,27 @@
             });
         }
 
+        /* ============================================================== */
+        /* ABLY REALTIME TABLE MULTIPLAYER NETWORK MANAGER                 */
+        /* High-speed peer-to-peer table presence & state synchronization  */
+        /* Allowance: 6,000,000 msgs / month, 200 concurrent players      */
+        /* ============================================================== */
+        const DEFAULT_ABLY_KEY = "A8ZtLw.TuYjNQ:kEL5pokKiyYuiVZXxELR718xnZedaZfZIQp1McLLIKU";
+
         const NetworkManager = {
-            ws: null,
-            workerUrl: localStorage.getItem("gaslands_worker_url") || "wss://gaslands-relay.cruelenquiries.workers.dev/ws",
-            customRoom: localStorage.getItem("gaslands_custom_room") || "",
-            tableName: null,
+            ablyClient: null,
+            channel: null,
+            presenceChannel: null,
+            directoryChannel: null,
+            localBroadcast: null,
+            apiKey: localStorage.getItem("gaslands_ably_key") || DEFAULT_ABLY_KEY,
+            customRoom: localStorage.getItem("gaslands_custom_room") || "table-1",
+            tableName: localStorage.getItem("gaslands_table_name") || "Arena Table 1",
             tablePin: "",
             playerId: null,
             rivals: new Map(),
-            reconnectTimer: null,
             connected: false,
-            isManuallyDisconnected: false,
+            playerCount: 1,
 
             init() {
                 this.playerId = localStorage.getItem("gaslands_player_id");
@@ -3608,278 +3562,333 @@
                     localStorage.setItem("gaslands_player_id", this.playerId);
                 }
 
-                // Ensure websocket protocol prefix
-                let url = this.workerUrl.trim();
-                if (url.startsWith("http://")) url = "ws://" + url.slice(7);
-                else if (url.startsWith("https://")) url = "wss://" + url.slice(8);
-                else if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
-                    url = "wss://" + url;
-                }
-                this.workerUrl = url;
-                localStorage.setItem("gaslands_worker_url", this.workerUrl);
-
                 const urlParams = new URLSearchParams(window.location.search);
                 const roomParam = urlParams.get("room");
                 if (roomParam) {
                     this.customRoom = cleanRoomCode(roomParam);
                     localStorage.setItem("gaslands_custom_room", this.customRoom);
                 } else {
-                    const saved = localStorage.getItem("gaslands_custom_room") || "";
+                    const saved = localStorage.getItem("gaslands_custom_room") || "table-1";
                     this.customRoom = cleanRoomCode(saved);
                 }
 
+                this.tablePin = sessionStorage.getItem("gaslands_pin_" + this.customRoom) || "";
+
+                this.initLocalBroadcast();
                 this.connect();
 
-                // Smart visibility lifecycle: Close connection when device screen is turned off or tab hidden
                 document.addEventListener("visibilitychange", () => {
-                    if (document.visibilityState === "hidden") {
-                        if (this.ws) {
-                            try { this.ws.close(); } catch(_) {}
-                            this.ws = null;
-                        }
-                    } else {
-                        if (!this.isManuallyDisconnected) {
+                    if (document.visibilityState === "visible") {
+                        if (this.ablyClient && (!this.connected || this.ablyClient.connection.state !== 'connected')) {
                             this.connect();
                         }
                     }
                 });
             },
 
-            getWebSocketEndpoint() {
-                let url = this.workerUrl.trim();
-                if (url.startsWith("http://")) url = "ws://" + url.slice(7);
-                else if (url.startsWith("https://")) url = "wss://" + url.slice(8);
-                else if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
-                    url = "wss://" + url;
-                }
-
+            initLocalBroadcast() {
                 try {
-                    const parsed = new URL(url);
-                    if (!parsed.pathname.endsWith("/ws")) {
-                        parsed.pathname = parsed.pathname.replace(/\/+$/, "") + "/ws";
+                    if (window.BroadcastChannel) {
+                        if (this.localBroadcast) {
+                            try { this.localBroadcast.close(); } catch(_) {}
+                        }
+                        this.localBroadcast = new BroadcastChannel("gaslands_local_table_" + (this.customRoom || "default"));
+                        this.localBroadcast.onmessage = (e) => {
+                            if (e.data && e.data.type) {
+                                this.handleIncomingMessage(e.data, true);
+                            }
+                        };
                     }
-                    if (this.customRoom) {
-                        parsed.searchParams.set("room", this.customRoom);
-                        const savedPin = this.tablePin || sessionStorage.getItem("gaslands_pin_" + this.customRoom) || "";
-                        if (savedPin) parsed.searchParams.set("pin", savedPin);
-                        if (this.tableName) parsed.searchParams.set("tableName", this.tableName);
-                    }
-                    return parsed.toString();
-                } catch (_) {
-                    return url;
+                } catch (e) {
+                    console.warn("[NetworkManager] Local broadcast not available", e);
                 }
             },
 
+            setApiKey(key) {
+                this.apiKey = (key || "").trim() || DEFAULT_ABLY_KEY;
+                localStorage.setItem("gaslands_ably_key", this.apiKey);
+                this.connect(true);
+            },
+
             connect(force = false) {
-                if (!this.workerUrl) {
-                    this.updatePill("offline", "Table: Setup Needed");
+                if (!this.apiKey) {
+                    this.updatePill("offline", "Table: Needs Ably Key");
                     return;
                 }
-                if (this.ws) {
+
+                if (typeof window.Ably === "undefined") {
+                    console.warn("[NetworkManager] Ably library not yet loaded. Retrying in 500ms.");
+                    setTimeout(() => this.connect(force), 500);
+                    return;
+                }
+
+                if (this.ablyClient) {
                     if (force) {
-                        try { this.ws.close(); } catch(_) {}
-                        this.ws = null;
-                        this.rivals.clear();
-                    } else if (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING) {
+                        try { this.disconnect(); } catch(_) {}
+                    } else if (this.connected && this.ablyClient.connection.state === 'connected') {
                         return;
                     }
                 }
 
                 this.updatePill("connecting", "Table: Connecting...");
 
-                const endpoint = this.getWebSocketEndpoint();
                 try {
-                    this.ws = new WebSocket(endpoint);
+                    this.ablyClient = new window.Ably.Realtime({
+                        key: this.apiKey,
+                        clientId: this.playerId,
+                        autoConnect: true,
+                        echoMessages: false
+                    });
+
+                    this.ablyClient.connection.on('connected', () => {
+                        this.connected = true;
+                        this.updatePill("connected", "Table: Connected");
+                        console.log("[NetworkManager] Connected to Ably Realtime!");
+                        this.joinTableChannel();
+                        this.joinDirectoryChannel();
+                    });
+
+                    this.ablyClient.connection.on('disconnected', () => {
+                        this.connected = false;
+                        this.updatePill("connecting", "Table: Reconnecting...");
+                    });
+
+                    this.ablyClient.connection.on('suspended', () => {
+                        this.connected = false;
+                        this.updatePill("error", "Table: Disconnected");
+                    });
+
+                    this.ablyClient.connection.on('failed', (err) => {
+                        this.connected = false;
+                        console.error("[NetworkManager] Ably connection failed:", err);
+                        this.updatePill("error", "Table: Key Invalid");
+                    });
                 } catch (err) {
-                    console.warn("WebSocket init error:", err);
-                    this.updatePill("error", "Table: Offline");
-                    return;
+                    console.error("[NetworkManager] Error creating Ably client:", err);
+                    this.updatePill("error", "Table: Connection Error");
                 }
+            },
 
-                this.ws.onopen = () => {
-                    this.connected = true;
-                    this.updatePill("connected", "Table: Connected");
-                    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-
-                    // Send HELLO with initial vehicle roster
-                    this.sendHello();
-                    // NO PING TIMERS NEEDED! WebSocket Hibernation keeps connection open with 0 CPU/duration cost
-                };
-
-                this.ws.onmessage = (event) => {
+            disconnect() {
+                if (this.channel) {
                     try {
-                        const data = JSON.parse(event.data);
-                        this.handleMessage(data);
-                    } catch (err) {
-                        console.error("Failed to parse incoming WS msg:", err);
-                    }
-                };
+                        this.channel.presence.leave();
+                        this.channel.unsubscribe();
+                    } catch(_) {}
+                    this.channel = null;
+                }
+                if (this.directoryChannel) {
+                    try { this.directoryChannel.unsubscribe(); } catch(_) {}
+                    this.directoryChannel = null;
+                }
+                if (this.ablyClient) {
+                    try { this.ablyClient.close(); } catch(_) {}
+                    this.ablyClient = null;
+                }
+                this.connected = false;
+                this.rivals.clear();
+            },
 
-                this.ws.onclose = () => {
-                    this.connected = false;
-                    this.updatePill("offline", "Table: Disconnected");
-                    if (document.visibilityState !== "hidden" && !this.isManuallyDisconnected) {
-                        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-                        this.reconnectTimer = setTimeout(() => this.connect(), 4000);
-                    }
-                };
+            joinTableChannel() {
+                if (!this.ablyClient || !this.connected) return;
 
-                this.ws.onerror = (err) => {
-                    this.connected = false;
-                    this.updatePill("error", "Table: Offline");
+                const channelName = `gaslands-table-${this.customRoom || "default"}`;
+                this.channel = this.ablyClient.channels.get(channelName);
+
+                // Subscribe to real-time events on this table
+                this.channel.subscribe(msg => {
+                    this.handleIncomingMessage(msg.data);
+                });
+
+                // Ably Presence: automatically tracks drivers currently at this table
+                this.channel.presence.subscribe('enter', member => this.handleMemberJoin(member));
+                this.channel.presence.subscribe('leave', member => this.handleMemberLeave(member));
+                this.channel.presence.subscribe('update', member => this.handleMemberJoin(member));
+
+                // Enter presence with current player info
+                this.channel.presence.enter({
+                    teamName: appState.teamName || "Anonymous Driver",
+                    sponsor: appState.sponsor || "Sponsorless",
+                    pin: this.tablePin
+                });
+
+                // Fetch current presence list
+                this.channel.presence.get((err, members) => {
+                    if (!err && members) {
+                        this.playerCount = Math.max(1, members.length);
+                        this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                    }
+                });
+
+                // Send immediate sync with roster
+                this.syncVehicles();
+            },
+
+            joinDirectoryChannel() {
+                if (!this.ablyClient || !this.connected) return;
+                // Channel where public tables announce themselves for the table browser
+                this.directoryChannel = this.ablyClient.channels.get("gaslands-directory");
+                this.announceTableToDirectory();
+            },
+
+            announceTableToDirectory() {
+                if (!this.directoryChannel || !this.customRoom) return;
+                const info = {
+                    roomCode: this.customRoom,
+                    tableName: this.tableName || this.customRoom,
+                    hasPin: !!this.tablePin,
+                    playerCount: this.playerCount,
+                    updatedAt: Date.now()
                 };
+                try {
+                    this.directoryChannel.publish("table_announce", info);
+                } catch(_) {}
             },
 
             isConnected() {
-                return this.ws && this.ws.readyState === WebSocket.OPEN;
+                return this.connected && this.channel !== null;
             },
 
-            async sendHello() {
-                const sanitizedVehicles = await this.getSanitizedVehicles();
-                const msg = {
-                    type: "HELLO",
+            async syncVehicles() {
+                const sanitized = await this.getSanitizedVehicles();
+                const payload = {
+                    type: "SYNC_VEHICLES",
                     playerId: this.playerId,
                     teamName: appState.teamName || "Anonymous Driver",
                     sponsor: appState.sponsor || "Sponsorless",
                     turn: appState.turn || 1,
                     phase: appState.phase || 1,
-                    vehicles: sanitizedVehicles
+                    votes: appState.votes || 0,
+                    pin: this.tablePin,
+                    vehicles: sanitized,
+                    timestamp: Date.now()
                 };
-                if (this.isConnected()) this.ws.send(JSON.stringify(msg));
-            },
 
-            async syncVehicles() {
-                if (!this.isConnected()) return;
-                const sanitizedVehicles = await this.getSanitizedVehicles();
-                this.ws.send(JSON.stringify({
-                    type: "SYNC_VEHICLES",
-                    playerId: this.playerId,
-                    teamName: appState.teamName || "Anonymous Driver",
-                    sponsor: appState.sponsor || "Sponsorless",
-                    vehicles: sanitizedVehicles
-                }));
+                if (this.localBroadcast) {
+                    try { this.localBroadcast.postMessage(payload); } catch(_) {}
+                }
+                if (this.channel && this.connected) {
+                    this.channel.publish("sync_vehicles", payload);
+                }
             },
 
             broadcastTurnPhase(turn, phase) {
-                if (!this.isConnected()) return;
-                this.ws.send(JSON.stringify({
+                const payload = {
                     type: "SYNC_TURN_PHASE",
+                    playerId: this.playerId,
+                    updatedBy: appState.teamName || "Table",
                     turn: turn,
-                    phase: phase
-                }));
+                    phase: phase,
+                    timestamp: Date.now()
+                };
+                if (this.localBroadcast) {
+                    try { this.localBroadcast.postMessage(payload); } catch(_) {}
+                }
+                if (this.channel && this.connected) {
+                    this.channel.publish("turn_phase", payload);
+                }
             },
 
             broadcastResetGame() {
-                if (!this.isConnected()) return;
-                this.ws.send(JSON.stringify({
+                const payload = {
                     type: "RESET_GAME",
-                    teamName: appState.teamName || "Anonymous Driver"
-                }));
+                    playerId: this.playerId,
+                    resetBy: appState.teamName || "A Driver",
+                    timestamp: Date.now()
+                };
+                if (this.localBroadcast) {
+                    try { this.localBroadcast.postMessage(payload); } catch(_) {}
+                }
+                if (this.channel && this.connected) {
+                    this.channel.publish("reset_game", payload);
+                }
             },
 
             broadcastRoll(rollData) {
-                if (!this.isConnected()) return;
-                this.ws.send(JSON.stringify({
+                const payload = {
                     type: "ROLL_EVENT",
+                    playerId: this.playerId,
                     teamName: rollData.teamName,
                     diceType: rollData.diceType,
                     count: rollData.count,
                     results: rollData.results,
-                    resultText: rollData.resultText
-                }));
+                    resultText: rollData.resultText,
+                    timestamp: Date.now()
+                };
+                if (this.localBroadcast) {
+                    try { this.localBroadcast.postMessage(payload); } catch(_) {}
+                }
+                if (this.channel && this.connected) {
+                    this.channel.publish("roll_event", payload);
+                }
             },
 
-            handleMessage(data) {
+            handleMemberJoin(member) {
+                if (member.clientId === this.playerId) return;
+                const name = member.data && member.data.teamName ? member.data.teamName : "A Driver";
+                showNetworkToast(`🏎️ <strong>${name}</strong> arrived at the table`);
+                if (this.channel) {
+                    this.channel.presence.get((err, members) => {
+                        if (!err && members) {
+                            this.playerCount = Math.max(1, members.length);
+                            this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                        }
+                    });
+                }
+                this.syncVehicles();
+            },
+
+            handleMemberLeave(member) {
+                if (member.clientId === this.playerId) return;
+                const r = this.rivals.get(member.clientId);
+                const name = r ? r.teamName : (member.data && member.data.teamName ? member.data.teamName : "A driver");
+                this.rivals.delete(member.clientId);
+                showNetworkToast(`👋 <strong>${name}</strong> left the table`);
+                if (appState.mode === "rivals") renderRivals();
+                if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
+
+                if (this.channel) {
+                    this.channel.presence.get((err, members) => {
+                        if (!err && members) {
+                            this.playerCount = Math.max(1, members.length);
+                            this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                        }
+                    });
+                }
+            },
+
+            handleIncomingMessage(data, isLocal = false) {
+                if (!data || data.playerId === this.playerId) return;
+
+                // Check PIN security if room is protected
+                if (this.tablePin && data.pin && this.tablePin !== data.pin) {
+                    return;
+                }
+
                 switch (data.type) {
-                    case "ERROR": {
-                        if (data.code === "INVALID_PIN") {
-                            showNetworkToast("❌ <strong>Access Denied:</strong> Incorrect 4-digit PIN for this table.");
-                            promptJoinTable(this.customRoom, encodeURIComponent(this.tableName || this.customRoom), true);
-                        }
-                        break;
-                    }
-
-                    case "WELCOME": {
-                        if (data.tableName) this.tableName = data.tableName;
-                        this.rivals.clear();
-                        if (data.rivals && Array.isArray(data.rivals)) {
-                            data.rivals.forEach(r => this.rivals.set(r.playerId, r));
-                        }
-
-                        if (typeof data.turn === "number") {
-                            appState.turn = data.turn;
-                            appState.phase = data.phase || 1;
-                            renderHeader();
-                            if (appState.mode === "play") renderVehicles();
-                        }
-
-                        if (data.rollHistory && Array.isArray(data.rollHistory) && typeof rollHistory !== "undefined") {
-                            data.rollHistory.forEach(r => {
-                                const entry = `<span style="color:var(--text-muted)">[${r.teamName}]</span> ${r.resultText}`;
-                                if (!rollHistory.includes(entry)) {
-                                    rollHistory.push(entry);
-                                }
-                            });
-                            if (rollHistory.length > 50) rollHistory = rollHistory.slice(-50);
-                            if (typeof updateDiceLog === "function") updateDiceLog();
-                        }
-
-                        const count = (data.activePlayers ? data.activePlayers.length : 1);
-                        this.updatePill("connected", `Table: ${count} Driver${count > 1 ? 's' : ''}`);
+                    case "SYNC_VEHICLES": {
+                        const prev = this.rivals.get(data.playerId);
+                        this.rivals.set(data.playerId, data);
                         if (appState.mode === "rivals") renderRivals();
                         if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
-                        break;
-                    }
 
-                    case "RIVALS_UPDATE": {
-                        if (data.player && data.player.playerId !== this.playerId) {
-                            const prev = this.rivals.get(data.player.playerId);
-                            this.rivals.set(data.player.playerId, data.player);
-                            if (appState.mode === "rivals") renderRivals();
-                            if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
-
-                            if (!prev) {
-                                showNetworkToast(`🏎️ <strong>${data.player.teamName}</strong> joined table radar`);
-                            } else {
-                                const prevDmg = (prev.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
-                                const newDmg = (data.player.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
-                                const prevHaz = (prev.vehicles || []).reduce((s, v) => s + (v.hazard || 0), 0);
-                                const newHaz = (data.player.vehicles || []).reduce((s, v) => s + (v.hazard || 0), 0);
-                                if (newDmg > prevDmg) {
-                                    showNetworkToast(`💥 <strong>${data.player.teamName}</strong> suffered damage!`);
-                                } else if (newHaz !== prevHaz) {
-                                    showNetworkToast(`⚠️ <strong>${data.player.teamName}</strong> hazard updated (${newHaz})`);
-                                }
+                        if (!prev) {
+                            showNetworkToast(`🏎️ <strong>${data.teamName}</strong> joined table radar`);
+                        } else {
+                            const prevDmg = (prev.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
+                            const newDmg = (data.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
+                            const prevHaz = (prev.vehicles || []).reduce((s, v) => s + (v.hazard || 0), 0);
+                            const newHaz = (data.vehicles || []).reduce((s, v) => s + (v.hazard || 0), 0);
+                            if (newDmg > prevDmg) {
+                                showNetworkToast(`💥 <strong>${data.teamName}</strong> suffered damage!`);
+                            } else if (newHaz !== prevHaz) {
+                                showNetworkToast(`⚠️ <strong>${data.teamName}</strong> hazard updated (${newHaz})`);
                             }
                         }
-                        if (data.activePlayers) {
-                            const count = data.activePlayers.length;
-                            this.updatePill("connected", `Table: ${count} Driver${count > 1 ? 's' : ''}`);
-                        }
                         break;
                     }
 
-                    case "PLAYER_LEFT": {
-                        if (this.rivals.has(data.playerId)) {
-                            this.rivals.delete(data.playerId);
-                            showNetworkToast(`👋 <strong>${data.teamName}</strong> left the table`);
-                            if (appState.mode === "rivals") renderRivals();
-                            if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
-                        }
-                        if (data.activePlayers) {
-                            const count = data.activePlayers.length;
-                            this.updatePill("connected", `Table: ${count} Driver${count > 1 ? 's' : ''}`);
-                        }
-                        break;
-                    }
-
-                    case "REMOTE_GAME_RESET": {
-                        executeGameReset(false);
-                        showNetworkToast(`🔄 <strong>${data.resetBy || 'A player'}</strong> reset the game state for this table.`);
-                        break;
-                    }
-
-                    case "REMOTE_TURN_PHASE": {
+                    case "SYNC_TURN_PHASE": {
                         appState.turn = data.turn;
                         appState.phase = data.phase;
                         renderHeader();
@@ -3889,15 +3898,20 @@
                         break;
                     }
 
-                    case "REMOTE_ROLL": {
-                        const roll = data.roll;
-                        const entry = `<span style="color:var(--text-muted)">[${roll.teamName}]</span> ${roll.resultText}`;
+                    case "RESET_GAME": {
+                        executeGameReset(false);
+                        showNetworkToast(`🔄 <strong>${data.resetBy || 'A player'}</strong> reset the game state for this table.`);
+                        break;
+                    }
+
+                    case "ROLL_EVENT": {
+                        const entry = `<span style="color:var(--text-muted)">[${data.teamName}]</span> ${data.resultText}`;
                         if (typeof rollHistory !== "undefined") {
                             rollHistory.push(entry);
                             if (rollHistory.length > 50) rollHistory.shift();
                             if (typeof updateDiceLog === "function") updateDiceLog();
                         }
-                        showNetworkToast(`🎲 <strong>${roll.teamName}</strong> rolled ${roll.count} ${(roll.diceType || '').toUpperCase()}: ${roll.resultText}`);
+                        showNetworkToast(`🎲 <strong>${data.teamName}</strong> rolled ${data.count} ${(data.diceType || '').toUpperCase()}: ${data.resultText}`);
                         break;
                     }
                 }
@@ -3979,7 +3993,7 @@
                         if (w > h) {
                             if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
                         } else {
-                            if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+                            if (h > maxDim) { w = Math.round(h * maxDim / h); h = maxDim; }
                         }
                         canvas.width = w;
                         canvas.height = h;
@@ -3997,7 +4011,7 @@
                 const label = document.getElementById("net-status-label");
                 let displayText = text;
                 if (status === "connected" && typeof text === "string" && text.startsWith("Table:")) {
-                    const roomTag = this.customRoom ? this.customRoom : "WiFi LAN";
+                    const roomTag = this.customRoom ? this.customRoom : "Arena";
                     displayText = text.replace("Table:", `Table [${roomTag}]:`);
                 }
                 if (dot) {
