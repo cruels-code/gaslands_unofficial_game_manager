@@ -1925,19 +1925,25 @@
 
         /* Background watermark badges */
         .bg-watermark-left {
-            position: fixed;
-            bottom: 12px;
-            left: 16px;
-            font-family: 'Orbitron', monospace, sans-serif;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            opacity: 0.55;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            pointer-events: none;
-            z-index: 10;
-            user-select: none;
-        }
+        position: fixed;
+        bottom: 12px;
+        left: 16px;
+        font-family: 'Orbitron', monospace, sans-serif;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        opacity: 0.65;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        z-index: 10;
+        user-select: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .bg-watermark-left:hover {
+        opacity: 1;
+        color: var(--glow-color);
+        text-shadow: 0 0 8px var(--glow-shadow);
+    }
 
         .bg-watermark-right {
             position: fixed;
@@ -2873,10 +2879,11 @@
                 <button class="close-modal-btn" onclick="closeAboutModal()">&times;</button>
             </div>
             <div style="padding: 1.2rem 0.2rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem; line-height: 1.65; color: var(--text-primary);">
-                <p style="margin: 0; white-space: pre-line;">This web app was built for the love of the game is provided free of charge. 
+                <p style="margin: 0; white-space: pre-line;">This web app was built for the love of the game is provided free of charge.
+
 It is a completely unofficial, non endorsed, fan made, unauthorised bootleg addtion to the game. 
 
-There's no support, You're smart, I'm sure you'll figure things out. 
+There's no support. You're smart, I'm sure you'll figure things out. 
 That being said there will be updates as I use it and fix things that annoy me. I'll keep a eye on reddit too.
 
 If you use it a lot you might fancy buying me a beer or a coffee. Once I figure out how make a donate button I'll add it here until then I'll just have to meet you in the pub.
@@ -2889,6 +2896,29 @@ Thanks to Mike for being ace.</p>
             </div>
         </div>
     </div>
+
+    <!-- Version / Changelog Modal -->
+    <div class="modal-overlay" id="version-modal" onclick="closeVersionModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
+            <div class="modal-header">
+                <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🏷️</span> Version History & Updates
+                </h3>
+                <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
+            </div>
+            <div style="padding: 1.2rem 0.2rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 6px; padding: 0.8rem 1rem;">
+                    <div style="font-family: 'Orbitron', monospace, sans-serif; font-size: 0.88rem; color: var(--glow-color); font-weight: 700;">
+                        V 1.0.0 - Initial public release. - 28.10.26
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--card-border); padding-top: 0.8rem;">
+                <button class="btn btn-primary" onclick="closeVersionModal()" style="padding: 0.45rem 1.4rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Database arrays
@@ -3527,6 +3557,19 @@ Thanks to Mike for being ace.</p>
                 return;
             }
             const modal = document.getElementById("about-modal");
+            if (modal) modal.classList.remove("active");
+        }
+
+        function openVersionModal() {
+            const modal = document.getElementById("version-modal");
+            if (modal) modal.classList.add("active");
+        }
+
+        function closeVersionModal(event) {
+            if (event && event.target && event.target.id !== "version-modal" && !event.target.classList.contains("close-modal-btn")) {
+                return;
+            }
+            const modal = document.getElementById("version-modal");
             if (modal) modal.classList.remove("active");
         }
 
@@ -8213,7 +8256,7 @@ Thanks to Mike for being ace.</p>
 
     </script>
     <!-- Background Watermarks -->
-    <div class="bg-watermark-left">v1.0.0 (Public)</div>
+    <div class="bg-watermark-left" onclick="openVersionModal()" title="View Version & Updates">v1.0.0 (Public)</div>
     <div class="bg-watermark-right" onclick="openAboutModal()" title="About Unofficial Gaslands Game Manager">FRIEND OF GASLANDS</div>
 </body>
 </html>
