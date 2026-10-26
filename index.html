@@ -2029,12 +2029,12 @@
             gap: 0.4rem;
         }
 
-        /* 2x2 Grid for 4 vehicles */
+        /* Play Mode Grid & Vehicle Cards: Vertical Card Layout Matching Garage Cards */
         body.play-mode-active #play-vehicles-container {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.6rem;
-            align-items: stretch;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            align-items: start;
         }
 
         @media (max-width: 900px) {
@@ -2043,80 +2043,103 @@
             }
         }
 
-        /* Compact play vehicle card */
+        /* Play vehicle card: vertical flow like garage vehicle-card with natural height */
         body.play-mode-active .play-dashboard-card {
-            padding: 0.65rem 0.8rem !important;
-            gap: 0.7rem !important;
-            border-radius: 8px !important;
-            margin-bottom: 0;
-            display: flex;
-            flex-direction: row !important;
-            overflow: hidden;
-        }
-
-        body.play-mode-active .play-dashboard-left {
-            flex: 1.15;
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            border-right: 1px solid var(--card-border);
-            padding-right: 0.7rem;
-            min-width: 0;
-        }
-
-        body.play-mode-active .play-dashboard-right {
-            flex: 1.0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            min-width: 0;
-            overflow-y: auto;
-            max-height: 250px;
-            padding-right: 0.2rem;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 1.1rem !important;
+            padding: 1.5rem !important;
+            border-radius: 12px !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            position: relative;
         }
 
         body.play-mode-active .play-dashboard-card .card-header {
-            padding-bottom: 0;
-            gap: 0.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.8rem;
         }
 
         body.play-mode-active .play-dashboard-card .vehicle-name-block span:first-child {
-            font-size: 0.95rem !important;
+            font-size: 1.25rem !important;
             line-height: 1.2;
         }
 
-        body.play-mode-active .play-dashboard-card .vehicle-name-block div {
-            font-size: 0.68rem !important;
-            margin-top: 1px;
-            gap: 0.3rem;
+        /* Status chips in header / action area */
+        .play-status-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.4rem;
         }
 
-        /* Compact status chips */
-        body.play-mode-active .play-dashboard-card .status-bar {
-            gap: 0.3rem;
-            margin: 0.1rem 0;
+        .play-status-chip {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+            border-radius: 4px;
+            padding: 0.25rem 0.55rem;
+            font-size: 0.72rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.25s ease;
+            color: var(--text-muted);
         }
 
-        body.play-mode-active .play-dashboard-card .status-chip {
-            padding: 0.15rem 0.45rem;
-            font-size: 0.68rem;
-            border-radius: 3px;
+        .play-status-chip:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
         }
 
-        /* Compact damage tracker */
+        .play-status-chip.on-fire.active {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: #f97316;
+            color: #f97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+            animation: fire-pulse 1s infinite alternate;
+        }
+
+        .play-status-chip.ghost-rider.active {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan-glow);
+        }
+
+        .play-status-chip.distracted.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+            box-shadow: 0 0 10px var(--danger-red-glow);
+        }
+
+        /* Hull & Hazard track styling under stats bar */
+        .play-trackers-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+        }
+
         body.play-mode-active .play-dashboard-card .hull-tracker {
-            gap: 0.15rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hull-tracker span {
-            font-size: 0.68rem !important;
+            gap: 0.35rem;
         }
 
         body.play-mode-active .play-dashboard-card .hull-points-grid {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: flex-start;
-            gap: 0.2rem;
+            gap: 0.3rem;
             width: 100%;
         }
 
@@ -2127,32 +2150,29 @@
             border-radius: 4px;
             flex-shrink: 0;
             margin: 0;
+            cursor: pointer;
         }
 
         body.play-mode-active .play-dashboard-card .hull-point-box.damaged::after {
             font-size: 1.1rem;
         }
 
-        /* Compact hazard tracker */
         body.play-mode-active .play-dashboard-card .hazard-tracker {
-            gap: 0.15rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hazard-tracker span {
-            font-size: 0.68rem !important;
+            gap: 0.35rem;
         }
 
         body.play-mode-active .play-dashboard-card .hazard-dots-row {
-            padding: 0.15rem 0.3rem;
-            gap: 0.35rem;
+            padding: 0.35rem 0.6rem;
+            gap: 0.5rem;
+            border-radius: 6px;
         }
 
         body.play-mode-active .play-dashboard-card .hazard-dots {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: flex-start;
-            gap: 0.2rem;
-            flex-grow: 0;
+            gap: 0.3rem;
+            flex-grow: 1;
         }
 
         body.play-mode-active .play-dashboard-card .hazard-dot {
@@ -2162,137 +2182,65 @@
             border-radius: 4px;
             flex-shrink: 0;
             margin: 0;
+            cursor: pointer;
         }
 
-        /* Compact gearbox */
         body.play-mode-active .play-dashboard-card .gearbox {
             margin-top: 0.1rem;
         }
 
-        body.play-mode-active .play-dashboard-card .gearbox span {
-            font-size: 0.68rem !important;
-        }
-
         body.play-mode-active .play-dashboard-card .gear-selector {
-            gap: 0.25rem;
-            margin-top: 0.15rem;
+            gap: 0.35rem;
+            margin-top: 0.25rem;
         }
 
         body.play-mode-active .play-dashboard-card .gear-btn {
-            padding: 0.2rem 0;
-            font-size: 0.72rem;
-            border-radius: 4px;
-        }
-
-        /* Compact Weapons & Upgrades lists */
-        body.play-mode-active .play-dashboard-card .play-section-title {
-            font-size: 0.68rem;
-            padding-bottom: 0.15rem;
-            margin-bottom: 0.25rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .play-list-container {
-            gap: 0.25rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .play-list-2col {
-            grid-template-columns: 1fr 1fr;
-            gap: 0.25rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .ref-item {
-            font-size: 0.72rem;
-            padding-bottom: 0.15rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .ref-item-header {
-            font-size: 0.72rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .ref-item-desc {
-            font-size: 0.68rem;
-            line-height: 1.25;
-            margin-top: 0.05rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .ammo-checkbox {
-            width: 16px;
-            height: 16px;
-        }
-
-        body.play-mode-active .play-dashboard-card .ammo-checkbox:checked::after {
-            top: 2px;
-            left: 2px;
-            width: 10px;
-            height: 10px;
-        }
-
-        /* Clean 1:1 aspect-ratio square buttons without large gaps */
-        .hull-point-box {
-            aspect-ratio: 1 / 1;
-        }
-        .hazard-dot {
-            aspect-ratio: 1 / 1;
-        }
-
-        /* Vehicle image aligned flush with the bottom of status chips */
-        .play-dashboard-left {
-            position: relative;
-        }
-        .play-header-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto auto;
-            align-items: stretch;
-            gap: 0.6rem;
-            width: 100%;
-        }
-        .play-header-details {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 0.25rem;
-            min-width: 0;
-        }
-        .play-card-img-wrap {
-            height: 100% !important;
-            min-height: 72px;
-            max-height: 82px;
-            width: 110px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            align-self: stretch;
-        }
-        body.play-mode-active .play-dashboard-card .play-card-img-wrap {
-            height: 100% !important;
-            min-height: 72px;
-            max-height: 82px;
-            width: 110px !important;
-            max-width: 110px !important;
-            align-self: stretch;
-        }
-
-        /* Sponsor image matching vehicle image height */
-        .play-dashboard-card .sponsor-logo-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 72px;
-            max-height: 82px;
-            width: 72px;
-            flex-shrink: 0;
-            align-self: stretch;
-            background: rgba(0, 0, 0, 0.18);
-            border: 1px solid var(--card-border);
+            padding: 0.35rem 0;
+            font-size: 0.85rem;
             border-radius: 6px;
-            overflow: hidden;
         }
-        body.play-mode-active .play-dashboard-card .sponsor-logo {
-            transform: scale(0.9);
-            transform-origin: center center;
-            margin: 0;
+
+        /* Ammo checkboxes */
+        .ammo-spent-tracker {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .ammo-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1.5px solid var(--accent-cyan);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .ammo-checkbox:hover {
+            border-color: #fff;
+            box-shadow: 0 0 5px var(--accent-cyan-glow);
+        }
+
+        .ammo-checkbox:checked {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger-red);
+        }
+
+        .ammo-checkbox:checked::after {
+            content: "✕";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--danger-red);
+            line-height: 1;
         }
     </style>
 </head>
@@ -5585,11 +5533,10 @@ Thanks to Mike for being ace.</p>
                     garageContainer.appendChild(card);
                     
                 } else {
-                    // Render Play Mode Card
+                    // Render Play Mode Card (matches Garage Mode Card layout with trackers directly under stats bar)
                     let hullBoxesHtml = "";
                     for (let i = 1; i <= currentMaxHull; i++) {
                         let classState = "filled";
-                        // Left-to-right sequential damage: if index is <= damage, it is marked as damaged
                         if (i <= vehicle.damage) {
                             classState = "damaged";
                         }
@@ -5619,120 +5566,122 @@ Thanks to Mike for being ace.</p>
                         gearButtonsHtml += `<button ${active} ${disabled} onclick="setGear('${vehicle.id}', ${i})">${i}</button>`;
                     }
 
-                    let playWeaponsHtml = "";
-                    vehicle.weapons.forEach((w, index) => {
-                        let ammoHtml = "";
-                        if (w.ammo !== undefined && w.ammo !== null) {
-                            let maxAmmo = w.ammo;
-                            if (appState.sponsor === "Rutherford" && w.ammo === 3) {
-                                maxAmmo = 4;
-                            }
-                            if (!vehicle.ammoStates) vehicle.ammoStates = {};
-                            const ammoKey = `w_${index}`;
-                            if (vehicle.ammoStates[ammoKey] === undefined) {
-                                vehicle.ammoStates[ammoKey] = 0; 
-                            }
-                            let spent = vehicle.ammoStates[ammoKey];
-                            
-                            ammoHtml += `<div class="ammo-spent-tracker">`;
-                            for (let a = 1; a <= maxAmmo; a++) {
-                                let checked = a <= spent ? "checked" : "";
-                                ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${vehicle.id}', '${ammoKey}', ${a}, this.checked)">`;
-                            }
-                            ammoHtml += `</div>`;
-                        }
-                        
-                        // Omit facing orientation if 0-slots weapon
-                        const isZeroSlots = w.slots === 0;
-                        const facingDisplay = isZeroSlots ? "360°" : w.facing;
-                        
-                        playWeaponsHtml += `
-                            <div class="ref-item">
-                                <div class="ref-item-header">
-                                    <span><strong>${w.name}</strong> <span style="font-size:0.75rem; color: var(--text-muted);">(${facingDisplay})</span></span>
-                                    <span>${ammoHtml ? ammoHtml : w.dice}</span>
-                                </div>
-                                <div class="ref-item-desc">${w.range} range • ${w.dice} attack • ${w.special || 'No special rules.'}</div>
+                    let isWipeout = vehicle.hazard >= hazardLimit;
+
+                    // Play Mode image slot matching Garage card
+                    let playImageSlotHtml = "";
+                    if (vehicle.imageUrl && vehicle.imageUrl !== "db_stored") {
+                        playImageSlotHtml = `
+                            <div style="position: relative; width: 100%; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border);">
+                                <img src="${vehicle.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
                         `;
-                    });
-
-                    let playRefsHtml = "";
-                    if (baseInfo.special) {
-                        playRefsHtml += `
-                            <div class="ref-item">
-                                <div class="ref-item-header"><strong>${vehicle.type} Chassis Rule</strong></div>
-                                <div class="ref-item-desc">${baseInfo.special}</div>
+                    } else {
+                        playImageSlotHtml = `
+                            <div style="width: 100%; height: 100px; border: 1px dashed var(--card-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; background: rgba(0,0,0,0.15);">
+                                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Image</span>
                             </div>
                         `;
                     }
-                    
-                    vehicle.upgrades.forEach((u, index) => {
-                        let ammoHtml = "";
-                        if (u.ammo !== undefined && u.ammo !== null) {
-                            if (!vehicle.ammoStates) vehicle.ammoStates = {};
-                            const ammoKey = `u_${index}`;
-                            if (vehicle.ammoStates[ammoKey] === undefined) {
-                                vehicle.ammoStates[ammoKey] = 0; 
+
+                    // Weapons list styled like Garage equipped items, with Ammo checkboxes
+                    let playWeaponsHtml = "";
+                    if (vehicle.weapons.length === 0) {
+                        playWeaponsHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No weapons equipped</div>`;
+                    } else {
+                        vehicle.weapons.forEach((w, index) => {
+                            let ammoHtml = "";
+                            if (w.ammo !== undefined && w.ammo !== null) {
+                                let maxAmmo = w.ammo;
+                                if (appState.sponsor === "Rutherford" && w.ammo === 3) {
+                                    maxAmmo = 4;
+                                }
+                                if (!vehicle.ammoStates) vehicle.ammoStates = {};
+                                const ammoKey = `w_${index}`;
+                                if (vehicle.ammoStates[ammoKey] === undefined) {
+                                    vehicle.ammoStates[ammoKey] = 0;
+                                }
+                                let spent = vehicle.ammoStates[ammoKey];
+                                
+                                ammoHtml += `<div class="ammo-spent-tracker" title="Ammo Tracker (checked = spent)">`;
+                                for (let a = 1; a <= maxAmmo; a++) {
+                                    let checked = a <= spent ? "checked" : "";
+                                    ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${vehicle.id}', '${ammoKey}', ${a}, this.checked)">`;
+                                }
+                                ammoHtml += `</div>`;
                             }
-                            let spent = vehicle.ammoStates[ammoKey];
-                            ammoHtml += `<div class="ammo-spent-tracker">`;
-                            for (let a = 1; a <= u.ammo; a++) {
-                                let checked = a <= spent ? "checked" : "";
-                                ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${vehicle.id}', '${ammoKey}', ${a}, this.checked)">`;
-                            }
-                            ammoHtml += `</div>`;
-                        }
-                        
-                        const facingDisplay = u.facing ? ` (${u.facing})` : '';
 
-                        playRefsHtml += `
-                            <div class="ref-item">
-                                <div class="ref-item-header">
-                                    <span><strong>${u.name}${facingDisplay}</strong></span>
-                                    <span>${ammoHtml}</span>
-                                </div>
-                                <div class="ref-item-desc">${u.special || 'No rules listed.'}</div>
-                            </div>
-                        `;
-                    });
+                            const isZeroSlots = w.slots === 0;
+                            const facingDisplay = isZeroSlots ? "360°" : w.facing;
 
-                    vehicle.perks.forEach(p => {
-                        playRefsHtml += `
-                            <div class="ref-item">
-                                <div class="ref-item-header"><strong>${p.name}</strong> <span style="font-size:0.75rem; color: var(--glow-color);">${p.class}</span></div>
-                                <div class="ref-item-desc">${p.desc || 'No rules listed.'}</div>
-                            </div>
-                        `;
-                    });
-
-                    const sp = SPONSORS.find(s => s.name === appState.sponsor);
-                    if (appState.mode !== "play" && sp && sp.name !== "Sponsorless") {
-                        sp.sponsored.forEach(rule => {
-                            const name = rule.split(":")[0];
-                            const desc = rule.split(":")[1] || rule;
-                            playRefsHtml += `
-                                <div class="ref-item">
-                                    <div class="ref-item-header"><strong>${name}</strong> <span style="font-size:0.75rem; color: var(--accent-cyan);">Sponsored</span></div>
-                                    <div class="ref-item-desc">${desc.trim()}</div>
+                            playWeaponsHtml += `
+                                <div class="equipped-item" style="flex-wrap: wrap; gap: 0.35rem;">
+                                    <div class="equipped-item-details">
+                                        <div class="equipped-item-name">
+                                            ${w.name} 
+                                            <span style="font-size:0.75rem; color: var(--glow-color); font-weight:normal;">(${facingDisplay})</span>
+                                        </div>
+                                        <div class="equipped-item-desc">${w.range} • ${w.dice}${w.special ? ` • ${w.special}` : ''}</div>
+                                    </div>
+                                    <div class="item-controls" style="margin-left: auto;">
+                                        ${ammoHtml ? ammoHtml : `<span style="font-size: 0.8rem; font-family: 'Orbitron', sans-serif; color: var(--accent-cyan); font-weight: 700;">${w.dice}</span>`}
+                                    </div>
                                 </div>
                             `;
                         });
                     }
 
-                    let isWipeout = vehicle.hazard >= hazardLimit;
+                    // Upgrades list styled like Garage equipped items, with ammo checkboxes for any that have ammo
+                    let playUpgradesHtml = "";
+                    if (vehicle.upgrades.length === 0) {
+                        playUpgradesHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No upgrades equipped</div>`;
+                    } else {
+                        vehicle.upgrades.forEach((u, index) => {
+                            let ammoHtml = "";
+                            if (u.ammo !== undefined && u.ammo !== null) {
+                                if (!vehicle.ammoStates) vehicle.ammoStates = {};
+                                const ammoKey = `u_${index}`;
+                                if (vehicle.ammoStates[ammoKey] === undefined) {
+                                    vehicle.ammoStates[ammoKey] = 0;
+                                }
+                                let spent = vehicle.ammoStates[ammoKey];
+                                ammoHtml += `<div class="ammo-spent-tracker" title="Ammo Tracker (checked = spent)">`;
+                                for (let a = 1; a <= u.ammo; a++) {
+                                    let checked = a <= spent ? "checked" : "";
+                                    ammoHtml += `<input type="checkbox" class="ammo-checkbox" ${checked} onchange="toggleWeaponAmmo('${vehicle.id}', '${ammoKey}', ${a}, this.checked)">`;
+                                }
+                                ammoHtml += `</div>`;
+                            }
 
-                    // Play Mode image header if exists (styled for floating right next to name)
-                    let playImageHtml = `
-                        <div class="play-card-img-wrap" style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--card-border); background: rgba(0,0,0,0.15); z-index: 2;">
-                            <span style="font-size: 0.65rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">NO IMAGE</span>
-                        </div>`;
-                    if (vehicle.imageUrl) {
-                        playImageHtml = `
-                            <div class="play-card-img-wrap" style="flex: 1.5; max-width: 180px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); z-index: 2;">
-                                <img src="${vehicle.imageUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                            </div>
-                        `;
+                            const facingDisplay = u.facing ? ` (${u.facing})` : '';
+
+                            playUpgradesHtml += `
+                                <div class="equipped-item" style="flex-wrap: wrap; gap: 0.35rem;">
+                                    <div class="equipped-item-details">
+                                        <div class="equipped-item-name">${u.name}${facingDisplay}</div>
+                                        <div class="equipped-item-desc">${u.special || (u.slots > 0 ? `${u.slots} Slots` : '0 Slots')}</div>
+                                    </div>
+                                    ${ammoHtml ? `<div class="item-controls" style="margin-left: auto;">${ammoHtml}</div>` : ''}
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Perks list styled like Garage equipped items
+                    let playPerksHtml = "";
+                    if (vehicle.perks.length === 0) {
+                        playPerksHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No perks selected</div>`;
+                    } else {
+                        vehicle.perks.forEach(p => {
+                            playPerksHtml += `
+                                <div class="equipped-item">
+                                    <div class="equipped-item-details">
+                                        <div class="equipped-item-name">${p.name}</div>
+                                        <div class="equipped-item-desc">${p.class ? p.class.toUpperCase() : ''}${p.desc ? ` • ${p.desc}` : ''}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
                     }
 
                     // Check if current phase is higher than vehicle gear
@@ -5761,47 +5710,70 @@ Thanks to Mike for being ace.</p>
                         <canvas id="glitch-canvas-${vehicle.id}" class="glitch-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; z-index: 100;"></canvas>
                         ` : ''}
 
-                        <!-- Left side: Info, Status, Hull, Hazards, Gear -->
-                        <div class="play-dashboard-left">
-                            <div class="play-header-grid">
-                                <div class="play-header-details">
-                                    <div class="vehicle-name-block">
-                                        <span style="font-family:'Orbitron', sans-serif; font-size: 1.15rem; font-weight:800; letter-spacing:0.5px;">${vehicle.name}</span>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
-                                            <span>${baseInfo.weight} • ${vehicle.type}</span>
-                                            <span style="color: var(--accent-cyan); font-weight: 700; background: rgba(56, 189, 248, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25);">HANDLING: ${currentHandling}</span>
-                                            <span style="color: var(--glow-color); font-weight: 700; background: rgba(245, 158, 11, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.25);">CREW: ${currentCrew}</span>
-                                        </div>
+                        <!-- Header: Car Name, Chassis Type, Sponsor, Cans/Gear Info & Status Buttons -->
+                        <div class="card-header">
+                            <div style="display: flex; gap: 0.5rem; align-items: flex-start; flex: 1; min-width: 120px;">
+                                <div class="vehicle-name-block" style="flex: 1;">
+                                    <span style="font-family:'Orbitron', sans-serif; font-size: 1.25rem; font-weight:800; letter-spacing:0.5px; color: var(--text-primary);">${vehicle.name}</span>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                                        <span>${baseInfo.weight} • ${vehicle.type}</span>
                                     </div>
 
-                                    <!-- Status Toggles (Flush inline with bottom of vehicle & sponsor images) -->
-                                    <div class="status-bar" style="margin-top: 0.2rem;">
-                                        <div class="status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 On Fire</div>
-                                        <div class="status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</div>
-                                        <div class="status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</div>
+                                    <!-- Status Buttons (On Fire, Ghost, Distracted) -->
+                                    <div class="play-status-bar">
+                                        <button type="button" class="play-status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 On Fire</button>
+                                        <button type="button" class="play-status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</button>
+                                        <button type="button" class="play-status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</button>
                                     </div>
                                 </div>
-                                <div class="sponsor-logo-wrap" title="${appState.sponsor}">
-                                    ${sponsorLogoHtml}
-                                </div>
-                                ${playImageHtml}
+                                ${sponsorLogoHtml}
                             </div>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; margin-left: 0.5rem; justify-content: center;">
+                                <span class="selection-item-cost" style="font-size: 1.1rem;">${cans} Cans</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">${slotsUsed} / ${slotsMax} Slots</span>
+                            </div>
+                        </div>
 
-                            ${gearWarningHtml}
+                        <!-- Chassis Image Slot -->
+                        ${playImageSlotHtml}
 
-                            <!-- Damage Bar (Hull) -->
+                        <!-- Stats Bar (Hull, Handling, Max Gear, Crew) -->
+                        <div class="stats-badge-grid">
+                            <div class="stat-badge">
+                                <span class="label">Hull</span>
+                                <span class="val">${currentMaxHull}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <span class="label">Handling</span>
+                                <span class="val">${currentHandling}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <span class="label">Max Gear</span>
+                                <span class="val">${currentMaxGear}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <span class="label">Crew</span>
+                                <span class="val">${currentCrew}</span>
+                            </div>
+                        </div>
+
+                        ${gearWarningHtml}
+
+                        <!-- Trackers directly under the Stats Bar (Hull & Hazards & Gearbox) -->
+                        <div class="play-trackers-panel">
+                            <!-- Hull Integrity Tracker -->
                             <div class="hull-tracker">
                                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight:bold;">
-                                    <span>HULL INTEGRITY</span>
-                                    <span style="color: ${vehicle.damage >= currentMaxHull ? 'var(--danger-red)' : 'var(--accent-cyan)'};">${currentMaxHull - vehicle.damage} / ${currentMaxHull} HP</span>
+                                    <span style="font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HULL INTEGRITY</span>
+                                    <span style="color: ${vehicle.damage >= currentMaxHull ? 'var(--danger-red)' : 'var(--accent-cyan)'}; font-family:'Orbitron', sans-serif;">${currentMaxHull - vehicle.damage} / ${currentMaxHull} HP</span>
                                 </div>
                                 <div class="hull-points-grid">${hullBoxesHtml}</div>
                             </div>
 
-                            <!-- Hazard Tracker -->
+                            <!-- Hazard Tokens Tracker -->
                             <div class="hazard-tracker">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.75rem; font-weight:bold;">HAZARD TOKENS</span>
+                                    <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HAZARD TOKENS</span>
                                     <div style="display:flex; align-items:center; gap:0.4rem;">
                                         <button style="background: transparent; border:none; color: var(--text-muted); cursor:pointer; font-size:0.8rem;" onclick="toggleHazard('${vehicle.id}', 0)">[Clear]</button>
                                         <span style="font-family:'Orbitron', sans-serif; font-size:0.9rem; font-weight:bold; color: var(--glow-color);">${vehicle.hazard} / ${hazardLimit}</span>
@@ -5815,24 +5787,33 @@ Thanks to Mike for being ace.</p>
 
                             <!-- Gearbox -->
                             <div class="gearbox">
-                                <span style="font-size: 0.75rem; font-weight:bold;">ACTIVE GEAR SHIFT</span>
+                                <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
                                 <div class="gear-selector">${gearButtonsHtml}</div>
                             </div>
                         </div>
 
-                        <!-- Right side: Weapons, Upgrades & Perks (Expanded by default) -->
-                        <div class="play-dashboard-right">
-                            <div>
-                                <div class="play-section-title">Weapons & Ammo</div>
-                                <div class="play-list-container">
-                                    ${playWeaponsHtml || '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No weapons fitted.</div>'}
-                                </div>
+                        <!-- Weapons with Ammo Counters -->
+                        <div class="garage-section">
+                            <div class="section-title">
+                                <span>Weapons & Ammo</span>
                             </div>
-                            <div style="margin-top: 0.5rem;">
-                                <div class="play-section-title">Upgrades & Perks</div>
-                                <div class="play-list-container play-list-2col">
-                                    ${playRefsHtml || '<div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No upgrades or perks.</div>'}
+                            <div class="item-list">${playWeaponsHtml}</div>
+                        </div>
+
+                        <!-- Upgrades & Perks in 2-Column Grid -->
+                        <div class="garage-2col-grid">
+                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
+                                <div class="section-title">
+                                    <span>Upgrades</span>
                                 </div>
+                                <div class="item-list">${playUpgradesHtml}</div>
+                            </div>
+
+                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
+                                <div class="section-title">
+                                    <span>Perks</span>
+                                </div>
+                                <div class="item-list">${playPerksHtml}</div>
                             </div>
                         </div>
 
