@@ -678,7 +678,7 @@
         }
 
         .hull-point-box {
-            aspect-ratio: 1.5;
+            aspect-ratio: 1 / 1;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 4px;
@@ -736,7 +736,7 @@
         }
 
         .hazard-dot {
-            aspect-ratio: 1.5;
+            aspect-ratio: 1 / 1;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 4px;
@@ -2107,16 +2107,24 @@
         }
 
         body.play-mode-active .play-dashboard-card .hull-points-grid {
-            gap: 0.15rem;
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            gap: 0.2rem;
+            width: 100%;
         }
 
         body.play-mode-active .play-dashboard-card .hull-point-box {
-            aspect-ratio: 1.8;
+            aspect-ratio: 1 / 1;
+            width: 16px;
+            height: 16px;
             border-radius: 2px;
+            flex-shrink: 0;
+            margin: 0;
         }
 
         body.play-mode-active .play-dashboard-card .hull-point-box.damaged::after {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
         }
 
         /* Compact hazard tracker */
@@ -2130,16 +2138,24 @@
 
         body.play-mode-active .play-dashboard-card .hazard-dots-row {
             padding: 0.15rem 0.3rem;
-            gap: 0.25rem;
+            gap: 0.35rem;
         }
 
         body.play-mode-active .play-dashboard-card .hazard-dots {
-            gap: 0.15rem;
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            gap: 0.2rem;
+            flex-grow: 0;
         }
 
         body.play-mode-active .play-dashboard-card .hazard-dot {
-            aspect-ratio: 1.8;
+            aspect-ratio: 1 / 1;
+            width: 16px;
+            height: 16px;
             border-radius: 2px;
+            flex-shrink: 0;
+            margin: 0;
         }
 
         /* Compact gearbox */
@@ -2205,38 +2221,12 @@
             height: 10px;
         }
 
-        /* Base reduction for Hull and Hazard buttons by 35% */
+        /* Clean 1:1 aspect-ratio square buttons without large gaps */
         .hull-point-box {
-            aspect-ratio: 1.5;
-            max-width: 28px;
-            max-height: 18px;
-            margin: 0 auto;
-            width: 100%;
+            aspect-ratio: 1 / 1;
         }
         .hazard-dot {
-            aspect-ratio: 1.5;
-            max-width: 28px;
-            max-height: 18px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Play mode Hull and Hazard buttons reduced by 35% */
-        body.play-mode-active .play-dashboard-card .hull-point-box {
-            aspect-ratio: 1.8;
-            max-width: 20px !important;
-            max-height: 11px !important;
-            border-radius: 2px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        body.play-mode-active .play-dashboard-card .hazard-dot {
-            aspect-ratio: 1.8;
-            max-width: 20px !important;
-            max-height: 11px !important;
-            border-radius: 2px;
-            margin: 0 auto;
-            width: 100%;
+            aspect-ratio: 1 / 1;
         }
 
         /* Vehicle image aligned flush with the bottom of status chips */
