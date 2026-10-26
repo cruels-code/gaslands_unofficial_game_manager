@@ -3229,6 +3229,20 @@ Thanks to Mike for being ace.</p>
         let pendingJoinRoom = null;
         let pendingJoinTableName = null;
 
+        function openPinPromptModal(roomCode, tableName) {
+            pendingJoinRoom = roomCode;
+            pendingJoinTableName = tableName;
+            const titleEl = document.getElementById("pin-prompt-title");
+            const errDiv = document.getElementById("pin-prompt-error");
+            const pinInput = document.getElementById("join-table-pin-input");
+            if (titleEl) titleEl.textContent = `🔒 ${tableName || roomCode}`;
+            if (errDiv) errDiv.textContent = "";
+            if (pinInput) { pinInput.value = ""; }
+            const modal = document.getElementById("pin-prompt-modal");
+            if (modal) modal.classList.add("active");
+            if (pinInput) setTimeout(() => pinInput.focus(), 150);
+        }
+
         function switchNetTab(tab) {
             ['browse', 'create', 'settings'].forEach(t => {
                 const el = document.getElementById('net-tab-' + t);
@@ -3252,27 +3266,52 @@ Thanks to Mike for being ace.</p>
             if (!listEl) return;
             const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
             
-            // Standard Ably shared tables
-            const defaultTables = [
-                { roomCode: "table-1", tableName: "Death Highway Arena (Table 1)", playerCount: 1, hasPin: false },
-                { roomCode: "table-2", tableName: "Rust Crater Stadium (Table 2)", playerCount: 1, hasPin: false },
-                { roomCode: "table-3", tableName: "Smackdown Raceway (Table 3)", playerCount: 1, hasPin: false }
-            ];
+            // Clean up any expired tables (no players for 60s or inactive for 60s)
+            if (window.NetworkManager && typeof window.NetworkManager.cleanExpiredTables === "function") {
+                window.NetworkManager.cleanExpiredTables();
+            }
 
-            let html = defaultTables.map(t => {
+            // Get live known tables map from NetworkManager
+            let tables = [];
+            if (window.NetworkManager && window.NetworkManager.knownTables) {
+                tables = Array.from(window.NetworkManager.knownTables.values());
+            }
+
+            // If empty or user is on a custom table, include current active table
+            if (tables.length === 0) {
+                if (currentRoom) {
+                    tables.push({
+                        roomCode: currentRoom,
+                        tableName: (window.NetworkManager && window.NetworkManager.tableName) || currentRoom,
+                        playerCount: (window.NetworkManager && window.NetworkManager.playerCount) || 1,
+                        hasPin: !!(window.NetworkManager && window.NetworkManager.tablePin)
+                    });
+                } else {
+                    tables = [
+                        { roomCode: "table-1", tableName: "Death Highway Arena (Table 1)", playerCount: 1, hasPin: false }
+                    ];
+                }
+            }
+
+            let html = tables.map(t => {
                 const isCurrent = (t.roomCode === currentRoom);
+                const joinAction = t.hasPin
+                    ? `openPinPromptModal('${t.roomCode}', '${(t.tableName || t.roomCode).replace(/'/g, "\'")}')`
+                    : `joinTableDirect('${t.roomCode}', '${(t.tableName || t.roomCode).replace(/'/g, "\'")}', '')`;
+
                 return `
                     <div style="background:rgba(0,0,0,0.3); border:1px solid ${isCurrent ? 'var(--glow-color)' : 'var(--card-border)'}; border-radius:6px; padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:700; font-size:0.85rem; color:${isCurrent ? 'var(--glow-color)' : 'var(--text-primary)'};">
-                                ${t.tableName}
-                                ${isCurrent ? '<span style="font-size:0.65rem; background:var(--glow-color); color:#000; padding:1px 5px; border-radius:3px; margin-left:6px; font-weight:700;">ACTIVE</span>' : ''}
+                        <div style="flex:1; min-width:0; padding-right:0.5rem;">
+                            <div style="font-weight:700; font-size:0.85rem; color:${isCurrent ? 'var(--glow-color)' : 'var(--text-primary)'}; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+                                <span>${t.hasPin ? '🔒 ' : ''}${t.tableName || t.roomCode}</span>
+                                ${isCurrent ? '<span style="font-size:0.65rem; background:var(--glow-color); color:#000; padding:1px 5px; border-radius:3px; font-weight:700;">ACTIVE</span>' : ''}
+                                <span style="font-size:0.68rem; background:rgba(255,255,255,0.08); color:var(--text-muted); padding:1px 6px; border-radius:10px;">${t.playerCount || 1} ${t.playerCount === 1 ? 'driver' : 'drivers'}</span>
                             </div>
                             <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
                                 Room: <code>${t.roomCode}</code> • Realtime Ably Mesh
                             </div>
                         </div>
-                        ${isCurrent ? '' : `<button class="btn btn-sm btn-primary" onclick="joinTableDirect('${t.roomCode}', '${t.tableName}', '')" style="font-size:0.72rem; padding:0.3rem 0.65rem;">Join</button>`}
+                        ${isCurrent ? '' : `<button class="btn btn-sm btn-primary" onclick="${joinAction}" style="font-size:0.72rem; padding:0.3rem 0.65rem; white-space:nowrap;">Join</button>`}
                     </div>
                 `;
             }).join("");
@@ -3316,10 +3355,24 @@ Thanks to Mike for being ace.</p>
             if (window.NetworkManager) {
                 const prevRoom = window.NetworkManager.customRoom;
                 const prevName = window.NetworkManager.tableName || prevRoom;
+                
+                // If this client was the only one on the table, announce 0 players so the 60s deletion countdown starts for any directory listeners
+                if (window.NetworkManager.directoryChannel && prevRoom) {
+                    try {
+                        window.NetworkManager.directoryChannel.publish("table_announce", {
+                            roomCode: prevRoom,
+                            tableName: prevName,
+                            playerCount: 0,
+                            updatedAt: Date.now()
+                        });
+                    } catch(_) {}
+                }
+
                 window.NetworkManager.customRoom = "";
                 window.NetworkManager.tableName = null;
                 window.NetworkManager.tablePin = "";
                 localStorage.removeItem("gaslands_custom_room");
+                localStorage.removeItem("gaslands_table_name");
                 if (prevRoom) {
                     sessionStorage.removeItem("gaslands_pin_" + prevRoom);
                 }
@@ -3764,6 +3817,12 @@ Thanks to Mike for being ace.</p>
             tablePin: "",
             playerId: null,
             rivals: new Map(),
+            knownTables: new Map(),
+            emptyTableTimer: null,
+            emptyTableCountdownInterval: null,
+            emptyTableStartedAt: null,
+            heartbeatInterval: null,
+            tableCleanupInterval: null,
             connected: false,
             playerCount: 1,
 
@@ -3927,8 +3986,10 @@ Thanks to Mike for being ace.</p>
                 // Fetch current presence list
                 this.channel.presence.get((err, members) => {
                     if (!err && members) {
-                        this.playerCount = Math.max(1, members.length);
+                        this.playerCount = members.length;
+                        this.checkEmptyTableTimeout(this.playerCount);
                         this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                        this.announceTableToDirectory();
                     }
                 });
 
@@ -3940,11 +4001,33 @@ Thanks to Mike for being ace.</p>
                 if (!this.ablyClient || !this.connected) return;
                 // Channel where public tables announce themselves for the table browser
                 this.directoryChannel = this.ablyClient.channels.get("gaslands-directory");
+                
+                // Subscribe to directory announcements and deletion broadcasts
+                this.directoryChannel.subscribe("table_announce", msg => {
+                    this.handleDirectoryAnnounce(msg.data);
+                });
+                this.directoryChannel.subscribe("table_delete", msg => {
+                    this.handleDirectoryDelete(msg.data);
+                });
+
+                // Periodically announce our table heartbeat (every 15s) while connected
+                if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
+                this.heartbeatInterval = setInterval(() => {
+                    this.announceTableToDirectory();
+                }, 15000);
+
+                // Periodic sweep every 5 seconds to delete tables with 0 players for >= 60 seconds
+                if (this.tableCleanupInterval) clearInterval(this.tableCleanupInterval);
+                this.tableCleanupInterval = setInterval(() => {
+                    this.cleanExpiredTables();
+                }, 5000);
+
                 this.announceTableToDirectory();
             },
 
             announceTableToDirectory() {
                 if (!this.directoryChannel || !this.customRoom) return;
+                // If table is currently undergoing empty countdown and has 0 players, don't keep it alive as active
                 const info = {
                     roomCode: this.customRoom,
                     tableName: this.tableName || this.customRoom,
@@ -3955,6 +4038,134 @@ Thanks to Mike for being ace.</p>
                 try {
                     this.directoryChannel.publish("table_announce", info);
                 } catch(_) {}
+            },
+
+            handleDirectoryAnnounce(info) {
+                if (!info || !info.roomCode) return;
+                const now = Date.now();
+                const existing = this.knownTables.get(info.roomCode);
+                
+                // If the table reports 0 players:
+                let zeroPlayersSince = existing ? existing.zeroPlayersSince : null;
+                if ((info.playerCount || 0) <= 0) {
+                    if (!zeroPlayersSince) zeroPlayersSince = now;
+                    // If it has had 0 players for >= 60 seconds, delete it
+                    if (now - zeroPlayersSince >= 60000) {
+                        this.knownTables.delete(info.roomCode);
+                        if (typeof fetchPublicTables === "function") fetchPublicTables();
+                        return;
+                    }
+                } else {
+                    zeroPlayersSince = null;
+                }
+
+                this.knownTables.set(info.roomCode, {
+                    roomCode: info.roomCode,
+                    tableName: info.tableName || info.roomCode,
+                    hasPin: !!info.hasPin,
+                    playerCount: info.playerCount || 1,
+                    updatedAt: now,
+                    zeroPlayersSince: zeroPlayersSince
+                });
+
+                if (typeof fetchPublicTables === "function") fetchPublicTables();
+            },
+
+            handleDirectoryDelete(data) {
+                if (!data || !data.roomCode) return;
+                this.knownTables.delete(data.roomCode);
+                if (typeof fetchPublicTables === "function") fetchPublicTables();
+
+                // If this client is currently on the table being deleted:
+                if (this.customRoom === data.roomCode) {
+                    showNetworkToast(`⚠️ Table <strong>${data.tableName || data.roomCode}</strong> was deleted (no players for 60s). Returning to default table.`);
+                    this.leaveTableDueToDeletion();
+                }
+            },
+
+            cleanExpiredTables() {
+                const now = Date.now();
+                let changed = false;
+                for (const [code, info] of this.knownTables.entries()) {
+                    // Rule: If table has had no players for 60 seconds or has not been seen for 60 seconds, delete it
+                    const hasZeroPlayersFor60s = info.zeroPlayersSince && (now - info.zeroPlayersSince >= 60000);
+                    const notSeenFor60s = (now - (info.updatedAt || 0) >= 60000);
+                    if (hasZeroPlayersFor60s || notSeenFor60s) {
+                        this.knownTables.delete(code);
+                        changed = true;
+                    }
+                }
+                if (changed && typeof fetchPublicTables === "function") {
+                    fetchPublicTables();
+                }
+            },
+
+            checkEmptyTableTimeout(currentMembersCount) {
+                // If table has 0 players (or only disconnected), start 60s deletion timer
+                if (currentMembersCount <= 0) {
+                    if (!this.emptyTableTimer) {
+                        this.emptyTableStartedAt = Date.now();
+                        console.log(`[NetworkManager] Table ${this.customRoom} is empty. Starting 60s deletion timer.`);
+                        this.emptyTableTimer = setTimeout(() => {
+                            this.executeTableDeletion();
+                        }, 60000);
+                    }
+                } else {
+                    // Table has active player(s); cancel deletion countdown
+                    if (this.emptyTableTimer) {
+                        console.log(`[NetworkManager] Player joined table ${this.customRoom}. Cancelling empty deletion countdown.`);
+                        clearTimeout(this.emptyTableTimer);
+                        this.emptyTableTimer = null;
+                        this.emptyTableStartedAt = null;
+                    }
+                }
+            },
+
+            executeTableDeletion() {
+                const roomToDelete = this.customRoom;
+                const nameToDelete = this.tableName || roomToDelete;
+                console.log(`[NetworkManager] 60s expired with 0 players. Deleting table ${roomToDelete}...`);
+
+                // Broadcast table deletion on directory channel so all clients drop it
+                if (this.directoryChannel) {
+                    try {
+                        this.directoryChannel.publish("table_delete", {
+                            roomCode: roomToDelete,
+                            tableName: nameToDelete,
+                            reason: "empty_timeout"
+                        });
+                    } catch(_) {}
+                }
+
+                // Clean local storage & session
+                if (roomToDelete) {
+                    localStorage.removeItem("gaslands_custom_room");
+                    localStorage.removeItem("gaslands_table_name");
+                    sessionStorage.removeItem("gaslands_pin_" + roomToDelete);
+                }
+
+                this.emptyTableTimer = null;
+                this.emptyTableStartedAt = null;
+                this.knownTables.delete(roomToDelete);
+
+                showNetworkToast(`🗑️ Table <strong>${nameToDelete}</strong> had no players for 60 seconds and was deleted.`);
+                this.leaveTableDueToDeletion();
+            },
+
+            leaveTableDueToDeletion() {
+                this.customRoom = "table-1";
+                this.tableName = "Death Highway Arena (Table 1)";
+                this.tablePin = "";
+                localStorage.setItem("gaslands_custom_room", "table-1");
+                localStorage.setItem("gaslands_table_name", "Death Highway Arena (Table 1)");
+                if (this.channel) {
+                    try {
+                        this.channel.presence.leave();
+                        this.channel.unsubscribe();
+                    } catch(_) {}
+                    this.channel = null;
+                }
+                this.connect(true);
             },
 
             isConnected() {
@@ -4042,8 +4253,10 @@ Thanks to Mike for being ace.</p>
                 if (this.channel) {
                     this.channel.presence.get((err, members) => {
                         if (!err && members) {
-                            this.playerCount = Math.max(1, members.length);
+                            this.playerCount = members.length;
+                            this.checkEmptyTableTimeout(this.playerCount);
                             this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                            this.announceTableToDirectory();
                         }
                     });
                 }
@@ -4062,8 +4275,10 @@ Thanks to Mike for being ace.</p>
                 if (this.channel) {
                     this.channel.presence.get((err, members) => {
                         if (!err && members) {
-                            this.playerCount = Math.max(1, members.length);
+                            this.playerCount = members.length;
+                            this.checkEmptyTableTimeout(this.playerCount);
                             this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                            this.announceTableToDirectory();
                         }
                     });
                 }
