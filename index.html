@@ -11,8 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Orbitron:wght@400;600;800;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <!-- 3D Dice: Three.js UMD + Cannon.js (file:// compatible, no ES modules needed) -->
-    <script src="three.min.js"></script>
+        <script src="three.min.js"></script>
     <script src="cannon.min.js"></script>
+    <script src="pdf.min.js"></script>
     <script src="sprites.js"></script>
     <script src="d6_sprites.js"></script>
     
@@ -2263,7 +2264,7 @@
                     <button class="mode-btn" id="play-mode-btn" onclick="switchMode('play')">Play Mode</button>
                     <button class="mode-btn" id="rivals-mode-btn" onclick="switchMode('rivals')">Rivals</button>
                     <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">AI Prompt</button>
-
+                    <button class="mode-btn" id="rules-mode-btn" onclick="switchMode('rules')">📖 Rules</button>
                 </div>
 
             </div>
@@ -2470,6 +2471,89 @@
                 </div>
 
                 <button class="btn" onclick="copyPromptTabText()">📋 Copy Prompt & Switch to Garage</button>
+            </div>
+        </div>
+
+        <!-- OFFICIAL PDF RULES VIEWER -->
+        <div id="rules-view" class="view-section">
+            <!-- State 1: When no PDF is linked / uploaded -->
+            <div id="pdf-unlinked-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 3rem 2rem; max-width: 720px; margin: 2rem auto; text-align: center; backdrop-filter: blur(16px); box-shadow: 0 4px 25px rgba(0,0,0,0.4);">
+                <div style="font-size: 3rem;">📖</div>
+                <h2 style="font-family: 'Orbitron', sans-serif; text-transform: uppercase; color: var(--glow-color); letter-spacing: 1.5px; margin: 0; font-size: 1.4rem;">Official Gaslands Rulebook Viewer</h2>
+                <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; max-width: 580px; margin: 0;">
+                    To protect Osprey Games copyright, the official rules PDF is not bundled with this community game manager. 
+                    If you own a legitimate copy of the official PDF (or purchase one below), you can link it directly in your browser.
+                </p>
+
+                <!-- Buy link card -->
+                <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid var(--accent-orange); border-radius: 8px; padding: 1.2rem 1.5rem; width: 100%; display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 0.82rem; color: var(--accent-orange); font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Don't own the official rules?</div>
+                    <div style="font-size: 0.85rem; color: var(--text-primary);">Purchase the official Gaslands: Refuelled rulebook directly from Osprey Games:</div>
+                    <a href="https://www.ospreypublishing.com/uk/gaslands-refuelled-9781472838865/" target="_blank" rel="noopener noreferrer" class="btn" style="background: var(--glow-color); color: #000; font-weight: 800; border-color: var(--glow-color); margin-top: 0.4rem; padding: 0.6rem 1.4rem;">
+                        🛒 Buy Official Gaslands Rulebook from Osprey Publishing ↗
+                    </a>
+                </div>
+
+                <!-- Load PDF section -->
+                <div style="width: 100%; border-top: 1px solid var(--card-border); padding-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                        Already own the official PDF?
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
+                        Choose your PDF file to view it with built-in search and reader tools:
+                    </p>
+                    <label class="btn btn-primary" style="cursor: pointer; padding: 0.7rem 1.6rem; font-size: 0.9rem;">
+                        📂 Choose PDF Rulebook File
+                        <input type="file" id="pdf-file-input" accept=".pdf,application/pdf" style="display: none;" onchange="handlePdfFileInput(event)">
+                    </label>
+                    <div style="font-size: 0.72rem; color: var(--text-muted);">
+                        🔒 Saved securely in your browser's private offline database (IndexedDB). Your PDF is never sent to any external server.
+                    </div>
+                </div>
+            </div>
+
+            <!-- State 2: When PDF is loaded into viewer -->
+            <div id="pdf-viewer-container" style="display: none; flex-direction: column; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; backdrop-filter: blur(16px); box-shadow: 0 6px 30px rgba(0,0,0,0.5);">
+                <!-- Toolbar -->
+                <div class="pdf-toolbar" style="background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid var(--card-border); padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
+                    <!-- Left: Navigation & Page Info -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="btn btn-sm" onclick="pdfPrevPage()" title="Previous Page" style="padding: 0.35rem 0.7rem; font-size: 0.85rem;">◀ Prev</button>
+                        <div style="display: flex; align-items: center; gap: 0.3rem; font-family: 'Orbitron', sans-serif; font-size: 0.82rem; color: var(--text-primary);">
+                            <span>Page</span>
+                            <input type="number" id="pdf-page-num-input" value="1" min="1" onchange="pdfGoToPage(this.value)" style="width: 55px; text-align: center; padding: 0.25rem; font-size: 0.8rem; font-family: monospace;">
+                            <span>/</span>
+                            <span id="pdf-page-count">0</span>
+                        </div>
+                        <button class="btn btn-sm" onclick="pdfNextPage()" title="Next Page" style="padding: 0.35rem 0.7rem; font-size: 0.85rem;">Next ▶</button>
+                    </div>
+
+                    <!-- Center: Search Tools -->
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px; min-width: 240px;">
+                        <input type="text" id="pdf-search-input" placeholder="Search rulebook..." onkeydown="if(event.key==='Enter') pdfFindNext()" style="width: 100%; padding: 0.35rem 0.7rem; font-size: 0.82rem;">
+                        <button class="btn btn-sm" onclick="pdfFindPrev()" title="Previous Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▲</button>
+                        <button class="btn btn-sm" onclick="pdfFindNext()" title="Next Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▼</button>
+                        <span id="pdf-search-status" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-family: monospace;"></span>
+                    </div>
+
+                    <!-- Right: Zoom & Reset / Replace PDF -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="btn btn-sm" onclick="pdfZoomOut()" title="Zoom Out" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍−</button>
+                        <span id="pdf-zoom-val" style="font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-color); min-width: 45px; text-align: center;">100%</span>
+                        <button class="btn btn-sm" onclick="pdfZoomIn()" title="Zoom In" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍+</button>
+                        <button class="btn btn-sm" onclick="pdfResetZoom()" title="Fit Width" style="padding: 0.35rem 0.6rem; font-size: 0.72rem;">Fit</button>
+                        <label class="btn btn-sm" style="cursor: pointer; padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Replace or re-link PDF">
+                            🔄 Change PDF
+                            <input type="file" accept=".pdf,application/pdf" style="display: none;" onchange="handlePdfFileInput(event)">
+                        </label>
+                        <button class="btn btn-sm btn-danger" onclick="removeStoredPdf()" title="Remove saved PDF from browser" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">✕ Remove</button>
+                    </div>
+                </div>
+
+                <!-- Canvas scroll view area -->
+                <div id="pdf-canvas-viewport" style="overflow: auto; max-height: calc(100vh - 180px); min-height: 600px; display: flex; justify-content: center; align-items: flex-start; padding: 1.5rem; background: rgba(0,0,0,0.5);">
+                    <canvas id="pdf-render-canvas" style="box-shadow: 0 4px 30px rgba(0,0,0,0.9); border-radius: 4px; background: #ffffff;"></canvas>
+                </div>
             </div>
         </div>
 
@@ -4143,13 +4227,18 @@
             if (rivalsBtn) rivalsBtn.classList.toggle("active", mode === "rivals");
             document.getElementById("prompt-mode-btn").classList.toggle("active", mode === "prompt");
             
+            const rulesBtn = document.getElementById("rules-mode-btn");
+            if (rulesBtn) rulesBtn.classList.toggle("active", mode === "rules");
+
             document.getElementById("garage-view").classList.toggle("active", mode === "garage");
             document.getElementById("play-view").classList.toggle("active", mode === "play");
             const rivalsView = document.getElementById("rivals-view");
             if (rivalsView) rivalsView.classList.toggle("active", mode === "rivals");
             document.getElementById("prompt-view").classList.toggle("active", mode === "prompt");
+            const rulesView = document.getElementById("rules-view");
+            if (rulesView) rulesView.classList.toggle("active", mode === "rules");
             
-            const hideControls = (mode === "play" || mode === "rivals");
+            const hideControls = (mode === "play" || mode === "rivals" || mode === "rules");
             if (mode === "rivals") {
                 renderRivals();
             }
@@ -4160,6 +4249,9 @@
             if (mode === "prompt") {
                 populatePromptVehicleDropdown();
                 updatePromptTabOutput();
+            }
+            if (mode === "rules") {
+                initRulesPdfViewer();
             }
 
             renderVehicles();
@@ -7103,6 +7195,290 @@
         console.log('[Dice3D] Ready — Three.js UMD + Cannon.js confirmed loaded.');
     });
     
+    
+    /* ================================================================== */
+    /* OFFICIAL PDF RULES VIEWER CONTROLLER (IndexedDB + PDF.js)          */
+    /* ================================================================== */
+    let pdfDoc = null;
+    let pdfPageNum = 1;
+    let pdfPageRendering = false;
+    let pdfPageNumPending = null;
+    let pdfScale = 1.25;
+    let pdfSearchResults = []; // array of { page, index }
+    let pdfSearchCurrentIndex = -1;
+    let pdfTextIndex = null; // Map of pageNum -> text string for search
+
+    const PDF_STORE_NAME = "rulebookPdf";
+
+    function openPdfDB(callback) {
+        const req = indexedDB.open("GaslandsPdfDB", 1);
+        req.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(PDF_STORE_NAME)) {
+                db.createObjectStore(PDF_STORE_NAME);
+            }
+        };
+        req.onsuccess = function(e) {
+            callback(e.target.result);
+        };
+        req.onerror = function() {
+            console.error("Failed to open GaslandsPdfDB");
+            callback(null);
+        };
+    }
+
+    function savePdfToDB(arrayBuffer, callback) {
+        openPdfDB(db => {
+            if (!db) return;
+            const tx = db.transaction(PDF_STORE_NAME, "readwrite");
+            const store = tx.objectStore(PDF_STORE_NAME);
+            store.put(arrayBuffer, "official_rules_pdf");
+            tx.oncomplete = function() {
+                if (callback) callback();
+            };
+        });
+    }
+
+    function getPdfFromDB(callback) {
+        openPdfDB(db => {
+            if (!db) { callback(null); return; }
+            const tx = db.transaction(PDF_STORE_NAME, "readonly");
+            const store = tx.objectStore(PDF_STORE_NAME);
+            const req = store.get("official_rules_pdf");
+            req.onsuccess = function() {
+                callback(req.result || null);
+            };
+            req.onerror = function() {
+                callback(null);
+            };
+        });
+    }
+
+    function removeStoredPdf() {
+        if (!confirm("Remove the stored rulebook PDF from your browser? You can re-link it anytime.")) return;
+        openPdfDB(db => {
+            if (!db) return;
+            const tx = db.transaction(PDF_STORE_NAME, "readwrite");
+            const store = tx.objectStore(PDF_STORE_NAME);
+            store.delete("official_rules_pdf");
+            tx.oncomplete = function() {
+                pdfDoc = null;
+                document.getElementById("pdf-unlinked-state").style.display = "flex";
+                document.getElementById("pdf-viewer-container").style.display = "none";
+            };
+        });
+    }
+
+    function initRulesPdfViewer() {
+        if (pdfDoc) {
+            document.getElementById("pdf-unlinked-state").style.display = "none";
+            document.getElementById("pdf-viewer-container").style.display = "flex";
+            renderPdfPage(pdfPageNum);
+            return;
+        }
+
+        getPdfFromDB(buffer => {
+            if (buffer) {
+                loadPdfFromBuffer(buffer);
+            } else {
+                document.getElementById("pdf-unlinked-state").style.display = "flex";
+                document.getElementById("pdf-viewer-container").style.display = "none";
+            }
+        });
+    }
+
+    function handlePdfFileInput(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const buffer = evt.target.result;
+            savePdfToDB(buffer, () => {
+                loadPdfFromBuffer(buffer);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function loadPdfFromBuffer(buffer) {
+        if (typeof pdfjsLib === "undefined") {
+            alert("PDF reader engine is still loading, please try again in a second.");
+            return;
+        }
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
+        const loadingTask = pdfjsLib.getDocument({ data: buffer });
+        loadingTask.promise.then(pdf => {
+            pdfDoc = pdf;
+            document.getElementById("pdf-page-count").textContent = pdf.numPages;
+            document.getElementById("pdf-page-num-input").max = pdf.numPages;
+            document.getElementById("pdf-unlinked-state").style.display = "none";
+            document.getElementById("pdf-viewer-container").style.display = "flex";
+            pdfPageNum = 1;
+            renderPdfPage(pdfPageNum);
+            buildPdfTextIndex();
+        }).catch(err => {
+            console.error("Error loading PDF:", err);
+            alert("Could not load PDF file: " + (err.message || err));
+        });
+    }
+
+    function renderPdfPage(num) {
+        pdfPageRendering = true;
+        pdfDoc.getPage(num).then(page => {
+            const canvas = document.getElementById("pdf-render-canvas");
+            const ctx = canvas.getContext("2d");
+            const viewport = page.getViewport({ scale: pdfScale });
+
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            const renderTask = page.render(renderContext);
+
+            renderTask.promise.then(() => {
+                pdfPageRendering = false;
+                if (pdfPageNumPending !== null) {
+                    renderPdfPage(pdfPageNumPending);
+                    pdfPageNumPending = null;
+                }
+            });
+        });
+
+        document.getElementById("pdf-page-num-input").value = num;
+        document.getElementById("pdf-zoom-val").textContent = `${Math.round(pdfScale * 100)}%`;
+    }
+
+    function queueRenderPdfPage(num) {
+        if (pdfPageRendering) {
+            pdfPageNumPending = num;
+        } else {
+            renderPdfPage(num);
+        }
+    }
+
+    function pdfPrevPage() {
+        if (!pdfDoc || pdfPageNum <= 1) return;
+        pdfPageNum--;
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfNextPage() {
+        if (!pdfDoc || pdfPageNum >= pdfDoc.numPages) return;
+        pdfPageNum++;
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfGoToPage(val) {
+        if (!pdfDoc) return;
+        let num = parseInt(val, 10);
+        if (isNaN(num)) return;
+        num = Math.max(1, Math.min(num, pdfDoc.numPages));
+        pdfPageNum = num;
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfZoomIn() {
+        if (!pdfDoc || pdfScale >= 3.0) return;
+        pdfScale = parseFloat((pdfScale + 0.15).toFixed(2));
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfZoomOut() {
+        if (!pdfDoc || pdfScale <= 0.5) return;
+        pdfScale = parseFloat((pdfScale - 0.15).toFixed(2));
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfResetZoom() {
+        if (!pdfDoc) return;
+        const container = document.getElementById("pdf-canvas-viewport");
+        if (container && container.clientWidth) {
+            // Fit approximately to viewport width
+            pdfScale = parseFloat(Math.max(0.6, (container.clientWidth - 80) / 750).toFixed(2));
+        } else {
+            pdfScale = 1.0;
+        }
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    // Search Tools: Index all pages for keyword match
+    function buildPdfTextIndex() {
+        if (!pdfDoc) return;
+        pdfTextIndex = [];
+        const promises = [];
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            promises.push(
+                pdfDoc.getPage(i).then(page => {
+                    return page.getTextContent().then(tc => {
+                        const str = tc.items.map(s => s.str).join(" ");
+                        pdfTextIndex[i] = str;
+                    });
+                })
+            );
+        }
+        Promise.all(promises).then(() => {
+            console.log("[PDF Search] Indexed", pdfDoc.numPages, "pages");
+        });
+    }
+
+    function pdfSearch(query) {
+        if (!pdfDoc || !pdfTextIndex) return;
+        const q = (query || "").toLowerCase().trim();
+        pdfSearchResults = [];
+        pdfSearchCurrentIndex = -1;
+
+        if (!q) {
+            document.getElementById("pdf-search-status").textContent = "";
+            return;
+        }
+
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const pageText = (pdfTextIndex[i] || "").toLowerCase();
+            if (pageText.includes(q)) {
+                pdfSearchResults.push(i);
+            }
+        }
+
+        const statusEl = document.getElementById("pdf-search-status");
+        if (pdfSearchResults.length === 0) {
+            statusEl.textContent = "0 matches";
+        } else {
+            pdfSearchCurrentIndex = 0;
+            statusEl.textContent = `1 / ${pdfSearchResults.length} pages`;
+            pdfPageNum = pdfSearchResults[0];
+            queueRenderPdfPage(pdfPageNum);
+        }
+    }
+
+    function pdfFindNext() {
+        const query = document.getElementById("pdf-search-input").value;
+        if (pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
+            pdfSearch(query);
+            return;
+        }
+        pdfSearchCurrentIndex = (pdfSearchCurrentIndex + 1) % pdfSearchResults.length;
+        document.getElementById("pdf-search-status").textContent = `${pdfSearchCurrentIndex + 1} / ${pdfSearchResults.length} pages`;
+        pdfPageNum = pdfSearchResults[pdfSearchCurrentIndex];
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfFindPrev() {
+        const query = document.getElementById("pdf-search-input").value;
+        if (pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
+            pdfSearch(query);
+            return;
+        }
+        pdfSearchCurrentIndex = (pdfSearchCurrentIndex - 1 + pdfSearchResults.length) % pdfSearchResults.length;
+        document.getElementById("pdf-search-status").textContent = `${pdfSearchCurrentIndex + 1} / ${pdfSearchResults.length} pages`;
+        pdfPageNum = pdfSearchResults[pdfSearchCurrentIndex];
+        queueRenderPdfPage(pdfPageNum);
+    }
+
     </script>
     <!-- Background Watermarks -->
     <div class="bg-watermark-left">v1.0.0 (Public)</div>
