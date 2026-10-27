@@ -1656,7 +1656,12 @@
         }
     
         .fire-canvas {
-            opacity: 0.30 !important;
+            height: 70% !important;
+            bottom: 0 !important;
+            top: auto !important;
+            opacity: 0.70 !important;
+            mask-image: linear-gradient(to top, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0) 100%);
         }
     
         /* ===== Table Network / Multiplayer Styles ===== */
@@ -1758,10 +1763,10 @@
         .rivals-card-img {
             width: 85px;
             height: 65px;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 6px;
             border: 1px solid var(--card-border);
-            background: rgba(0,0,0,0.5);
+            background: transparent;
             flex-shrink: 0;
         }
         .rivals-card-img-placeholder {
@@ -2575,12 +2580,13 @@
                         <span id="pdf-search-status" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-family: monospace;"></span>
                     </div>
 
-                    <!-- Right: Zoom & Reset / Replace PDF -->
+                    <!-- Right: Zoom, Rotate & Reset / Replace PDF -->
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button class="btn btn-sm" onclick="pdfZoomOut()" title="Zoom Out" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍−</button>
                         <span id="pdf-zoom-val" style="font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-color); min-width: 45px; text-align: center;">100%</span>
                         <button class="btn btn-sm" onclick="pdfZoomIn()" title="Zoom In" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍+</button>
                         <button class="btn btn-sm" onclick="pdfResetZoom()" title="Fit Width" style="padding: 0.35rem 0.6rem; font-size: 0.72rem;">Fit</button>
+                        <button class="btn btn-sm" onclick="pdfRotate()" title="Rotate Page 90° Clockwise" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">↻ Rotate</button>
                         <label class="btn btn-sm" style="cursor: pointer; padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Replace or re-link PDF">
                             🔄 Change PDF
                             <input type="file" accept=".pdf,application/pdf" style="display: none;" onchange="handlePdfFileInput(event)">
@@ -2658,12 +2664,13 @@
                         <span id="qrs-search-status" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-family: monospace;"></span>
                     </div>
 
-                    <!-- Right: Zoom & Reset / Replace PDF -->
+                    <!-- Right: Zoom, Rotate & Reset / Replace PDF -->
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button class="btn btn-sm" onclick="qrsZoomOut()" title="Zoom Out" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍−</button>
                         <span id="qrs-zoom-val" style="font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-color); min-width: 45px; text-align: center;">100%</span>
                         <button class="btn btn-sm" onclick="qrsZoomIn()" title="Zoom In" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">🔍+</button>
                         <button class="btn btn-sm" onclick="qrsResetZoom()" title="Fit Width" style="padding: 0.35rem 0.6rem; font-size: 0.72rem;">Fit</button>
+                        <button class="btn btn-sm" onclick="qrsRotate()" title="Rotate Page 90° Clockwise" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">↻ Rotate</button>
                         <label class="btn btn-sm" style="cursor: pointer; padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Replace or re-link Reference Sheet PDF">
                             🔄 Change PDF
                             <input type="file" accept=".pdf,application/pdf" style="display: none;" onchange="handleQrsFileInput(event)">
@@ -3222,11 +3229,28 @@ Thanks to Mike for being ace.</p>
         async function fetchPublicTables() {
             const listEl = document.getElementById('net-tables-list');
             if (!listEl) return;
-            const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
+            const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "table-1";
             
             // Clean up any expired tables (no players for 60s or inactive for 60s)
             if (window.NetworkManager && typeof window.NetworkManager.cleanExpiredTables === "function") {
                 window.NetworkManager.cleanExpiredTables();
+            }
+
+            const liveCurrentCount = (window.NetworkManager && typeof window.NetworkManager.getActiveDriverCount === "function")
+                ? window.NetworkManager.getActiveDriverCount()
+                : ((window.NetworkManager && window.NetworkManager.playerCount) || 1);
+
+            // Ensure current active table is always reflected with accurate live driver count
+            if (window.NetworkManager && window.NetworkManager.knownTables && currentRoom) {
+                const existing = window.NetworkManager.knownTables.get(currentRoom);
+                window.NetworkManager.knownTables.set(currentRoom, {
+                    roomCode: currentRoom,
+                    tableName: (window.NetworkManager.tableName) || (existing && existing.tableName) || (currentRoom === "table-1" ? "Arena Table 1" : currentRoom),
+                    playerCount: liveCurrentCount,
+                    hasPin: !!(window.NetworkManager.tablePin || (existing && existing.hasPin)),
+                    updatedAt: Date.now(),
+                    zeroPlayersSince: null
+                });
             }
 
             // Get live known tables map from NetworkManager
@@ -3235,27 +3259,23 @@ Thanks to Mike for being ace.</p>
                 tables = Array.from(window.NetworkManager.knownTables.values());
             }
 
-            // If empty or user is on a custom table, include current active table
+            // If empty, include current active table
             if (tables.length === 0) {
-                if (currentRoom) {
-                    tables.push({
-                        roomCode: currentRoom,
-                        tableName: (window.NetworkManager && window.NetworkManager.tableName) || currentRoom,
-                        playerCount: (window.NetworkManager && window.NetworkManager.playerCount) || 1,
-                        hasPin: !!(window.NetworkManager && window.NetworkManager.tablePin)
-                    });
-                } else {
-                    tables = [
-                        { roomCode: "table-1", tableName: "Death Highway Arena (Table 1)", playerCount: 1, hasPin: false }
-                    ];
-                }
+                tables.push({
+                    roomCode: currentRoom,
+                    tableName: (window.NetworkManager && window.NetworkManager.tableName) || (currentRoom === "table-1" ? "Arena Table 1" : currentRoom),
+                    playerCount: liveCurrentCount,
+                    hasPin: !!(window.NetworkManager && window.NetworkManager.tablePin)
+                });
             }
 
             let html = tables.map(t => {
                 const isCurrent = (t.roomCode === currentRoom);
+                const countToShow = isCurrent ? liveCurrentCount : (t.playerCount || 1);
+                const safeName = (t.tableName || t.roomCode).replace(/'/g, "\'");
                 const joinAction = t.hasPin
-                    ? `openPinPromptModal('${t.roomCode}', '${(t.tableName || t.roomCode).replace(/'/g, "\'")}')`
-                    : `joinTableDirect('${t.roomCode}', '${(t.tableName || t.roomCode).replace(/'/g, "\'")}', '')`;
+                    ? `openPinPromptModal('${t.roomCode}', '${safeName}')`
+                    : `joinTableDirect('${t.roomCode}', '${safeName}', '')`;
 
                 return `
                     <div style="background:rgba(0,0,0,0.3); border:1px solid ${isCurrent ? 'var(--glow-color)' : 'var(--card-border)'}; border-radius:6px; padding:0.6rem 0.8rem; display:flex; justify-content:space-between; align-items:center;">
@@ -3263,7 +3283,7 @@ Thanks to Mike for being ace.</p>
                             <div style="font-weight:700; font-size:0.85rem; color:${isCurrent ? 'var(--glow-color)' : 'var(--text-primary)'}; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
                                 <span>${t.hasPin ? '🔒 ' : ''}${t.tableName || t.roomCode}</span>
                                 ${isCurrent ? '<span style="font-size:0.65rem; background:var(--glow-color); color:#000; padding:1px 5px; border-radius:3px; font-weight:700;">ACTIVE</span>' : ''}
-                                <span style="font-size:0.68rem; background:rgba(255,255,255,0.08); color:var(--text-muted); padding:1px 6px; border-radius:10px;">${t.playerCount || 1} ${t.playerCount === 1 ? 'driver' : 'drivers'}</span>
+                                <span style="font-size:0.68rem; background:rgba(255,255,255,0.08); color:var(--text-muted); padding:1px 6px; border-radius:10px;">${countToShow} ${countToShow === 1 ? 'driver' : 'drivers'}</span>
                             </div>
                             <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
                                 Room: <code>${t.roomCode}</code> • Realtime Ably Mesh
@@ -3298,8 +3318,10 @@ Thanks to Mike for being ace.</p>
         function joinTableDirect(roomCode, tableName, pin) {
             if (window.NetworkManager) {
                 window.NetworkManager.customRoom = roomCode;
+                window.NetworkManager.tableName = tableName || roomCode;
                 window.NetworkManager.tablePin = pin || "";
                 localStorage.setItem("gaslands_custom_room", roomCode);
+                localStorage.setItem("gaslands_table_name", tableName || roomCode);
                 if (pin) {
                     sessionStorage.setItem("gaslands_pin_" + roomCode, pin);
                 }
@@ -3313,28 +3335,29 @@ Thanks to Mike for being ace.</p>
             if (window.NetworkManager) {
                 const prevRoom = window.NetworkManager.customRoom;
                 const prevName = window.NetworkManager.tableName || prevRoom;
+                const remainingRivals = window.NetworkManager.rivals ? window.NetworkManager.rivals.size : 0;
                 
-                // If this client was the only one on the table, announce 0 players so the 60s deletion countdown starts for any directory listeners
+                // Update directory with remaining players on the table we are leaving
                 if (window.NetworkManager.directoryChannel && prevRoom) {
                     try {
                         window.NetworkManager.directoryChannel.publish("table_announce", {
                             roomCode: prevRoom,
                             tableName: prevName,
-                            playerCount: 0,
+                            playerCount: remainingRivals,
                             updatedAt: Date.now()
                         });
                     } catch(_) {}
                 }
 
-                window.NetworkManager.customRoom = "";
-                window.NetworkManager.tableName = null;
+                window.NetworkManager.customRoom = "table-1";
+                window.NetworkManager.tableName = "Arena Table 1";
                 window.NetworkManager.tablePin = "";
-                localStorage.removeItem("gaslands_custom_room");
-                localStorage.removeItem("gaslands_table_name");
-                if (prevRoom) {
+                localStorage.setItem("gaslands_custom_room", "table-1");
+                localStorage.setItem("gaslands_table_name", "Arena Table 1");
+                if (prevRoom && prevRoom !== "table-1") {
                     sessionStorage.removeItem("gaslands_pin_" + prevRoom);
                 }
-                showNetworkToast(`Left table <strong>${prevName || "custom table"}</strong>. Returned to Same-WiFi Auto LAN.`);
+                showNetworkToast(`Left table <strong>${prevName || "custom table"}</strong>. Joined Arena Table 1.`);
                 window.NetworkManager.connect(true);
             }
             closeNetworkModal();
@@ -3380,6 +3403,7 @@ Thanks to Mike for being ace.</p>
                 window.NetworkManager.tablePin = pin;
                 window.NetworkManager.tableName = tableName;
                 localStorage.setItem("gaslands_custom_room", roomCode);
+                localStorage.setItem("gaslands_table_name", tableName);
                 sessionStorage.setItem("gaslands_pin_" + roomCode, pin);
                 showNetworkToast(`Created table <strong>${tableName}</strong>! Connecting...`);
                 window.NetworkManager.connect(true);
@@ -3390,27 +3414,39 @@ Thanks to Mike for being ace.</p>
         async function updateNetworkDiagnostics() {
             const diagEl = document.getElementById("net-diag-info");
             if (!diagEl) return;
-            try {
-                let base = (window.NetworkManager && window.NetworkManager.workerUrl) ? window.NetworkManager.workerUrl : "https://gaslands-relay.cruelenquiries.workers.dev";
-                base = base.replace(/^ws:\/\//i, "http://").replace(/^wss:\/\//i, "https://").replace(/\/ws\/?$/i, "");
-                const res = await fetch(base + "/");
-                const json = await res.json();
-                diagEl.innerHTML = `Public IP: <code style="color:var(--glow-color);">${json.clientIp}</code><br>Assigned Auto-LAN Room: <code style="color:var(--accent-cyan);">${json.lanRoom}</code>`;
-            } catch (_) {
-                diagEl.textContent = "Unable to fetch network diagnostics.";
-            }
+            const connected = window.NetworkManager && window.NetworkManager.isConnected();
+            const room = (window.NetworkManager && window.NetworkManager.customRoom) || "table-1";
+            const count = (window.NetworkManager && typeof window.NetworkManager.getActiveDriverCount === "function")
+                ? window.NetworkManager.getActiveDriverCount()
+                : 1;
+            diagEl.innerHTML = `Transport: <code style="color:var(--glow-color);">Ably Realtime Mesh</code> (${connected ? "Connected" : "Connecting"})<br>Active Table Channel: <code style="color:var(--accent-cyan);">gaslands-table-${room}</code> • <strong>${count}</strong> active ${count === 1 ? "driver" : "drivers"}`;
         }
 
         function updateActivePlayersListModal() {
             const listEl = document.getElementById("net-active-players-list");
             if (listEl) {
-                let players = [`• <strong>${appState.teamName || "Your Team"}</strong> (You)`];
+                const myTeam = (appState.teamName && appState.teamName.trim()) ? appState.teamName.trim() : "Anonymous Driver";
+                const mySponsor = appState.sponsor || "Sponsorless";
+                const myVehicles = (appState.vehicles || []).length;
+                let players = [`• <strong style="color:var(--glow-color);">${myTeam}</strong> (${mySponsor} • ${myVehicles} ${myVehicles === 1 ? 'vehicle' : 'vehicles'}) — <em>You</em>`];
                 if (window.NetworkManager && window.NetworkManager.rivals) {
-                    window.NetworkManager.rivals.forEach(r => {
-                        players.push(`• <strong>${r.teamName || "Unknown Team"}</strong> (${r.sponsor || "Sponsorless"})`);
+                    window.NetworkManager.rivals.forEach((r, pid) => {
+                        if (!r || pid === window.NetworkManager.playerId) return;
+                        const rName = (r.teamName && r.teamName.trim()) ? r.teamName.trim() : "Anonymous Driver";
+                        const rSponsor = r.sponsor || "Sponsorless";
+                        const vCount = Array.isArray(r.vehicles) ? r.vehicles.length : null;
+                        const vLabel = vCount !== null ? ` • ${vCount} ${vCount === 1 ? 'vehicle' : 'vehicles'}` : '';
+                        players.push(`• <strong>${rName}</strong> (${rSponsor}${vLabel})`);
                     });
                 }
                 listEl.innerHTML = players.join("<br>");
+            }
+            const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "table-1";
+            const currentLabel = document.getElementById("net-current-table-label");
+            if (currentLabel && window.NetworkManager) {
+                const count = typeof window.NetworkManager.getActiveDriverCount === "function" ? window.NetworkManager.getActiveDriverCount() : (window.NetworkManager.playerCount || 1);
+                const tName = window.NetworkManager.tableName || (currentRoom === "table-1" ? "Arena Table 1" : currentRoom);
+                currentLabel.textContent = `${tName} (${count} ${count === 1 ? 'Driver' : 'Drivers'})`;
             }
         }
 
@@ -3418,14 +3454,14 @@ Thanks to Mike for being ace.</p>
             const modal = document.getElementById("network-modal");
             if (!modal) return;
             
-            const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
-            const currentLabel = document.getElementById("net-current-table-label");
-            if (currentLabel) {
-                currentLabel.textContent = currentRoom ? (window.NetworkManager.tableName || currentRoom) : "Same-WiFi Auto LAN";
+            if (window.NetworkManager && typeof window.NetworkManager.refreshPresenceMembers === "function") {
+                window.NetworkManager.refreshPresenceMembers();
             }
+
+            const currentRoom = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "table-1";
             const leaveBtn = document.getElementById("net-leave-table-btn");
             if (leaveBtn) {
-                leaveBtn.style.display = currentRoom ? "inline-block" : "none";
+                leaveBtn.style.display = (currentRoom && currentRoom !== "table-1") ? "inline-block" : "none";
             }
             
             const keyInput = document.getElementById("net-ably-key-input");
@@ -3434,7 +3470,11 @@ Thanks to Mike for being ace.</p>
             const statusText = document.getElementById("net-modal-status-text");
             if (statusText) {
                 const connected = window.NetworkManager && window.NetworkManager.isConnected();
-                statusText.textContent = connected ? "Connected" : "Offline / Disconnected";
+                const count = (window.NetworkManager && typeof window.NetworkManager.getActiveDriverCount === "function")
+                    ? window.NetworkManager.getActiveDriverCount()
+                    : 1;
+                const roomTag = currentRoom || "table-1";
+                statusText.textContent = connected ? `Table [${roomTag}]: ${count} ${count === 1 ? 'Driver' : 'Drivers'}` : "Offline / Disconnected";
                 statusText.style.color = connected ? "var(--accent-cyan)" : "var(--danger-red)";
             }
 
@@ -3574,7 +3614,7 @@ Thanks to Mike for being ace.</p>
         function copyInviteLink() {
             let base = window.location.origin + window.location.pathname;
             if (!base.startsWith("http")) {
-                base = "https://cruels-code.github.io/gaslands/";
+                base = "https://cruels-code.github.io/gaslands_unofficial_game_manager/";
             }
             let room = (window.NetworkManager && window.NetworkManager.customRoom) ? window.NetworkManager.customRoom : "";
             room = cleanRoomCode(room);
@@ -3743,7 +3783,7 @@ Thanks to Mike for being ace.</p>
                                 ${weaponsHtml}
 
                                 ${v.onFire ? `
-                                <canvas id="${fireCanvasId}" class="fire-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 10px; z-index: 10; opacity: 0.30;"></canvas>
+                                <canvas id="${fireCanvasId}" class="fire-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; pointer-events: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 10; opacity: 0.70;"></canvas>
                                 ` : ''}
                             </div>
                         `;
@@ -3757,6 +3797,70 @@ Thanks to Mike for being ace.</p>
             });
 
             container.innerHTML = html;
+
+            // Ensure all rival vehicle images have a transparent background (even if sent as JPEG by an un-refreshed device)
+            container.querySelectorAll(".rivals-card-img").forEach(imgEl => {
+                if (imgEl.dataset.bgCleaned) return;
+                imgEl.dataset.bgCleaned = "true";
+                const processImg = () => {
+                    try {
+                        const w = imgEl.naturalWidth || imgEl.width;
+                        const h = imgEl.naturalHeight || imgEl.height;
+                        if (!w || !h) return;
+                        const c = document.createElement("canvas");
+                        c.width = w;
+                        c.height = h;
+                        const ctx = c.getContext("2d");
+                        ctx.drawImage(imgEl, 0, 0, w, h);
+                        const imgData = ctx.getImageData(0, 0, w, h);
+                        const d = imgData.data;
+                        const visited = new Uint8Array(w * h);
+                        const queue = [];
+                        const isBg = (idx) => {
+                            const p = idx * 4;
+                            if (d[p + 3] < 20) return true;
+                            const r = d[p], g = d[p + 1], b = d[p + 2];
+                            const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+                            const isBlack = maxC < 42 && (maxC - minC) < 18;
+                            const isWhite = minC > 215 && (maxC - minC) < 15;
+                            return isBlack || isWhite;
+                        };
+                        const enqueue = (x, y) => {
+                            if (x < 0 || x >= w || y < 0 || y >= h) return;
+                            const idx = y * w + x;
+                            if (!visited[idx] && isBg(idx)) {
+                                visited[idx] = 1;
+                                queue.push(idx);
+                            }
+                        };
+                        for (let x = 0; x < w; x++) { enqueue(x, 0); enqueue(x, h - 1); }
+                        for (let y = 0; y < h; y++) { enqueue(0, y); enqueue(w - 1, y); }
+                        let modified = false;
+                        while (queue.length > 0) {
+                            const curr = queue.pop();
+                            if (d[curr * 4 + 3] !== 0) {
+                                d[curr * 4 + 3] = 0;
+                                modified = true;
+                            }
+                            const cx = curr % w;
+                            const cy = (curr - cx) / w;
+                            enqueue(cx - 1, cy);
+                            enqueue(cx + 1, cy);
+                            enqueue(cx, cy - 1);
+                            enqueue(cx, cy + 1);
+                        }
+                        if (modified) {
+                            ctx.putImageData(imgData, 0, 0);
+                            imgEl.src = c.toDataURL("image/png");
+                        }
+                    } catch (_) {}
+                };
+                if (imgEl.complete && imgEl.naturalWidth > 0) {
+                    processImg();
+                } else {
+                    imgEl.onload = processImg;
+                }
+            });
 
             // Initialize WebGL fire canvases for active on-fire rival cards
             container.querySelectorAll(".fire-canvas").forEach(canvas => {
@@ -3823,8 +3927,17 @@ Thanks to Mike for being ace.</p>
                     if (document.visibilityState === "visible") {
                         if (this.ablyClient && (!this.connected || this.ablyClient.connection.state !== 'connected')) {
                             this.connect();
+                        } else if (this.connected) {
+                            this.refreshPresenceMembers();
                         }
                     }
+                });
+
+                window.addEventListener("pagehide", () => {
+                    try {
+                        if (this.channel) this.channel.presence.leave();
+                        if (this.ablyClient) this.ablyClient.close();
+                    } catch (_) {}
                 });
             },
 
@@ -3931,11 +4044,131 @@ Thanks to Mike for being ace.</p>
                 this.rivals.clear();
             },
 
+            getActiveDriverCount() {
+                let rivalCount = 0;
+                if (this.rivals) {
+                    this.rivals.forEach((val, key) => {
+                        if (key && key !== this.playerId) rivalCount++;
+                    });
+                }
+                return Math.max(1, 1 + rivalCount);
+            },
+
+            updateDriverCountUI() {
+                this.playerCount = this.getActiveDriverCount();
+                this.checkEmptyTableTimeout(this.playerCount);
+                if (this.connected) {
+                    this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
+                }
+                if (this.customRoom && this.knownTables) {
+                    const existing = this.knownTables.get(this.customRoom);
+                    this.knownTables.set(this.customRoom, {
+                        roomCode: this.customRoom,
+                        tableName: this.tableName || (existing && existing.tableName) || (this.customRoom === "table-1" ? "Arena Table 1" : this.customRoom),
+                        hasPin: !!(this.tablePin || (existing && existing.hasPin)),
+                        playerCount: this.playerCount,
+                        updatedAt: Date.now(),
+                        zeroPlayersSince: null
+                    });
+                }
+                if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
+                if (typeof updateNetworkDiagnostics === "function") updateNetworkDiagnostics();
+                if (typeof fetchPublicTables === "function") {
+                    const modal = document.getElementById("network-modal");
+                    if (modal && modal.classList.contains("active")) fetchPublicTables();
+                }
+            },
+
+            updatePresenceMetadata() {
+                if (this.channel && this.connected) {
+                    try {
+                        this.channel.presence.update({
+                            teamName: appState.teamName || "Anonymous Driver",
+                            sponsor: appState.sponsor || "Sponsorless",
+                            pin: this.tablePin
+                        });
+                    } catch (_) {}
+                }
+            },
+
+            refreshPresenceMembers() {
+                if (!this.channel || !this.connected) {
+                    this.updateDriverCountUI();
+                    return;
+                }
+                this.channel.presence.get((err, members) => {
+                    if (err || !members) {
+                        this.updateDriverCountUI();
+                        return;
+                    }
+                    const presentRivalIds = new Set();
+                    let needRosterRequest = false;
+
+                    members.forEach(m => {
+                        if (!m || !m.clientId || m.clientId === this.playerId) return;
+                        if (this.tablePin && m.data && m.data.pin && this.tablePin !== m.data.pin) return;
+                        presentRivalIds.add(m.clientId);
+
+                        const existing = this.rivals.get(m.clientId);
+                        if (!existing) {
+                            this.rivals.set(m.clientId, {
+                                playerId: m.clientId,
+                                teamName: (m.data && m.data.teamName) ? m.data.teamName : "Anonymous Driver",
+                                sponsor: (m.data && m.data.sponsor) ? m.data.sponsor : "Sponsorless",
+                                vehicles: [],
+                                fromPresence: true,
+                                timestamp: Date.now()
+                            });
+                            needRosterRequest = true;
+                        } else if (m.data) {
+                            if (m.data.teamName) existing.teamName = m.data.teamName;
+                            if (m.data.sponsor) existing.sponsor = m.data.sponsor;
+                        }
+                    });
+
+                    // Remove any Ably rivals no longer in presence (preserve localBroadcast-only tabs if active within 45s)
+                    const now = Date.now();
+                    for (const [pid, rData] of this.rivals.entries()) {
+                        if (!presentRivalIds.has(pid)) {
+                            const isRecentLocal = rData && rData._isLocal && (now - (rData.timestamp || 0) < 45000);
+                            if (!isRecentLocal) {
+                                this.rivals.delete(pid);
+                            }
+                        }
+                    }
+
+                    this.updateDriverCountUI();
+                    this.announceTableToDirectory();
+                    if (appState.mode === "rivals") renderRivals();
+
+                    if (needRosterRequest) {
+                        this.requestTableSync();
+                    }
+                });
+            },
+
+            requestTableSync() {
+                const payload = {
+                    type: "REQUEST_SYNC",
+                    playerId: this.playerId,
+                    pin: this.tablePin,
+                    timestamp: Date.now()
+                };
+                if (this.localBroadcast) {
+                    try { this.localBroadcast.postMessage(payload); } catch (_) {}
+                }
+                if (this.channel && this.connected) {
+                    try { this.channel.publish("request_sync", payload); } catch (_) {}
+                }
+            },
+
             joinTableChannel() {
                 if (!this.ablyClient || !this.connected) return;
 
+                this.initLocalBroadcast();
+
                 const channelName = `gaslands-table-${this.customRoom || "default"}`;
-                this.channel = this.ablyClient.channels.get(channelName);
+                this.channel = this.ablyClient.channels.get(channelName, { params: { rewind: '10' } });
 
                 // Subscribe to real-time events on this table
                 this.channel.subscribe(msg => {
@@ -3952,17 +4185,13 @@ Thanks to Mike for being ace.</p>
                     teamName: appState.teamName || "Anonymous Driver",
                     sponsor: appState.sponsor || "Sponsorless",
                     pin: this.tablePin
+                }, () => {
+                    this.refreshPresenceMembers();
                 });
 
-                // Fetch current presence list
-                this.channel.presence.get((err, members) => {
-                    if (!err && members) {
-                        this.playerCount = members.length;
-                        this.checkEmptyTableTimeout(this.playerCount);
-                        this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
-                        this.announceTableToDirectory();
-                    }
-                });
+                // Fetch current presence list & request full vehicle sync from existing table members
+                this.refreshPresenceMembers();
+                this.requestTableSync();
 
                 // Send immediate sync with roster
                 this.syncVehicles();
@@ -3998,10 +4227,10 @@ Thanks to Mike for being ace.</p>
 
             announceTableToDirectory() {
                 if (!this.directoryChannel || !this.customRoom) return;
-                // If table is currently undergoing empty countdown and has 0 players, don't keep it alive as active
+                this.playerCount = this.getActiveDriverCount();
                 const info = {
                     roomCode: this.customRoom,
-                    tableName: this.tableName || this.customRoom,
+                    tableName: this.tableName || (this.customRoom === "table-1" ? "Arena Table 1" : this.customRoom),
                     hasPin: !!this.tablePin,
                     playerCount: this.playerCount,
                     updatedAt: Date.now()
@@ -4016,9 +4245,13 @@ Thanks to Mike for being ace.</p>
                 const now = Date.now();
                 const existing = this.knownTables.get(info.roomCode);
                 
+                // If this announcement is for our own active room, use our authoritative live driver count
+                const isOwnRoom = (info.roomCode === this.customRoom);
+                const reportedCount = isOwnRoom ? this.getActiveDriverCount() : (typeof info.playerCount === "number" ? info.playerCount : 1);
+
                 // If the table reports 0 players:
                 let zeroPlayersSince = existing ? existing.zeroPlayersSince : null;
-                if ((info.playerCount || 0) <= 0) {
+                if (reportedCount <= 0) {
                     if (!zeroPlayersSince) zeroPlayersSince = now;
                     // If it has had 0 players for >= 60 seconds, delete it
                     if (now - zeroPlayersSince >= 60000) {
@@ -4034,7 +4267,7 @@ Thanks to Mike for being ace.</p>
                     roomCode: info.roomCode,
                     tableName: info.tableName || info.roomCode,
                     hasPin: !!info.hasPin,
-                    playerCount: info.playerCount || 1,
+                    playerCount: reportedCount,
                     updatedAt: now,
                     zeroPlayersSince: zeroPlayersSince
                 });
@@ -4218,45 +4451,44 @@ Thanks to Mike for being ace.</p>
             },
 
             handleMemberJoin(member) {
-                if (member.clientId === this.playerId) return;
-                const name = member.data && member.data.teamName ? member.data.teamName : "A Driver";
-                showNetworkToast(`🏎️ <strong>${name}</strong> arrived at the table`);
-                if (this.channel) {
-                    this.channel.presence.get((err, members) => {
-                        if (!err && members) {
-                            this.playerCount = members.length;
-                            this.checkEmptyTableTimeout(this.playerCount);
-                            this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
-                            this.announceTableToDirectory();
-                        }
+                if (!member || member.clientId === this.playerId) return;
+                if (this.tablePin && member.data && member.data.pin && this.tablePin !== member.data.pin) return;
+
+                const name = (member.data && member.data.teamName) ? member.data.teamName : "A Driver";
+                const sponsor = (member.data && member.data.sponsor) ? member.data.sponsor : "Sponsorless";
+                const existing = this.rivals.get(member.clientId);
+
+                if (!existing) {
+                    this.rivals.set(member.clientId, {
+                        playerId: member.clientId,
+                        teamName: name,
+                        sponsor: sponsor,
+                        vehicles: [],
+                        fromPresence: true,
+                        timestamp: Date.now()
                     });
+                    showNetworkToast(`🏎️ <strong>${name}</strong> arrived at the table`);
+                } else {
+                    existing.teamName = name;
+                    existing.sponsor = sponsor;
                 }
+
+                this.refreshPresenceMembers();
                 this.syncVehicles();
             },
 
             handleMemberLeave(member) {
-                if (member.clientId === this.playerId) return;
+                if (!member || member.clientId === this.playerId) return;
                 const r = this.rivals.get(member.clientId);
                 const name = r ? r.teamName : (member.data && member.data.teamName ? member.data.teamName : "A driver");
                 this.rivals.delete(member.clientId);
                 showNetworkToast(`👋 <strong>${name}</strong> left the table`);
                 if (appState.mode === "rivals") renderRivals();
-                if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
-
-                if (this.channel) {
-                    this.channel.presence.get((err, members) => {
-                        if (!err && members) {
-                            this.playerCount = members.length;
-                            this.checkEmptyTableTimeout(this.playerCount);
-                            this.updatePill("connected", `Table: ${this.playerCount} Driver${this.playerCount > 1 ? 's' : ''}`);
-                            this.announceTableToDirectory();
-                        }
-                    });
-                }
+                this.refreshPresenceMembers();
             },
 
             handleIncomingMessage(data, isLocal = false) {
-                if (!data || data.playerId === this.playerId) return;
+                if (!data || !data.playerId || data.playerId === this.playerId) return;
 
                 // Check PIN security if room is protected
                 if (this.tablePin && data.pin && this.tablePin !== data.pin) {
@@ -4264,15 +4496,26 @@ Thanks to Mike for being ace.</p>
                 }
 
                 switch (data.type) {
+                    case "REQUEST_SYNC": {
+                        this.syncVehicles();
+                        break;
+                    }
+
                     case "SYNC_VEHICLES": {
                         const prev = this.rivals.get(data.playerId);
+                        data._isLocal = !!isLocal;
                         this.rivals.set(data.playerId, data);
+                        this.updateDriverCountUI();
+                        this.announceTableToDirectory();
                         if (appState.mode === "rivals") renderRivals();
-                        if (typeof updateActivePlayersListModal === "function") updateActivePlayersListModal();
 
                         if (!prev) {
                             showNetworkToast(`🏎️ <strong>${data.teamName}</strong> joined table radar`);
-                        } else {
+                            // Reply with our own vehicles so the newly discovered peer also has our state immediately
+                            if (!data._repliedOnce) {
+                                this.syncVehicles();
+                            }
+                        } else if (!prev.fromPresence) {
                             const prevDmg = (prev.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
                             const newDmg = (data.vehicles || []).reduce((s, v) => s + (v.damage || 0), 0);
                             const prevHaz = (prev.vehicles || []).reduce((s, v) => s + (v.hazard || 0), 0);
@@ -4326,17 +4569,17 @@ Thanks to Mike for being ace.</p>
                     if (v.isPrisonCar && v.type === "Car") maxHull -= 2;
 
                     let thumb = null;
-                    if (v.thumbnail) {
-                        thumb = v.thumbnail;
+                    if (v.thumbnailPng && v.thumbnailPng.startsWith("data:image/png")) {
+                        thumb = v.thumbnailPng;
                     } else if (v.imageUrl && v.imageUrl !== "db_stored") {
                         thumb = await this.downscaleImage(v.imageUrl);
-                        v.thumbnail = thumb;
+                        v.thumbnailPng = thumb;
                     } else if (v.imageUrl === "db_stored") {
                         thumb = await new Promise(res => {
                             getImageFromDB(v.id, async base64 => {
                                 if (base64) {
                                     const ds = await this.downscaleImage(base64);
-                                    v.thumbnail = ds;
+                                    v.thumbnailPng = ds;
                                     res(ds);
                                 } else {
                                     res(null);
@@ -4385,19 +4628,56 @@ Thanks to Mike for being ace.</p>
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement("canvas");
-                        const maxDim = 80;
+                        const maxDim = 120;
                         let w = img.width;
                         let h = img.height;
                         if (w > h) {
                             if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
                         } else {
-                            if (h > maxDim) { w = Math.round(h * maxDim / h); h = maxDim; }
+                            if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
                         }
                         canvas.width = w;
                         canvas.height = h;
                         const ctx = canvas.getContext("2d");
+                        ctx.clearRect(0, 0, w, h);
                         ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL("image/jpeg", 0.6));
+                        try {
+                            const imgData = ctx.getImageData(0, 0, w, h);
+                            const d = imgData.data;
+                            const visited = new Uint8Array(w * h);
+                            const queue = [];
+                            const isBg = (idx) => {
+                                const p = idx * 4;
+                                if (d[p + 3] < 20) return true;
+                                const r = d[p], g = d[p + 1], b = d[p + 2];
+                                const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+                                const isBlack = maxC < 42 && (maxC - minC) < 18;
+                                const isWhite = minC > 215 && (maxC - minC) < 15;
+                                return isBlack || isWhite;
+                            };
+                            const enqueue = (x, y) => {
+                                if (x < 0 || x >= w || y < 0 || y >= h) return;
+                                const idx = y * w + x;
+                                if (!visited[idx] && isBg(idx)) {
+                                    visited[idx] = 1;
+                                    queue.push(idx);
+                                }
+                            };
+                            for (let x = 0; x < w; x++) { enqueue(x, 0); enqueue(x, h - 1); }
+                            for (let y = 0; y < h; y++) { enqueue(0, y); enqueue(w - 1, y); }
+                            while (queue.length > 0) {
+                                const curr = queue.pop();
+                                d[curr * 4 + 3] = 0;
+                                const cx = curr % w;
+                                const cy = (curr - cx) / w;
+                                enqueue(cx - 1, cy);
+                                enqueue(cx + 1, cy);
+                                enqueue(cx, cy - 1);
+                                enqueue(cx, cy + 1);
+                            }
+                            ctx.putImageData(imgData, 0, 0);
+                        } catch (_) {}
+                        resolve(canvas.toDataURL("image/png"));
                     };
                     img.onerror = () => resolve(null);
                     img.src = base64;
@@ -4531,6 +4811,9 @@ Thanks to Mike for being ace.</p>
                         imagesLoadedCount++;
                         if (imagesLoadedCount === checkCount) {
                             renderVehicles();
+                            if (window.NetworkManager && window.NetworkManager.isConnected()) {
+                                window.NetworkManager.syncVehicles();
+                            }
                         }
                     });
                 }
@@ -4581,6 +4864,12 @@ Thanks to Mike for being ace.</p>
 
         function updateTeamName() {
             appState.teamName = document.getElementById("team-name-input").value;
+            if (window.NetworkManager && typeof window.NetworkManager.updatePresenceMetadata === "function") {
+                window.NetworkManager.updatePresenceMetadata();
+            }
+            if (typeof updateActivePlayersListModal === "function") {
+                updateActivePlayersListModal();
+            }
             saveState();
         }
 
@@ -4593,6 +4882,12 @@ Thanks to Mike for being ace.</p>
             renderHeader();
             renderSponsorInfo();
             renderVehicles();
+            if (window.NetworkManager && typeof window.NetworkManager.updatePresenceMetadata === "function") {
+                window.NetworkManager.updatePresenceMetadata();
+            }
+            if (typeof updateActivePlayersListModal === "function") {
+                updateActivePlayersListModal();
+            }
             saveState();
         }
 
@@ -4941,7 +5236,7 @@ Thanks to Mike for being ace.</p>
                 // Calculate transparency so it overlays properly on the card
                 float luma = dot(color, vec3(0.299, 0.587, 0.114));
                 // fade out at the top of the card
-                float fade = smoothstep(1.0, 0.3, uv.y);
+                float fade = smoothstep(1.0, 0.25, uv.y);
                 float alpha = min(1.0, luma * 2.0 * fade);
                 
                 gl_FragColor = vec4(color * alpha, alpha);
@@ -5817,7 +6112,7 @@ Thanks to Mike for being ace.</p>
 
                         <!-- WebGL Fire shader overlay when on fire (covers bottom 35% of the card) -->
                         ${vehicle.onFire ? `
-                        <canvas id="fire-canvas-${vehicle.id}" class="fire-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; pointer-events: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 10; opacity: 0.30;"></canvas>
+                        <canvas id="fire-canvas-${vehicle.id}" class="fire-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; pointer-events: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 10; opacity: 0.70;"></canvas>
                         ` : ''}
                     `;
                     playContainer.appendChild(card);
@@ -5924,11 +6219,13 @@ Thanks to Mike for being ace.</p>
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Apply transparency mask removing white background pixels
+                // Apply transparency mask removing white/black background pixels
                 removeWhiteBackground(e.target.result, function(maskedDataUrl) {
                     const v = appState.vehicles.find(car => car.id === vehicleId);
                     if (v) {
                         v.imageUrl = maskedDataUrl;
+                        delete v.thumbnail;
+                        delete v.thumbnailPng;
                         saveImageToDB(vehicleId, maskedDataUrl);
                         renderVehicles();
                         saveState();
@@ -5945,22 +6242,27 @@ Thanks to Mike for being ace.</p>
                 canvas.width = img.width;
                 canvas.height = img.height;
                 const ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
                 
                 const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imgData.data;
                 
-                // Color key threshold: key out neutral white/light-grey down to 210 RGB
+                // Color key threshold: key out neutral white/light-grey down to 210 RGB or solid near-black backgrounds
                 for (let i = 0; i < data.length; i += 4) {
                     const r = data[i];
                     const g = data[i+1];
                     const b = data[i+2];
                     
-                    // Check if pixel is neutral (close to grayscale) and very bright
-                    if (r > 210 && g > 210 && b > 210 && 
+                    const isWhite = (r > 210 && g > 210 && b > 210 && 
                         Math.abs(r - g) < 15 && 
                         Math.abs(r - b) < 15 && 
-                        Math.abs(g - b) < 15) {
+                        Math.abs(g - b) < 15);
+                    const isBlack = (r < 24 && g < 24 && b < 24 &&
+                        Math.abs(r - g) < 10 &&
+                        Math.abs(r - b) < 10 &&
+                        Math.abs(g - b) < 10);
+                    if (isWhite || isBlack) {
                         data[i+3] = 0; // Set Alpha to fully transparent
                     }
                 }
@@ -5975,6 +6277,8 @@ Thanks to Mike for being ace.</p>
             const v = appState.vehicles.find(car => car.id === vehicleId);
             if (v) {
                 v.imageUrl = null;
+                delete v.thumbnail;
+                delete v.thumbnailPng;
                 deleteImageFromDB(vehicleId);
                 renderVehicles();
                 saveState();
@@ -7672,6 +7976,7 @@ Thanks to Mike for being ace.</p>
     let pdfPageRendering = false;
     let pdfPageNumPending = null;
     let pdfScale = 1.25;
+    let pdfRotation = 0;
     let pdfSearchResults = []; // array of { page, index }
     let pdfSearchCurrentIndex = -1;
     let pdfTextIndex = null; // Map of pageNum -> text string for search
@@ -7797,7 +8102,8 @@ Thanks to Mike for being ace.</p>
         pdfDoc.getPage(num).then(page => {
             const canvas = document.getElementById("pdf-render-canvas");
             const ctx = canvas.getContext("2d");
-            const viewport = page.getViewport({ scale: pdfScale });
+            const totalRotation = ((page.rotate || 0) + pdfRotation) % 360;
+            const viewport = page.getViewport({ scale: pdfScale, rotation: totalRotation });
 
             canvas.height = viewport.height;
             canvas.width = viewport.width;
@@ -7871,6 +8177,12 @@ Thanks to Mike for being ace.</p>
         } else {
             pdfScale = 1.0;
         }
+        queueRenderPdfPage(pdfPageNum);
+    }
+
+    function pdfRotate() {
+        if (!pdfDoc) return;
+        pdfRotation = (pdfRotation + 90) % 360;
         queueRenderPdfPage(pdfPageNum);
     }
 
@@ -7956,6 +8268,7 @@ Thanks to Mike for being ace.</p>
     let qrsPageRendering = false;
     let qrsPageNumPending = null;
     let qrsScale = 1.25;
+    let qrsRotation = 0;
     let qrsSearchResults = [];
     let qrsSearchCurrentIndex = -1;
     let qrsTextIndex = null;
@@ -8081,7 +8394,8 @@ Thanks to Mike for being ace.</p>
         qrsDoc.getPage(num).then(page => {
             const canvas = document.getElementById("qrs-render-canvas");
             const ctx = canvas.getContext("2d");
-            const viewport = page.getViewport({ scale: qrsScale });
+            const totalRotation = ((page.rotate || 0) + qrsRotation) % 360;
+            const viewport = page.getViewport({ scale: qrsScale, rotation: totalRotation });
 
             canvas.height = viewport.height;
             canvas.width = viewport.width;
@@ -8154,6 +8468,12 @@ Thanks to Mike for being ace.</p>
         } else {
             qrsScale = 1.0;
         }
+        queueRenderQrsPage(qrsPageNum);
+    }
+
+    function qrsRotate() {
+        if (!qrsDoc) return;
+        qrsRotation = (qrsRotation + 90) % 360;
         queueRenderQrsPage(qrsPageNum);
     }
 
