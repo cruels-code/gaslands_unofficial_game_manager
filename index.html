@@ -2573,11 +2573,11 @@
                     </div>
 
                     <!-- Center: Search Tools -->
-                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px; min-width: 240px;">
-                        <input type="text" id="pdf-search-input" placeholder="Search rulebook..." onkeydown="if(event.key==='Enter') pdfFindNext()" style="width: 100%; padding: 0.35rem 0.7rem; font-size: 0.82rem;">
-                        <button class="btn btn-sm" onclick="pdfFindPrev()" title="Previous Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▲</button>
-                        <button class="btn btn-sm" onclick="pdfFindNext()" title="Next Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▼</button>
-                        <span id="pdf-search-status" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-family: monospace;"></span>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 480px; min-width: 260px;">
+                        <input type="text" id="pdf-search-input" placeholder="Search rulebook..." oninput="pdfSearch(this.value)" onkeydown="if(event.key==='Enter'){ event.preventDefault(); pdfFindNext(); }" style="width: 100%; padding: 0.35rem 0.7rem; font-size: 0.82rem;">
+                        <button class="btn btn-sm" onclick="pdfFindPrev()" title="Previous Matching Page" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">◀</button>
+                        <button class="btn btn-sm" onclick="pdfFindNext()" title="Next Matching Page" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▶</button>
+                        <span id="pdf-search-status" style="font-size: 0.75rem; color: var(--glow-color); white-space: nowrap; font-family: 'Orbitron', monospace; min-width: 85px; text-align: center;"></span>
                     </div>
 
                     <!-- Right: Zoom, Rotate & Reset / Replace PDF -->
@@ -2657,11 +2657,11 @@
                     </div>
 
                     <!-- Center: Search Tools -->
-                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 420px; min-width: 240px;">
-                        <input type="text" id="qrs-search-input" placeholder="Search reference sheet..." onkeydown="if(event.key==='Enter') qrsFindNext()" style="width: 100%; padding: 0.35rem 0.7rem; font-size: 0.82rem;">
-                        <button class="btn btn-sm" onclick="qrsFindPrev()" title="Previous Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▲</button>
-                        <button class="btn btn-sm" onclick="qrsFindNext()" title="Next Match" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▼</button>
-                        <span id="qrs-search-status" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-family: monospace;"></span>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; max-width: 480px; min-width: 260px;">
+                        <input type="text" id="qrs-search-input" placeholder="Search reference sheet..." oninput="qrsSearch(this.value)" onkeydown="if(event.key==='Enter'){ event.preventDefault(); qrsFindNext(); }" style="width: 100%; padding: 0.35rem 0.7rem; font-size: 0.82rem;">
+                        <button class="btn btn-sm" onclick="qrsFindPrev()" title="Previous Matching Page" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">◀</button>
+                        <button class="btn btn-sm" onclick="qrsFindNext()" title="Next Matching Page" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">▶</button>
+                        <span id="qrs-search-status" style="font-size: 0.75rem; color: var(--glow-color); white-space: nowrap; font-family: 'Orbitron', monospace; min-width: 85px; text-align: center;"></span>
                     </div>
 
                     <!-- Right: Zoom, Rotate & Reset / Replace PDF -->
@@ -7977,9 +7977,12 @@ Thanks to Mike for being ace.</p>
     let pdfPageNumPending = null;
     let pdfScale = 1.25;
     let pdfRotation = 0;
-    let pdfSearchResults = []; // array of { page, index }
+    let pdfSearchResults = []; // array of matching page numbers
     let pdfSearchCurrentIndex = -1;
-    let pdfTextIndex = null; // Map of pageNum -> text string for search
+    let pdfLastSearchQuery = "";
+    let pdfTextIndex = null; // Map of pageNum -> { spaced, compact }
+    let pdfIndexPromise = null;
+    let pdfCurrentRenderTask = null;
 
     const PDF_STORE_NAME = "rulebookPdf";
 
@@ -8084,6 +8087,11 @@ Thanks to Mike for being ace.</p>
         const loadingTask = pdfjsLib.getDocument({ data: buffer });
         loadingTask.promise.then(pdf => {
             pdfDoc = pdf;
+            pdfTextIndex = null;
+            pdfIndexPromise = null;
+            pdfSearchResults = [];
+            pdfSearchCurrentIndex = -1;
+            pdfLastSearchQuery = "";
             document.getElementById("pdf-page-count").textContent = pdf.numPages;
             document.getElementById("pdf-page-num-input").max = pdf.numPages;
             document.getElementById("pdf-unlinked-state").style.display = "none";
@@ -8098,6 +8106,7 @@ Thanks to Mike for being ace.</p>
     }
 
     function renderPdfPage(num) {
+        if (!pdfDoc) return;
         pdfPageRendering = true;
         pdfDoc.getPage(num).then(page => {
             const canvas = document.getElementById("pdf-render-canvas");
@@ -8113,18 +8122,93 @@ Thanks to Mike for being ace.</p>
                 viewport: viewport
             };
             const renderTask = page.render(renderContext);
+            pdfCurrentRenderTask = renderTask;
 
             renderTask.promise.then(() => {
+                // Highlight matching search terms on the rendered PDF canvas
+                const activeQuery = (document.getElementById("pdf-search-input") ? document.getElementById("pdf-search-input").value : "").trim();
+                if (activeQuery) {
+                    highlightSearchMatchesOnCanvas(page, viewport, ctx, activeQuery);
+                }
                 pdfPageRendering = false;
                 if (pdfPageNumPending !== null) {
-                    renderPdfPage(pdfPageNumPending);
+                    const nextNum = pdfPageNumPending;
                     pdfPageNumPending = null;
+                    renderPdfPage(nextNum);
+                }
+            }).catch(() => {
+                pdfPageRendering = false;
+                if (pdfPageNumPending !== null) {
+                    const nextNum = pdfPageNumPending;
+                    pdfPageNumPending = null;
+                    renderPdfPage(nextNum);
                 }
             });
         });
 
         document.getElementById("pdf-page-num-input").value = num;
         document.getElementById("pdf-zoom-val").textContent = `${Math.round(pdfScale * 100)}%`;
+    }
+
+    function highlightSearchMatchesOnCanvas(page, viewport, ctx, query) {
+        const q = (query || "").toLowerCase().trim();
+        if (!q) return Promise.resolve();
+        return page.getTextContent().then(tc => {
+            if (!tc || !tc.items) return;
+            ctx.save();
+            ctx.fillStyle = "rgba(250, 204, 21, 0.42)";
+            ctx.strokeStyle = "rgba(217, 119, 6, 0.95)";
+            ctx.lineWidth = 2;
+
+            const qCompact = q.replace(/\s+/g, "");
+            // Check individual items and sliding window of items for split words
+            const items = tc.items;
+            const matchedItems = new Set();
+
+            for (let i = 0; i < items.length; i++) {
+                const str = (items[i].str || "").toLowerCase();
+                if (str && str.includes(q)) {
+                    matchedItems.add(i);
+                }
+            }
+
+            // Also check concatenated consecutive runs in case a word is split across adjacent PDF glyph runs
+            if (qCompact.length >= 2) {
+                let concat = "";
+                const charToItem = [];
+                for (let i = 0; i < items.length; i++) {
+                    const s = (items[i].str || "").toLowerCase().replace(/\s+/g, "");
+                    for (let c = 0; c < s.length; c++) {
+                        concat += s[c];
+                        charToItem.push(i);
+                    }
+                }
+                let pos = 0;
+                while ((pos = concat.indexOf(qCompact, pos)) !== -1) {
+                    for (let k = pos; k < pos + qCompact.length; k++) {
+                        matchedItems.add(charToItem[k]);
+                    }
+                    pos += qCompact.length;
+                }
+            }
+
+            matchedItems.forEach(idx => {
+                const item = items[idx];
+                if (!item || !item.transform) return;
+                const tx = (typeof pdfjsLib !== "undefined" && pdfjsLib.Util)
+                    ? pdfjsLib.Util.transform(viewport.transform, item.transform)
+                    : null;
+                if (tx) {
+                    const fontHeight = Math.hypot(tx[2], tx[3]) || (12 * viewport.scale);
+                    const w = (item.width ? item.width * viewport.scale : fontHeight * (item.str.length * 0.55));
+                    const x = tx[4];
+                    const y = tx[5] - fontHeight * 0.85;
+                    ctx.fillRect(x - 2, y - 2, Math.max(w + 4, 8), fontHeight + 4);
+                    ctx.strokeRect(x - 2, y - 2, Math.max(w + 4, 8), fontHeight + 4);
+                }
+            });
+            ctx.restore();
+        }).catch(() => {});
     }
 
     function queueRenderPdfPage(num) {
@@ -8188,74 +8272,123 @@ Thanks to Mike for being ace.</p>
 
     // Search Tools: Index all pages for keyword match
     function buildPdfTextIndex() {
-        if (!pdfDoc) return;
+        if (!pdfDoc) return Promise.resolve();
+        if (pdfIndexPromise) return pdfIndexPromise;
+
         pdfTextIndex = [];
-        const promises = [];
-        for (let i = 1; i <= pdfDoc.numPages; i++) {
-            promises.push(
-                pdfDoc.getPage(i).then(page => {
-                    return page.getTextContent().then(tc => {
-                        const str = tc.items.map(s => s.str).join(" ");
-                        pdfTextIndex[i] = str;
-                    });
-                })
-            );
-        }
-        Promise.all(promises).then(() => {
-            console.log("[PDF Search] Indexed", pdfDoc.numPages, "pages");
-        });
+        const statusEl = document.getElementById("pdf-search-status");
+        const total = pdfDoc.numPages;
+
+        pdfIndexPromise = (async () => {
+            for (let i = 1; i <= total; i++) {
+                try {
+                    const page = await pdfDoc.getPage(i);
+                    const tc = await page.getTextContent();
+                    const rawItems = (tc && tc.items) ? tc.items.map(s => s.str || "") : [];
+                    const spaced = rawItems.join(" ").replace(/\s+/g, " ").toLowerCase();
+                    const compact = rawItems.join("").replace(/\s+/g, "").toLowerCase();
+                    pdfTextIndex[i] = { spaced, compact };
+                } catch (err) {
+                    pdfTextIndex[i] = { spaced: "", compact: "" };
+                }
+            }
+            console.log("[PDF Search] Indexed", total, "pages");
+            const inputEl = document.getElementById("pdf-search-input");
+            if (inputEl && inputEl.value.trim()) {
+                pdfSearch(inputEl.value, false);
+            } else if (statusEl && statusEl.textContent.startsWith("Indexing")) {
+                statusEl.textContent = "";
+            }
+        })();
+
+        return pdfIndexPromise;
     }
 
-    function pdfSearch(query) {
-        if (!pdfDoc || !pdfTextIndex) return;
-        const q = (query || "").toLowerCase().trim();
-        pdfSearchResults = [];
-        pdfSearchCurrentIndex = -1;
+    function pageMatchesQuery(pageEntry, q) {
+        if (!pageEntry || !q) return false;
+        if (typeof pageEntry === "string") {
+            return pageEntry.toLowerCase().includes(q);
+        }
+        const qNorm = q.replace(/\s+/g, " ");
+        const qCompact = q.replace(/\s+/g, "");
+        return pageEntry.spaced.includes(qNorm) || (qCompact.length >= 2 && pageEntry.compact.includes(qCompact));
+    }
+
+    async function pdfSearch(query, jumpToFirst = true) {
+        if (!pdfDoc) return;
+        const q = (query !== undefined && query !== null ? String(query) : (document.getElementById("pdf-search-input") ? document.getElementById("pdf-search-input").value : "")).toLowerCase().trim();
+        const statusEl = document.getElementById("pdf-search-status");
 
         if (!q) {
-            document.getElementById("pdf-search-status").textContent = "";
+            pdfSearchResults = [];
+            pdfSearchCurrentIndex = -1;
+            pdfLastSearchQuery = "";
+            if (statusEl) statusEl.textContent = "";
+            queueRenderPdfPage(pdfPageNum);
             return;
         }
 
+        // Ensure text index is ready (or wait if still indexing)
+        if (!pdfTextIndex || pdfTextIndex.length <= pdfDoc.numPages) {
+            if (statusEl) statusEl.textContent = "Indexing PDF...";
+            await buildPdfTextIndex();
+        }
+
+        pdfLastSearchQuery = q;
+        pdfSearchResults = [];
+        pdfSearchCurrentIndex = -1;
+
         for (let i = 1; i <= pdfDoc.numPages; i++) {
-            const pageText = (pdfTextIndex[i] || "").toLowerCase();
-            if (pageText.includes(q)) {
+            if (pageMatchesQuery(pdfTextIndex[i], q)) {
                 pdfSearchResults.push(i);
             }
         }
 
-        const statusEl = document.getElementById("pdf-search-status");
         if (pdfSearchResults.length === 0) {
-            statusEl.textContent = "0 matches";
+            if (statusEl) statusEl.textContent = "0 pages";
+            queueRenderPdfPage(pdfPageNum);
         } else {
-            pdfSearchCurrentIndex = 0;
-            statusEl.textContent = `1 / ${pdfSearchResults.length} pages`;
-            pdfPageNum = pdfSearchResults[0];
+            // If current page is already one of the matches and jumpToFirst is false, select it
+            const existingIdx = pdfSearchResults.indexOf(pdfPageNum);
+            pdfSearchCurrentIndex = (!jumpToFirst && existingIdx !== -1) ? existingIdx : 0;
+            const targetPage = pdfSearchResults[pdfSearchCurrentIndex];
+            if (statusEl) {
+                statusEl.textContent = `Page ${targetPage} (${pdfSearchCurrentIndex + 1}/${pdfSearchResults.length})`;
+            }
+            pdfPageNum = targetPage;
             queueRenderPdfPage(pdfPageNum);
         }
     }
 
-    function pdfFindNext() {
-        const query = document.getElementById("pdf-search-input").value;
-        if (pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
-            pdfSearch(query);
+    async function pdfFindNext() {
+        if (!pdfDoc) return;
+        const query = (document.getElementById("pdf-search-input") ? document.getElementById("pdf-search-input").value : "").toLowerCase().trim();
+        if (!query) return;
+
+        if (query !== pdfLastSearchQuery || pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
+            await pdfSearch(query, true);
             return;
         }
         pdfSearchCurrentIndex = (pdfSearchCurrentIndex + 1) % pdfSearchResults.length;
-        document.getElementById("pdf-search-status").textContent = `${pdfSearchCurrentIndex + 1} / ${pdfSearchResults.length} pages`;
-        pdfPageNum = pdfSearchResults[pdfSearchCurrentIndex];
+        const targetPage = pdfSearchResults[pdfSearchCurrentIndex];
+        document.getElementById("pdf-search-status").textContent = `Page ${targetPage} (${pdfSearchCurrentIndex + 1}/${pdfSearchResults.length})`;
+        pdfPageNum = targetPage;
         queueRenderPdfPage(pdfPageNum);
     }
 
-    function pdfFindPrev() {
-        const query = document.getElementById("pdf-search-input").value;
-        if (pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
-            pdfSearch(query);
+    async function pdfFindPrev() {
+        if (!pdfDoc) return;
+        const query = (document.getElementById("pdf-search-input") ? document.getElementById("pdf-search-input").value : "").toLowerCase().trim();
+        if (!query) return;
+
+        if (query !== pdfLastSearchQuery || pdfSearchResults.length === 0 || pdfSearchCurrentIndex === -1) {
+            await pdfSearch(query, true);
             return;
         }
         pdfSearchCurrentIndex = (pdfSearchCurrentIndex - 1 + pdfSearchResults.length) % pdfSearchResults.length;
-        document.getElementById("pdf-search-status").textContent = `${pdfSearchCurrentIndex + 1} / ${pdfSearchResults.length} pages`;
-        pdfPageNum = pdfSearchResults[pdfSearchCurrentIndex];
+        const targetPage = pdfSearchResults[pdfSearchCurrentIndex];
+        document.getElementById("pdf-search-status").textContent = `Page ${targetPage} (${pdfSearchCurrentIndex + 1}/${pdfSearchResults.length})`;
+        pdfPageNum = targetPage;
         queueRenderPdfPage(pdfPageNum);
     }
 
@@ -8271,7 +8404,9 @@ Thanks to Mike for being ace.</p>
     let qrsRotation = 0;
     let qrsSearchResults = [];
     let qrsSearchCurrentIndex = -1;
+    let qrsLastSearchQuery = "";
     let qrsTextIndex = null;
+    let qrsIndexPromise = null;
 
     const QRS_STORE_NAME = "qrsPdf";
 
@@ -8376,6 +8511,11 @@ Thanks to Mike for being ace.</p>
         const loadingTask = pdfjsLib.getDocument({ data: buffer });
         loadingTask.promise.then(pdf => {
             qrsDoc = pdf;
+            qrsTextIndex = null;
+            qrsIndexPromise = null;
+            qrsSearchResults = [];
+            qrsSearchCurrentIndex = -1;
+            qrsLastSearchQuery = "";
             document.getElementById("qrs-page-count").textContent = pdf.numPages;
             document.getElementById("qrs-page-num-input").max = pdf.numPages;
             document.getElementById("qrs-unlinked-state").style.display = "none";
@@ -8390,6 +8530,7 @@ Thanks to Mike for being ace.</p>
     }
 
     function renderQrsPage(num) {
+        if (!qrsDoc) return;
         qrsPageRendering = true;
         qrsDoc.getPage(num).then(page => {
             const canvas = document.getElementById("qrs-render-canvas");
@@ -8407,10 +8548,22 @@ Thanks to Mike for being ace.</p>
             const renderTask = page.render(renderContext);
 
             renderTask.promise.then(() => {
+                const activeQuery = (document.getElementById("qrs-search-input") ? document.getElementById("qrs-search-input").value : "").trim();
+                if (activeQuery) {
+                    highlightSearchMatchesOnCanvas(page, viewport, ctx, activeQuery);
+                }
                 qrsPageRendering = false;
                 if (qrsPageNumPending !== null) {
-                    renderQrsPage(qrsPageNumPending);
+                    const nextNum = qrsPageNumPending;
                     qrsPageNumPending = null;
+                    renderQrsPage(nextNum);
+                }
+            }).catch(() => {
+                qrsPageRendering = false;
+                if (qrsPageNumPending !== null) {
+                    const nextNum = qrsPageNumPending;
+                    qrsPageNumPending = null;
+                    renderQrsPage(nextNum);
                 }
             });
         });
@@ -8478,74 +8631,111 @@ Thanks to Mike for being ace.</p>
     }
 
     function buildQrsTextIndex() {
-        if (!qrsDoc) return;
+        if (!qrsDoc) return Promise.resolve();
+        if (qrsIndexPromise) return qrsIndexPromise;
+
         qrsTextIndex = [];
-        const promises = [];
-        for (let i = 1; i <= qrsDoc.numPages; i++) {
-            promises.push(
-                qrsDoc.getPage(i).then(page => {
-                    return page.getTextContent().then(tc => {
-                        const str = tc.items.map(s => s.str).join(" ");
-                        qrsTextIndex[i] = str;
-                    });
-                })
-            );
-        }
-        Promise.all(promises).then(() => {
-            console.log("[QRS Search] Indexed", qrsDoc.numPages, "pages");
-        });
+        const statusEl = document.getElementById("qrs-search-status");
+        const total = qrsDoc.numPages;
+
+        qrsIndexPromise = (async () => {
+            for (let i = 1; i <= total; i++) {
+                try {
+                    const page = await qrsDoc.getPage(i);
+                    const tc = await page.getTextContent();
+                    const rawItems = (tc && tc.items) ? tc.items.map(s => s.str || "") : [];
+                    const spaced = rawItems.join(" ").replace(/\s+/g, " ").toLowerCase();
+                    const compact = rawItems.join("").replace(/\s+/g, "").toLowerCase();
+                    qrsTextIndex[i] = { spaced, compact };
+                } catch (err) {
+                    qrsTextIndex[i] = { spaced: "", compact: "" };
+                }
+            }
+            console.log("[QRS Search] Indexed", total, "pages");
+            const inputEl = document.getElementById("qrs-search-input");
+            if (inputEl && inputEl.value.trim()) {
+                qrsSearch(inputEl.value, false);
+            } else if (statusEl && statusEl.textContent.startsWith("Indexing")) {
+                statusEl.textContent = "";
+            }
+        })();
+
+        return qrsIndexPromise;
     }
 
-    function qrsSearch(query) {
-        if (!qrsDoc || !qrsTextIndex) return;
-        const q = (query || "").toLowerCase().trim();
-        qrsSearchResults = [];
-        qrsSearchCurrentIndex = -1;
+    async function qrsSearch(query, jumpToFirst = true) {
+        if (!qrsDoc) return;
+        const q = (query !== undefined && query !== null ? String(query) : (document.getElementById("qrs-search-input") ? document.getElementById("qrs-search-input").value : "")).toLowerCase().trim();
+        const statusEl = document.getElementById("qrs-search-status");
 
         if (!q) {
-            document.getElementById("qrs-search-status").textContent = "";
+            qrsSearchResults = [];
+            qrsSearchCurrentIndex = -1;
+            qrsLastSearchQuery = "";
+            if (statusEl) statusEl.textContent = "";
+            queueRenderQrsPage(qrsPageNum);
             return;
         }
 
+        if (!qrsTextIndex || qrsTextIndex.length <= qrsDoc.numPages) {
+            if (statusEl) statusEl.textContent = "Indexing PDF...";
+            await buildQrsTextIndex();
+        }
+
+        qrsLastSearchQuery = q;
+        qrsSearchResults = [];
+        qrsSearchCurrentIndex = -1;
+
         for (let i = 1; i <= qrsDoc.numPages; i++) {
-            const pageText = (qrsTextIndex[i] || "").toLowerCase();
-            if (pageText.includes(q)) {
+            if (pageMatchesQuery(qrsTextIndex[i], q)) {
                 qrsSearchResults.push(i);
             }
         }
 
-        const statusEl = document.getElementById("qrs-search-status");
         if (qrsSearchResults.length === 0) {
-            statusEl.textContent = "0 matches";
+            if (statusEl) statusEl.textContent = "0 pages";
+            queueRenderQrsPage(qrsPageNum);
         } else {
-            qrsSearchCurrentIndex = 0;
-            statusEl.textContent = `1 / ${qrsSearchResults.length} pages`;
-            qrsPageNum = qrsSearchResults[0];
+            const existingIdx = qrsSearchResults.indexOf(qrsPageNum);
+            qrsSearchCurrentIndex = (!jumpToFirst && existingIdx !== -1) ? existingIdx : 0;
+            const targetPage = qrsSearchResults[qrsSearchCurrentIndex];
+            if (statusEl) {
+                statusEl.textContent = `Page ${targetPage} (${qrsSearchCurrentIndex + 1}/${qrsSearchResults.length})`;
+            }
+            qrsPageNum = targetPage;
             queueRenderQrsPage(qrsPageNum);
         }
     }
 
-    function qrsFindNext() {
-        const query = document.getElementById("qrs-search-input").value;
-        if (qrsSearchResults.length === 0 || qrsSearchCurrentIndex === -1) {
-            qrsSearch(query);
+    async function qrsFindNext() {
+        if (!qrsDoc) return;
+        const query = (document.getElementById("qrs-search-input") ? document.getElementById("qrs-search-input").value : "").toLowerCase().trim();
+        if (!query) return;
+
+        if (query !== qrsLastSearchQuery || qrsSearchResults.length === 0 || qrsSearchCurrentIndex === -1) {
+            await qrsSearch(query, true);
             return;
         }
         qrsSearchCurrentIndex = (qrsSearchCurrentIndex + 1) % qrsSearchResults.length;
-        document.getElementById("qrs-search-status").textContent = `${qrsSearchCurrentIndex + 1} / ${qrsSearchResults.length} pages`;
-        qrsPageNum = qrsSearchResults[qrsSearchCurrentIndex];
+        const targetPage = qrsSearchResults[qrsSearchCurrentIndex];
+        document.getElementById("qrs-search-status").textContent = `Page ${targetPage} (${qrsSearchCurrentIndex + 1}/${qrsSearchResults.length})`;
+        qrsPageNum = targetPage;
         queueRenderQrsPage(qrsPageNum);
     }
 
-    function qrsFindPrev() {
-        const query = document.getElementById("qrs-search-input").value;
-        if (qrsSearchResults.length === 0 || qrsSearchCurrentIndex === -1) {
-            qrsSearch(query);
+    async function qrsFindPrev() {
+        if (!qrsDoc) return;
+        const query = (document.getElementById("qrs-search-input") ? document.getElementById("qrs-search-input").value : "").toLowerCase().trim();
+        if (!query) return;
+
+        if (query !== qrsLastSearchQuery || qrsSearchResults.length === 0 || qrsSearchCurrentIndex === -1) {
+            await qrsSearch(query, true);
             return;
         }
         qrsSearchCurrentIndex = (qrsSearchCurrentIndex - 1 + qrsSearchResults.length) % qrsSearchResults.length;
-        document.getElementById("qrs-search-status").textContent = `${qrsSearchCurrentIndex + 1} / ${qrsSearchResults.length} pages`;
-        qrsPageNum = qrsSearchResults[qrsSearchCurrentIndex];
+        const targetPage = qrsSearchResults[qrsSearchCurrentIndex];
+        document.getElementById("qrs-search-status").textContent = `Page ${targetPage} (${qrsSearchCurrentIndex + 1}/${qrsSearchResults.length})`;
+        qrsPageNum = targetPage;
         queueRenderQrsPage(qrsPageNum);
     }
 
