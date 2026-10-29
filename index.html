@@ -7432,11 +7432,13 @@ Thanks to Mike for being ace.</p>
         hazard: '#e6a020',
     };
 
+    // Official Gaslands Skid Die face distribution (and standard D6 conversion):
+    //   1 = Hazard (1x), 2 = Spin (1x), 3 = Slide (1x), 4/5/6 = Shift (3x)
     function valueToOutcome(v) {
-        if (v === 1 || v === 2) return 'shift';
-        if (v === 3)            return 'slide';
-        if (v === 4 || v === 6) return 'spin';
-        return 'hazard';
+        if (v === 1) return 'hazard';
+        if (v === 2) return 'spin';
+        if (v === 3) return 'slide';
+        return 'shift'; // 4, 5, 6
     }
 
     /* ------------------------------------------------------------------ */
