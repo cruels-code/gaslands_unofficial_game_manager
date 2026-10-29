@@ -2070,7 +2070,7 @@
             padding-bottom: 0.8rem;
         }
 
-        body.play-mode-active .play-dashboard-card .vehicle-name-block span:first-child {
+        body.play-mode-active .play-dashboard-card .vehicle-name-block > span:first-child {
             font-size: 1.25rem !important;
             line-height: 1.2;
         }
@@ -5020,6 +5020,51 @@ Thanks to Mike for being ace.</p>
             saveState();
         }
 
+        function duplicateVehicle(id) {
+            const index = appState.vehicles.findIndex(v => v.id === id);
+            if (index === -1) return;
+            const source = appState.vehicles[index];
+            const vehicleCost = calculateVehicleCans(source);
+            const totalSpent = getTotalCansSpent();
+
+            if (totalSpent + vehicleCost > appState.budget) {
+                alert(`Cannot duplicate ${source.name}: duplicating this vehicle (${vehicleCost} Cans) would exceed your Can budget (${totalSpent + vehicleCost} / ${appState.budget} Cans).`);
+                return;
+            }
+
+            const newId = Date.now() + Math.random().toString(36).substr(2, 9);
+            const copy = JSON.parse(JSON.stringify(source));
+            copy.id = newId;
+            copy.name = `${source.name} (Copy)`;
+            copy.damage = 0;
+            copy.hazard = 0;
+            copy.gear = 1;
+            copy.onFire = false;
+            copy.ghostRider = false;
+            copy.distracted = false;
+            copy.wrecked = false;
+            copy.ammoStates = {};
+
+            // Copy vehicle image in IndexedDB if present
+            if (source.imageUrl && source.imageUrl !== "db_stored") {
+                copy.imageUrl = source.imageUrl;
+                saveImageToDB(newId, source.imageUrl);
+            } else if (source.imageUrl === "db_stored") {
+                getImageFromDB(source.id, function(base64Data) {
+                    if (base64Data) {
+                        copy.imageUrl = base64Data;
+                        saveImageToDB(newId, base64Data);
+                        renderVehicles();
+                        saveState();
+                    }
+                });
+            }
+
+            appState.vehicles.splice(index + 1, 0, copy);
+            renderVehicles();
+            saveState();
+        }
+
         // Validate sponsor rules and constraints
         function validateSponsorConstraints() {
             const sp = SPONSORS.find(s => s.name === appState.sponsor);
@@ -5739,7 +5784,10 @@ Thanks to Mike for being ace.</p>
                             <div style="display: flex; gap: 0.5rem; align-items: center; flex: 1; min-width: 120px;">
                                 <div class="vehicle-name-block" style="flex: 1;">
                                     <input type="text" class="vehicle-title-input" value="${vehicle.name}" onchange="updateVehicleName('${vehicle.id}', this.value)" placeholder="Car Name">
-                                    <select onchange="updateVehicleType('${vehicle.id}', this.value)" style="margin-top:0.2rem; font-size: 0.8rem; padding: 0.2rem; width: 100%;">
+                                    <div style="font-size: 0.38rem; color: var(--text-muted); text-transform: uppercase; margin-top: 1px; letter-spacing: 0.5px;">
+                                        <span>${baseInfo.weight} • ${vehicle.type}</span>
+                                    </div>
+                                    <select onchange="updateVehicleType('${vehicle.id}', this.value)" style="margin-top:0.15rem; font-size: 0.45rem; padding: 0.15rem 0.35rem; width: 100%;">
                                         ${VEHICLE_TYPES.map(t => {
                                             let disabled = false;
                                             let note = "";
@@ -5764,7 +5812,11 @@ Thanks to Mike for being ace.</p>
                             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; margin-left: 0.5rem; justify-content: center;">
                                 <span class="selection-item-cost" style="font-size: 1.1rem;">${cans} Cans</span>
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">${slotsUsed} / ${slotsMax} Slots</span>
-                                <button class="remove-item-btn" style="font-size: 0.75rem; margin-top: 0.35rem;" onclick="removeVehicle('${vehicle.id}')">Delete Vehicle</button>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; margin-top: 0.35rem;">
+                                    <button class="remove-item-btn" style="font-size: 0.72rem; color: var(--accent-cyan);" onclick="duplicateVehicle('${vehicle.id}')" title="Create a copy of this vehicle">Duplicate</button>
+                                    <span style="color: var(--text-dark); font-size: 0.7rem;">|</span>
+                                    <button class="remove-item-btn" style="font-size: 0.72rem;" onclick="removeVehicle('${vehicle.id}')">Delete</button>
+                                </div>
                             </div>
                         </div>
 
@@ -6010,8 +6062,8 @@ Thanks to Mike for being ace.</p>
                                 ${sponsorLogoHtml}
                                 <div class="vehicle-name-block" style="flex: 1;">
                                     <span style="font-family:'Orbitron', sans-serif; font-size: 1.25rem; font-weight:800; letter-spacing:0.5px; color: var(--text-primary);">${vehicle.name}</span>
-                                    <div style="font-size: 0.38rem; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; letter-spacing: 0.5px;">
-                                        <span>${baseInfo.weight} • ${vehicle.type}</span>
+                                    <div style="font-size: 0.38rem; line-height: 1.1; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; display: flex; gap: 0.3rem; flex-wrap: wrap; align-items: center; letter-spacing: 0.5px;">
+                                        <span style="font-size: 0.38rem !important;">${baseInfo.weight} • ${vehicle.type}</span>
                                     </div>
 
                                     <!-- Status Buttons (On Fire, Ghost, Distracted in a line) -->
