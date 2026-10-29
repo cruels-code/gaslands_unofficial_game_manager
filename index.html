@@ -7415,14 +7415,14 @@ Thanks to Mike for being ace.</p>
     //   face material index: 0(+X)=2,  1(-X)=5,  2(+Y)=1,  3(-Y)=6,  4(+Z)=3,  5(-Z)=4
     const FACE_VALUES = [2, 5, 1, 6, 3, 4];
 
-    // Euler rotations 
+    // Euler rotations that bring each value's face normal to +Y (camera UP)
     const VALUE_EULER = {
-        1: [0, 0, Math.PI/2],    // Face 0 (+X) points UP (+Y)
-        6: [0, 0, -Math.PI/2],   // Face 1 (-X) points UP (+Y)
-        2: [0, 0, 0],            // Face 2 (+Y) points UP (+Y)
-        5: [Math.PI, 0, 0],      // Face 3 (-Y) points UP (+Y)
-        3: [-Math.PI/2, 0, 0],   // Face 4 (+Z) points UP (+Y)
-        4: [Math.PI/2, 0, 0],    // Face 5 (-Z) points UP (+Y)
+        1: [0, 0, 0],            // Face 2 (+Y, value 1) points UP (+Y)
+        2: [0, 0, Math.PI/2],    // Face 0 (+X, value 2) rotates +90deg around Z to UP (+Y)
+        3: [-Math.PI/2, 0, 0],   // Face 4 (+Z, value 3) rotates -90deg around X to UP (+Y)
+        4: [Math.PI/2, 0, 0],    // Face 5 (-Z, value 4) rotates +90deg around X to UP (+Y)
+        5: [0, 0, -Math.PI/2],   // Face 1 (-X, value 5) rotates -90deg around Z to UP (+Y)
+        6: [Math.PI, 0, 0],      // Face 3 (-Y, value 6) rotates 180deg around X to UP (+Y)
     };
 
     const OUTCOME_COLORS = {
@@ -7896,7 +7896,13 @@ Thanks to Mike for being ace.</p>
         const diceType = document.getElementById('dice-type') ? document.getElementById('dice-type').value : 'skid';
         let rollResultStrings = [];
 
-        diceObjs.forEach(d => {
+        // Sort dice visually left-to-right (by X, then Z) so the history log and remote broadcast match the screen order
+        const sortedDice = [...diceObjs].sort((a, b) => {
+            const dx = a.mesh.position.x - b.mesh.position.x;
+            return Math.abs(dx) > 0.25 ? dx : (a.mesh.position.z - b.mesh.position.z);
+        });
+
+        sortedDice.forEach(d => {
             counts[d.outcome]++;
             if (diceType === 'd6') {
                 rollResultStrings.push(d.value);
@@ -7905,8 +7911,21 @@ Thanks to Mike for being ace.</p>
             }
         });
 
+        let parts = [];
+        if (diceType === 'd6') {
+            const sum = sortedDice.reduce((s, d) => s + d.value, 0);
+            parts.push(`<span style="color:#f2ede0">D6: ${sortedDice.map(d => d.value).join(', ')}${sortedDice.length > 1 ? ` (Total: ${sum})` : ''}</span>`);
+        } else {
+            if (counts.shift)  parts.push(`<span class="rs-shift">${counts.shift}\u00d7 Shift</span>`);
+            if (counts.slide)  parts.push(`<span class="rs-slide">${counts.slide}\u00d7 Slide</span>`);
+            if (counts.spin)   parts.push(`<span class="rs-spin">${counts.spin}\u00d7 Spin</span>`);
+            if (counts.hazard) parts.push(`<span class="rs-hazard">${counts.hazard}\u00d7 Hazard</span>`);
+        }
+
+        const resultJoined = rollResultStrings.join(' • ');
+
         // Add to history log
-        rollHistory.push(rollResultStrings.join(' • '));
+        rollHistory.push(resultJoined);
         if (rollHistory.length > 30) rollHistory.shift();
         updateDiceLog();
 
@@ -7914,17 +7933,11 @@ Thanks to Mike for being ace.</p>
             window.NetworkManager.broadcastRoll({
                 teamName: (typeof appState !== 'undefined' && appState.teamName) ? appState.teamName : "Anonymous Driver",
                 diceType: diceType,
-                count: diceObjs.length,
-                results: diceObjs.map(d => ({ value: d.value, outcome: d.outcome })),
-                resultText: rollResultStrings.join(' • ')
+                count: sortedDice.length,
+                results: sortedDice.map(d => ({ value: d.value, outcome: d.outcome })),
+                resultText: resultJoined
             });
         }
-
-        let parts = [];
-        if (counts.shift)  parts.push(`<span class="rs-shift">${counts.shift}\u00d7 Shift</span>`);
-        if (counts.slide)  parts.push(`<span class="rs-slide">${counts.slide}\u00d7 Slide</span>`);
-        if (counts.spin)   parts.push(`<span class="rs-spin">${counts.spin}\u00d7 Spin</span>`);
-        if (counts.hazard) parts.push(`<span class="rs-hazard">${counts.hazard}\u00d7 Hazard</span>`);
 
         const strip = document.getElementById('dice3d-result');
         strip.innerHTML = parts.join(' &nbsp;·&nbsp; ');
