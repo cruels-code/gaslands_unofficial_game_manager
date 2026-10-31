@@ -1592,7 +1592,7 @@
 
         /* Sponsor Logo Sprites */
         .sponsor-logo {
-            background-image: url('sponsor_logos.png');
+            background-image: url('sponsor_logos.jpg');
             background-size: 330px 180px; /* 5 columns of 66px, 3 rows of 60px */
             background-repeat: no-repeat;
             display: inline-block;
@@ -1602,15 +1602,16 @@
             height: 60px; /* full cell height to show the text labels */
             overflow: hidden;
         }
+        .sponsor-logo.logo-none-sponsorless,
         .sponsor-logo.logo-sponsorless { background-position: 0px 0px; }
         .sponsor-logo.logo-rutherford { background-position: -66px 0px; }
         .sponsor-logo.logo-miyazaki { background-position: -132px 0px; }
         .sponsor-logo.logo-mishkin { background-position: -198px 0px; }
         .sponsor-logo.logo-idris { background-position: -264px 0px; }
-        .sponsor-logo.logo-slime { background-position: -66px -60px; }
-        .sponsor-logo.logo-the-warden { background-position: -132px -60px; }
-        .sponsor-logo.logo-scarlett { background-position: -198px -60px; }
-        .sponsor-logo.logo-highway-patrol { background-position: 0px 0px; } /* Fallback: not present on this sheet */
+        .sponsor-logo.logo-slime { background-position: 0px -60px; }
+        .sponsor-logo.logo-the-warden { background-position: -66px -60px; }
+        .sponsor-logo.logo-scarlett { background-position: -132px -60px; }
+        .sponsor-logo.logo-highway-patrol { background-position: -198px -60px; }
         .sponsor-logo.logo-verney { background-position: -264px -60px; }
         .sponsor-logo.logo-maxxine { background-position: 0px -120px; }
         .sponsor-logo.logo-beverly { background-position: -66px -120px; }
