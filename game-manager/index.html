@@ -82,7 +82,7 @@
                     <button class="mode-btn" id="play-mode-btn" onclick="switchMode('play')">Play Mode</button>
                     <button class="mode-btn" id="rivals-mode-btn" onclick="switchMode('rivals')">Rivals</button>
                     <button class="mode-btn" id="library-mode-btn" onclick="switchMode('library')">⚙ Library</button>
-                    <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">Prompt / Export</button>
+                    <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">AI Prompt</button>
                 </div>
 
                 <!-- 3D Dice Roller Controls -->
@@ -238,15 +238,39 @@
             </div>
         </div>
 
-        <!-- ================= PROMPT & EXPORT VIEW ================= -->
+        <!-- ================= AI IMAGE PROMPT VIEW ================= -->
         <div id="prompt-view" class="view-section">
-            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:1.5rem; max-width:900px; margin:0 auto;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h2 style="font-family:'Orbitron',sans-serif; color:var(--glow-color); font-size:1.15rem; text-transform:uppercase;">AI Game Master Prompt & Roster</h2>
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:1.5rem; max-width:680px; margin:0 auto; display:flex; flex-direction:column; gap:1.2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">
+                    <h2 style="font-family:'Orbitron',sans-serif; color:var(--glow-color); font-size:1.15rem; text-transform:uppercase; margin:0;">🎨 AI Image Prompt Generator</h2>
                     <button class="btn btn-primary btn-sm" onclick="copyPromptText()">📋 Copy Prompt</button>
                 </div>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Copy this formatted game summary into any AI model to act as a referee, create campaign narrative, or run combat commentary.</p>
-                <textarea id="prompt-output-text" readonly style="width:100%; height:380px; font-family:'Courier New',monospace; font-size:0.85rem; padding:1rem; background:rgba(0,0,0,0.5);"></textarea>
+
+                <div class="input-group">
+                    <label for="prompt-vehicle-select" style="font-size:0.85rem; font-weight:bold; color:var(--text-muted); display:block; margin-bottom:0.35rem;">Select Vehicle</label>
+                    <select id="prompt-vehicle-select" onchange="generatePromptText()" style="width:100%; padding:0.5rem 0.6rem; background:#000; border:1px solid var(--border-color); color:var(--text-primary); border-radius:6px; font-family:'Orbitron',sans-serif; font-size:0.85rem;">
+                        <!-- Loaded dynamically with roster vehicles -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label style="font-size:0.85rem; font-weight:bold; color:var(--text-muted); display:block; margin-bottom:0.35rem;">Prompt Purpose</label>
+                    <div style="display:flex; gap:1.5rem; margin-top:0.3rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.85rem;">
+                            <input type="radio" name="prompt-purpose" value="3d-model" checked onchange="generatePromptText()" style="accent-color:var(--glow-color); width:16px; height:16px;">
+                            🗿 3D Model (Clay Render)
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.85rem;">
+                            <input type="radio" name="prompt-purpose" value="in-game" onchange="generatePromptText()" style="accent-color:var(--glow-color); width:16px; height:16px;">
+                            🏎️ In-Game Card (Full Color, Transparent BG)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label style="font-size:0.85rem; font-weight:bold; color:var(--text-muted); display:block; margin-bottom:0.35rem;">Generated Prompt</label>
+                    <textarea id="prompt-output-text" readonly style="width:100%; height:200px; font-family:'Courier New',monospace; font-size:0.85rem; padding:0.8rem; background:rgba(0,0,0,0.5); border:1px solid var(--border-color); border-radius:6px; color:var(--text-primary); word-break:break-word; resize:vertical; line-height:1.5;"></textarea>
+                </div>
             </div>
         </div>
     </main>
@@ -865,6 +889,7 @@
             renderLibraryTable();
         } else if (mode === "prompt") {
             renderSponsorInfo();
+            populatePromptVehicleDropdown();
             generatePromptText();
         }
     }
@@ -2837,50 +2862,150 @@
     }
 
     // ==========================================
-    // AI Prompt View Generator
+    // AI Image Prompt Generator
     // ==========================================
-    function generatePromptText() {
-        const total = getTotalCansSpent();
-        let txt = `=== ${appState.gameName.toUpperCase()} ROSTER: ${appState.teamName || 'UNNAMED TEAM'} ===\n`;
-        txt += `Faction / Sponsor: ${appState.sponsor}\n`;
-        txt += `Total Points: ${total} / ${appState.budget} pts\n`;
-        txt += `Active Turn: ${appState.turn} | Gear Phase: ${appState.phase} | Table Points: ${appState.votes}\n\n`;
+    function populatePromptVehicleDropdown() {
+        const select = document.getElementById("prompt-vehicle-select");
+        if (!select) return;
+        const currentVal = select.value;
+        select.innerHTML = "";
+        
+        if (!appState.vehicles || appState.vehicles.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "No Vehicles Available";
+            select.appendChild(opt);
+            return;
+        }
 
-        appState.vehicles.forEach((v, idx) => {
-            txt += `--- VEHICLE #${idx + 1}: ${v.name} (${v.type}) ---\n`;
-            txt += `Stats: Hull ${v.hull - (v.damage || 0)}/${v.hull} HP | Handling ${v.handling} | Max Gear ${v.maxGear} | Crew ${v.crew} | Cost ${v.cost} pts\n`;
-            if (v.weapons && v.weapons.length > 0) {
-                txt += `Weapons:\n`;
-                v.weapons.forEach(w => {
-                    txt += `  * ${w.name} [Facing: ${w.facing || 'Front'}, Range: ${w.range}, Dice: ${w.dice || 'None'}] - ${w.special || ''}\n`;
-                });
-            }
-            if (v.upgrades && v.upgrades.length > 0) {
-                txt += `Upgrades:\n`;
-                v.upgrades.forEach(u => {
-                    txt += `  * ${u.name} - ${u.special || ''}\n`;
-                });
-            }
-            if (v.perks && v.perks.length > 0) {
-                txt += `Perks:\n`;
-                v.perks.forEach(p => {
-                    txt += `  * ${p.name} - ${p.desc || ''}\n`;
-                });
-            }
-            txt += `\n`;
+        appState.vehicles.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v.id;
+            opt.textContent = `${v.name || 'Unnamed Vehicle'} (${v.type})`;
+            select.appendChild(opt);
         });
 
-        txt += `=== INSTRUCTION ===\n`;
-        txt += `You are an AI Tabletop Referee and Narrative Announcer for ${appState.gameName}. Analyze this roster and describe tactical options, narrative combat events, and rule rulings as the action unfolds!`;
+        if (currentVal && appState.vehicles.some(v => v.id === currentVal)) {
+            select.value = currentVal;
+        }
+    }
 
-        document.getElementById("prompt-output-text").value = txt;
+    function generatePromptText() {
+        const select = document.getElementById("prompt-vehicle-select");
+        const output = document.getElementById("prompt-output-text");
+        if (!output) return;
+
+        if (!appState.vehicles || appState.vehicles.length === 0) {
+            output.value = "Please build a vehicle in the Garage tab first.";
+            return;
+        }
+
+        const vehicleId = select ? select.value : (appState.vehicles[0] && appState.vehicles[0].id);
+        const v = appState.vehicles.find(car => car.id === vehicleId) || appState.vehicles[0];
+        if (!v) {
+            output.value = "Vehicle not found.";
+            return;
+        }
+
+        const baseInfo = (typeof LibraryManager !== "undefined" && LibraryManager.data && LibraryManager.data.vehicles.find(t => t.name === v.type)) || { weight: "Middleweight" };
+
+        const typeDescriptions = {
+            "Buggy": "lightweight off-road buggy with exposed roll cage frame and four medium-sized knobby off-road wheels",
+            "Car": "midsize armored sedan car with four standard-sized wheels",
+            "Performance Car": "low-profile aerodynamic high-speed performance sports car with four low-profile racing wheels",
+            "Truck": "midsize rugged pickup truck with four large heavy-duty off-road wheels",
+            "Heavy Truck": "heavy industrial transport truck with ten large commercial truck wheels",
+            "Bus": "large heavy passenger transit bus with six large commercial wheels",
+            "Drag Racer": "long-wheelbase drag racer with skinny small front tires and huge oversized rear drag slicks",
+            "Bike": "lightweight off-road combat motorcycle with two medium spoked wheels",
+            "Bike with Sidecar": "lightweight motorcycle with three medium spoked wheels including the sidecar wheel",
+            "Ice Cream Truck": "boxy delivery ice cream truck with four medium commercial wheels",
+            "Gyrocopter": "lightweight single-seat gyrocopter aircraft with three small landing gear wheels",
+            "Ambulance": "heavy boxy medical ambulance van with four medium heavy-duty wheels",
+            "Monster Truck": "massive monster truck suspension with four giant oversized rubber tractor wheels",
+            "Helicopter": "military combat helicopter with dual landing skids and no wheels",
+            "Tank": "tracked military combat tank with heavy metal tread tracks instead of wheels",
+            "War Rig": "massive multi-wheeled articulated war rig semi-trailer truck with eighteen large commercial wheels"
+        };
+        const typeDesc = typeDescriptions[v.type] || `${(baseInfo.weight || 'midsize').toLowerCase()} ${(v.type || 'combat vehicle').toLowerCase()}`;
+
+        const radios = document.getElementsByName("prompt-purpose");
+        let purpose = "3d-model";
+        for (let r of radios) {
+            if (r.checked) purpose = r.value;
+        }
+
+        let description = "";
+        let loadout = [];
+        let hasRam = false;
+
+        function isCrewWeapon(weapon) {
+            if (!weapon) return false;
+            if (weapon.category === "Crew Fired") return true;
+            if (weapon.special && weapon.special.toLowerCase().includes("crew fired")) return true;
+            const name = (weapon.name || "").toLowerCase().trim();
+            const crewList = [
+                "handgun", "hand gun", "pistol", "magnum", "grenade", "grenades",
+                "gas grenade", "gas grenades", "molotov", "molotovs", "molotov cocktail",
+                "molotov cocktails", "shotgun", "blunderbuss", "steel net", "steel nets",
+                "submachine gun", "sub-machine gun", "smg", "rifle"
+            ];
+            return crewList.some(c => name === c || name.startsWith(c + " ") || name.endsWith(" " + c));
+        }
+
+        (v.weapons || []).forEach(w => {
+            if (w.name === "Ram" || w.name === "Exploding Ram") hasRam = true;
+            if (!isCrewWeapon(w) && (w.name || "").toLowerCase() !== "rc car bombs") {
+                const facing = (w.facing && w.facing !== "360°" && w.facing !== "360") ? `${w.facing.toLowerCase()}-mounted ` : "";
+                loadout.push(`${facing}${(w.name || '').toLowerCase()}`);
+            }
+        });
+        (v.upgrades || []).forEach(u => {
+            const uName = (u.name || "").toLowerCase();
+            if (uName !== "extra crewmember") {
+                loadout.push(uName);
+            }
+        });
+
+        let loadoutText = "";
+        if (loadout.length > 0) {
+            loadoutText = `, customized with: ${loadout.join(', ')}`;
+        } else {
+            loadoutText = `, customized with rusty metal spikes and protective armor plating`;
+        }
+
+        let ramInstructions = "";
+        if (hasRam) {
+            ramInstructions = " Any rams must be fitted completely flush to the front and/or rear bumper of the vehicle body with zero gap, acting directly as the vehicle's bumper. Absolutely no extensions, no poles, no struts, no bars, no stilts, and no connection brackets extending the ram away from the body frame. The ram is welded directly to the bumper.";
+        }
+
+        let teamSponsorDesc = "";
+        if (appState.teamName) teamSponsorDesc += ` from the team '${appState.teamName}'`;
+        if (appState.sponsor && appState.sponsor !== "Sponsorless") teamSponsorDesc += `, sponsored by ${appState.sponsor} with custom decals`;
+
+        if (purpose === "3d-model") {
+            description = `Isometric 3D model render of a post-apocalyptic Mad Max combat ${typeDesc}`;
+            if (v.name) description += ` named '${v.name}'`;
+            description += teamSponsorDesc;
+            description += loadoutText;
+            description += `. Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, clear solid white background, studio product lighting, 3d game asset, perfect for 3D modeling software input, highly detailed clay render. No text, no letters, no labels, no watermarks on the image.${ramInstructions}`;
+        } else {
+            description = `Isometric 3D model render of a post-apocalyptic Mad Max combat ${typeDesc}`;
+            if (v.name) description += ` named '${v.name}'`;
+            description += teamSponsorDesc;
+            description += loadoutText;
+            description += `. Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, full color concept art render, isolated on solid white background for transparency masking, studio product lighting, 3d game asset, perfect for game UI card art, highly detailed. No text, no letters, no labels, no watermarks on the image.${ramInstructions}`;
+        }
+
+        output.value = description;
     }
 
     function copyPromptText() {
         const el = document.getElementById("prompt-output-text");
+        if (!el || !el.value) return;
         el.select();
         navigator.clipboard.writeText(el.value).then(() => {
-            showToast("📋 Roster prompt copied to clipboard!");
+            showToast("🎨 AI Image Prompt copied to clipboard!");
         });
     }
 

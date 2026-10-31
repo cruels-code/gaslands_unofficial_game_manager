@@ -1,6 +1,6 @@
 # Game Manager — Tabletop Dashboard & Vehicle Builder
 
-**Game Manager** is a tabletop gaming companion application designed for vehicular combat games, car wars, post-apocalyptic racing, and custom tabletop miniature rulesets.
+**Game Manager** is a customizable tabletop gaming companion designed for vehicular combat games, car wars, post-apocalyptic racing, and custom miniature rulesets.
 
 ---
 
@@ -21,17 +21,19 @@
    - Direct browser-to-browser synchronization powered by **Ably Realtime**.
    - **Generous Free Tier:** 6,000,000 messages / month and 200 concurrent player connections.
    - Synchronizes vehicle hull damage, hazard tokens, gears, and equipped weapons live across devices.
-   - Built-in table presence roster and late-joiner state recovery (rewind).
+   - Built-in table presence roster, turn/phase synchronization, and per-car combat telemetry alerts.
 
 4. **3D Physics Dice Roller:**
    - Three.js + Cannon.js 3D physics dice simulation.
-   - Supports Standard D6 and custom dice.
+   - Supports Standard D6 and custom Skid Dice.
    - Click weapons in Play Mode to instantly roll their user-configured attack dice!
    - Optional **Random.org** API key integration for true atmospheric quantum entropy (TRNG).
    - Draggable roll history log with live network broadcast so all players see rolls in real time.
 
-5. **AI Referee & Narrative Prompt Generator:**
-   - Export your team and vehicle roster as a pre-formatted prompt for AI game mastering, combat commentary, and narrative campaign tracking.
+5. **AI Image Prompt Generator:**
+   - Auto-generates detailed text-to-image prompts for **Midjourney**, **DALL-E**, and **Stable Diffusion** tailored to each vehicle's build.
+   - Choose between **🗿 3D Model Clay Render** (shadowless isometric white background asset for 3D modeling) and **🏎️ In-Game Card Art** (full-color concept art render with transparent background masking).
+   - Accurately captures chassis dimensions, mounted weapon locations (Front, Turret, Sides), upgrades, bumper rams, team name, and sponsor decals.
 
 ---
 
@@ -50,7 +52,7 @@ Simply open `index.html` inside this `game-manager/` folder in any modern web br
 
 ---
 
-## 📂 File Structure
+## 📁 File Structure
 
 ```
 game-manager/
