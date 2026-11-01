@@ -17,62 +17,71 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
   - **Distracted:** Animated WebGL static distortion glitch shader overlay.
 - **Vehicle Special Rules:** Dedicated chassis rules displayed directly on each play card (Roll Cage, Pivot, Slip Away, Jet Engine, Full Throttle, Prison Car conversions, etc.).
 - **Team / Sponsor Traits:** Active sponsor perks, traits, and house rules prominently visible on every card.
-- **Out-of-Gear Warnings:** Visual alerts when the active gear phase exceeds a vehicle's current gear.
+- **Out-of-Gear Warnings:** Visual alerts when the active gear phase exceeds a vehicle's maximum allowable transmission gear.
 
-### 2. Full Garage Vehicle Builder
-- **16 Vehicle Types:** Buggy, Car, Performance Car, Truck, Heavy Truck, Bus, Drag Racer, Bike, Bike with Sidecar, Ice Cream Truck, Gyrocopter, Ambulance, Monster Truck, Helicopter, Tank, and War Rig.
-- **14 Sponsors:** Rutherford, Miyazaki, Mishkin, Idris, Slime, The Warden, Scarlett, Highway Patrol, Verney, Maxxine, The Order of the Inferno, Beverly, Rusty's Bootleggers, or Sponsorless / None.
-- **Complete Armory & Equipment:** Weapons with mounted facing selectors (360°, Front, Rear, Left, Right, Turret with automatic 3x Cans calculation), Upgrades, and Perk classes.
-- **Rules & Constraint Validation:** Real-time checking against build slot limits, Cans budget, and sponsor restrictions (e.g. Rutherford lightweight ban, Miyazaki handling minimums, Idris gyrocopter ban).
-- **Chassis Image Upload:** Upload custom vehicle photos or AI renders with automatic transparent cutout rendering.
-- **Duplicate & Delete:** Quick-clone or remove vehicles with a single click.
+### 2. Adaptive Tablet & Smartphone Auto-Detection (v1.0.4)
+- **Automatic Device & Orientation Detection:** Integrated `DeviceManager` that learns the player's device type (`phone`, `tablet`, `desktop`) and orientation (`portrait`, `landscape`) in real-time.
+- **Touch-Optimized Tabletop Controls:** Enlarged 36px–40px tap targets for Hull boxes, Hazard dots, and Gear selectors so fingers never miss during chaotic tabletop games.
+- **Adaptive Multi-Column Grids:** Tablet portrait displays balanced 2-column vehicle grids instead of stretched single cards; phones utilize clean single-column cards with touch-friendly spacing and hidden watermarks for maximum readability.
+- **Compact Phone Landscape Viewports:** Streamlined low-profile headers and turn/phase trackers designed for smartphone landscape screens, keeping dashboards fully visible.
 
-### 3. Realtime Multiplayer Tables (Powered by Ably)
-- **Direct Realtime Mesh:** Browser-to-browser synchronization with no accounts or server setup needed.
-- **Table Presence Radar:** See which drivers and teams are currently at your table.
-- **Per-Car Combat Telemetry:** Real-time toast alerts inform all connected players whenever individual cars suffer damage, repair hull, or gain/clear hazard tokens.
-- **Turn & Phase Sync:** Shared Turn and Gear Phase controls synchronize live across all players.
-- **Table Security:** Optional PIN code locks for private gaming sessions.
-- **Auto Table Expiration:** Tables with zero active players for 60 seconds are automatically pruned from the lobby directory.
+### 3. Tactical Radio Comms & Driver Roster (v1.0.4)
+- **Real-Time In-Game Radio Network:** Integrated tactical comms channel for coordinating with your table or chatting in the central lobby.
+- **Active Driver Roster:** Side-by-side active driver roster displaying usernames, team names, sponsors, table host crowns, and supporter flairs.
+- **Mobile-Adaptive Comms Sheet:** Floating resizable/draggable window on desktop; sleek slide-up bottom-sheet drawer with collapsible roster on phones.
+- **Audio FX Synthesizer:** Pure Web Audio API synthesizers provide retro radio and alert chimes, with a global "Mute All Sounds" toggle in Settings and the Comms window.
+- **Driver Call-Signs & Commands:** Set persistent nicknames or use IRC-style slash commands (`/nick`, `/me`, `/clear`, `/help`).
 
-### 4. 3D Physics Dice Roller
-- **Three.js + Cannon.js Simulation:** Realistic 3D dice physics rolling directly in your browser.
-- **Official Skid Dice & D6:** Skid Dice featuring official face distributions (3x Shift, 1x Slide, 1x Spin, 1x Hazard) and numeric D6 dice.
-- **1 to 10 Dice Throw:** Select anywhere from 1 to 10 dice per roll.
-- **Keyboard Hotkeys:**
-  - `Space`: Roll active dice
-  - `1`–`9`, `0`: Set throw count (1–10 dice)
-  - `S`: Toggle between Skid Dice and Standard D6
-- **Random.org Quantum TRNG:** Optional integration with Random.org API for true atmospheric quantum entropy.
-- **Roll History Terminal:** Draggable, resizable retro terminal log tracking every roll and broadcasting results to connected table rivals.
+### 4. Full Garage Vehicle Builder
+- **Complete Ruleset Database:** All official vehicle chassis (Buggy, Car, Performance Car, Truck, Heavy Truck, Monster Truck, Bus, Gyrocopter, Tank, War Rig, Helicopter, Ambulance, etc.).
+- **Weapons, Upgrades & Perks:** Accurate Can cost calculations, Build Slot constraints, crew limits, and weapon mount facings (Front, Rear, Left, Right, 360° Turret).
+- **Official Sponsors:** Full roster including Rutherford, Miyazaki, Mishkin, Idris, Slime, Rusty's Bootleggers, The Warden, Order of the Inferno, Beverly, Highway Patrol, Verney, Maxxine, and Scarlett.
+- **Fleet Management:** Create, clone, customize, and manage multiple teams simultaneously.
+- **Import / Export / Print:** Full JSON team roster backup/restore and clean, high-contrast, print-friendly roster output.
 
-### 5. Audience Vote Perks HUD
-Interactive vote counters with one-click vote spending:
-- **Gain Vote (+1):** Increment audience votes from televised carnage.
-- **Thunderous Applause (1 Vote):** Remove D6 Hazard Tokens from a friendly vehicle.
-- **Burn Rubber (1 Vote):** Shift gear +/- 1 and gain 1 Hazard Token.
-- **Carpe Diem (2 Votes):** Immediately move Pole Position or prevent it from moving.
-- **Reload Weapon (2 Votes):** Restore 1 ammo token to an equipped weapon or upgrade.
-- **Executive Intervention (2 Votes):** Force an enemy vehicle to gain hazards until it has 5.
-- **Respawn Wreck (3 Votes / 1 Vote for Beverly):** Respawn a destroyed vehicle at half Hull points.
+### 5. Realtime Multiplayer Tables (Powered by Ably)
+- **Online Lobby & Table Matchmaker:** Centralized lobby where racers can idle and chat before entering a game table. Includes instant live player counts, table directory, and quick matchmaker.
+- **Host Management & Player Kick:** Table creators hold Table Host status (👑 HOST badge) and can kick players if needed.
+- **Auto LAN Discovery:** One-click local WiFi table creation with customizable table names (e.g., "Basement Brawl", "Garage LAN").
+- **Peer Synchronization:** Live multi-player dashboard synchronization of hull points, hazard tokens, gears, status effects, and audience votes across all connected devices.
 
-### 6. AI Image Prompt Generator
-- Auto-generates structured prompts for **Midjourney**, **DALL-E**, and **Stable Diffusion** tailored to each vehicle in your garage.
-- **Two Rendering Modes:**
-  - **🗿 3D Model (Clay Render):** Isometric shadowless white-background asset ready for 3D modeling and sculpting.
-  - **🏎️ In-Game Card Art:** Full-color concept art render isolated on solid white for transparent background cutout into vehicle cards.
-- Intelligently incorporates chassis type, mounted weapon placements, upgrades, flush bumper rams, team name, and sponsor decals.
+### 6. 3D Physics Dice Roller
+- **Authentic Skid Dice:** Full 3D Cannon.js physics simulation of custom Gaslands Skid Dice faces (Shift, Hazard, Spin, Slide).
+- **Attack & Defense D6:** Physics-based combat dice with automatic hit counting.
 
-### 7. Settings, Night Vision Mode & Custom Sponsors
-- **Night Vision Mode (Dark Theme):** Toggle between the classic Camouflage & Desert Sand theme and a dedicated Red & Black Night Vision theme engineered to preserve rod-cell night vision during tabletop play in darkened rooms. Also supports automatic OS theme matching.
-- **Custom Team Sponsor Logos:** Upload custom team sponsor images (PNG, JPG, SVG, WEBP) to replace the default sprite sheet logos across all cards, dashboards, and badges with persistent local storage and instant reset to defaults.
-- **Hide AI Prompt Toggle:** Option in Settings to toggle visibility of AI Image Prompt generator buttons across the interface.
-- **Double-Click Changelog:** Double-clicking the version badge (v1.0.2) in the bottom-left opens an interactive changelog modal detailing all historical and recent feature updates.
+### 7. Audience Vote Perks HUD
+- **Live Crowd Vote Counter:** Easily track crowd votes and spend them instantly on canonical perks (Carpe Diem, Reload, Inferno, Cheers, Boos, etc.).
 
-### 8. Official Rulebook & Quick Reference Sheet (QRS) Viewers
-- Secure, client-side PDF reader for your locally linked official Gaslands: Refuelled rulebook and reference sheets.
-- **Live Search Query Tracking:** Split-glyph text indexing with animated canvas match highlights.
-- **Zoom & Page Rotation:** 90° canvas rotation and zoom controls for landscape table play.
+### 8. Settings, Night Vision Mode & Custom Sponsors
+- **Themes:** High-contrast Wasteland Day Theme, Desert Sand Theme, and authentic Night Vision Red/Green/Amber cockpit HUD themes.
+- **Custom Sponsor Logo Uploads:** Upload your own sponsor crests with real-time transparent white/black background cutout processing.
+- **Sound & AI Controls:** Global sound toggle to mute all audio FX, and an AI prompt visibility switch.
+
+### 9. Official Rulebook & Quick Reference Sheet (QRS) Viewers
+- **Embedded Document Readers:** Built-in PDF reader for locally linked Gaslands rulebooks with page rotation and split-glyph text search.
+
+---
+
+## 🏷️ Version History
+
+### v1.0.4 - Current Release (01.11.26)
+- **Adaptive Tablet & Smartphone Auto-Detection:** Integrated `DeviceManager` that dynamically detects device class (phone, tablet, desktop) and orientation (portrait, landscape), tailoring grids, layouts, and typography.
+- **Touch-Optimized Hit Targets:** Hull boxes, hazard dots, and gear selector buttons enlarged to 36px–40px for error-free tabletop finger tapping.
+- **Responsive Grids:** 2-column balanced layouts for tablet portrait; clean single-column cards with hidden watermarks for smartphones.
+- **Tactical Radio Comms:** Split chat buffer and active driver roster with draggable/resizable window on desktop and bottom-sheet drawer on mobile.
+- **Audio FX Synthesizer:** Web Audio API sound chimes with a global "Mute All Sounds" toggle in Settings and the Comms window.
+- **Persistent Driver ID & Supporter System:** Persistent IDs, Ko-fi supporter links, and VIP flair activation.
+- **Online Lobby Default Routing:** Automatic lobby connection on launch before joining tables.
+
+### v1.0.3 (01.11.26)
+- **Online Table Lobby & Matchmaker:** Real-time lobby directory with instant player counts.
+- **Table Host Controls:** 👑 Host badge and player kick capability.
+- **Auto LAN Friendly Naming:** Custom naming for local network rooms.
+- **Default Garage Screen:** Automatic routing to Garage Mode upon load and join.
+
+### v1.0.2 (01.11.26)
+- **Night Vision Tactical Themes:** Authentic tactical red, amber, and green cockpit themes.
+- **Custom Sponsor System:** Upload custom logos with instant transparency extraction.
 
 ---
 
@@ -94,6 +103,13 @@ No Node.js, server, or build step is required!
 2. Create an application and copy your API Key.
 3. Click the **Table: Offline** indicator in the top header, enter your key, and join or create a table room code (e.g. `table-1`).
 4. Share the room code or click **Copy Table Link** to share the direct URL with your friends!
+
+---
+
+## ☕ Support the Project
+If you enjoy using the Unofficial Gaslands Game Manager, you can support further development:
+- **Ko-fi:** [https://ko-fi.com/gaslands_game_manager](https://ko-fi.com/gaslands_game_manager)
+- All supporters receive a custom VIP Supporter Badge flair next to their driver call-sign!
 
 ---
 

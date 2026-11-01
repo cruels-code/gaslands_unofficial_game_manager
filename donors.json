@@ -1,0 +1,17 @@
+{
+  "description": "Gaslands Unofficial Game Manager - Supporter Registry",
+  "donors": {
+    "SAMPLE-DRIVER-ID": {
+      "name": "Sample Supporter",
+      "tier": "supporter",
+      "title": "Nitro Supporter"
+    }
+  },
+  "supporterCodes": [
+    "GAS-VIP-MVY0RYHXD254M",
+    "NITRO-BREW-2026",
+    "GASLANDS-BEER",
+    "ROAD-WARRIOR-VIP",
+    "CRUELS-CREW-DONOR"
+  ]
+}
