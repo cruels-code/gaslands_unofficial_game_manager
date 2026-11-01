@@ -1590,6 +1590,202 @@
             transform: translate(-50%, -5px);
         }
 
+        /* ========================================================
+           THEME & SETTINGS STYLING
+           ======================================================== */
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.18);
+            transition: .25s ease;
+            border-radius: 26px;
+            border: 1px solid var(--card-border);
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-primary);
+            transition: .25s ease;
+            border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--glow-color);
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background-color: #000;
+        }
+
+        /* Hide AI Prompt when setting active */
+        body.hide-ai-prompt #prompt-mode-btn,
+        body.hide-ai-prompt .ai-prompt-btn,
+        body.hide-ai-prompt button[onclick*="goToPromptTab"] {
+            display: none !important;
+        }
+
+        /* --------------------------------------------------------
+           THEME: NIGHT VISION (RED & BLACK) FOR PRESERVING NIGHT VISION
+           -------------------------------------------------------- */
+        body.theme-night-vision {
+            --bg-darker: #050000 !important;
+            --bg-dark: #120101 !important;
+            --card-bg: rgba(24, 2, 2, 0.88) !important;
+            --card-border: rgba(220, 38, 38, 0.32) !important;
+            
+            --accent-orange: #ef4444 !important;
+            --accent-orange-glow: rgba(239, 68, 68, 0.3) !important;
+            --accent-cyan: #ff4d4d !important;
+            --accent-cyan-glow: rgba(255, 77, 77, 0.3) !important;
+            --danger-red: #ff2222 !important;
+            --danger-red-glow: rgba(255, 34, 34, 0.4) !important;
+            
+            --text-primary: #ff9999 !important;
+            --text-muted: #c94040 !important;
+            --text-dark: #771a1a !important;
+            
+            --glow-color: #ef4444 !important;
+            --glow-shadow: rgba(239, 68, 68, 0.3) !important;
+            
+            background-color: #050000 !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(42, 4, 4, 0.95) 0, transparent 65%),
+                radial-gradient(at 50% 100%, rgba(220, 38, 38, 0.15) 0, transparent 65%),
+                radial-gradient(at 100% 0%, rgba(180, 20, 20, 0.08) 0, transparent 65%) !important;
+            color: #ff9999 !important;
+        }
+
+        body.theme-night-vision header {
+            background: rgba(18, 1, 1, 0.95) !important;
+            border-bottom-color: rgba(220, 38, 38, 0.35) !important;
+        }
+
+        body.theme-night-vision .vehicle-card,
+        body.theme-night-vision .play-dashboard-card {
+            background: rgba(24, 2, 2, 0.88) !important;
+            border-color: rgba(220, 38, 38, 0.3) !important;
+        }
+
+        body.theme-night-vision .stat-badge {
+            background: rgba(42, 5, 5, 0.75) !important;
+            border-color: rgba(220, 38, 38, 0.25) !important;
+        }
+        body.theme-night-vision .stat-badge .val {
+            color: #ff5555 !important;
+        }
+
+        body.theme-night-vision input,
+        body.theme-night-vision select,
+        body.theme-night-vision textarea {
+            background: #0d0101 !important;
+            color: #ff9999 !important;
+            border-color: rgba(220, 38, 38, 0.35) !important;
+        }
+
+        body.theme-night-vision .btn {
+            background: rgba(45, 5, 5, 0.8) !important;
+            color: #ff8888 !important;
+            border-color: rgba(220, 38, 38, 0.4) !important;
+        }
+
+        body.theme-night-vision .btn-primary {
+            background: #8b1212 !important;
+            color: #ffcccc !important;
+            border-color: #ef4444 !important;
+        }
+
+        body.theme-night-vision .btn-danger {
+            background: rgba(120, 10, 10, 0.8) !important;
+            border-color: #ef4444 !important;
+            color: #ffaaaa !important;
+        }
+
+        body.theme-night-vision .mode-btn {
+            color: #c94040;
+            border-color: rgba(220, 38, 38, 0.25);
+        }
+
+        body.theme-night-vision .mode-btn.active {
+            background: #8b1212 !important;
+            border-color: #ef4444 !important;
+            color: #ffcccc !important;
+        }
+
+        body.theme-night-vision .modal-content {
+            background: #0f0202 !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.35) !important;
+        }
+
+        body.theme-night-vision .modal-header {
+            border-bottom-color: rgba(220, 38, 38, 0.35) !important;
+        }
+
+        body.theme-night-vision .qrs-data-table th {
+            background: #200404 !important;
+            color: #ff9999 !important;
+            border-bottom-color: #ef4444 !important;
+        }
+        body.theme-night-vision .qrs-data-table td {
+            border-bottom-color: rgba(220, 38, 38, 0.2) !important;
+            color: #ff9999 !important;
+        }
+        body.theme-night-vision .qrs-data-table tr:hover td {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+        body.theme-night-vision .bg-watermark-left,
+        body.theme-night-vision .bg-watermark-right {
+            color: #881a1a !important;
+            opacity: 0.75 !important;
+            filter: none !important;
+        }
+        body.theme-night-vision .bg-watermark-left:hover,
+        body.theme-night-vision .bg-watermark-right:hover {
+            color: #ef4444 !important;
+            opacity: 1 !important;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.5) !important;
+        }
+
+        body.theme-night-vision #dice-log {
+            background: rgba(10, 0, 0, 0.95) !important;
+            border-color: #ef4444 !important;
+            color: #ff6666 !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.25) !important;
+        }
+
+        body.theme-night-vision #dice-log-header {
+            background: #ef4444 !important;
+            color: #000 !important;
+        }
+
+        body.theme-night-vision .theme-choice-label.active {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.15) !important;
+        }
+
+        /* --------------------------------------------------------
+           THEME: LIGHT MODE
+           Light mode uses the original Camouflage & Desert Sand color scheme.
+           No CSS overrides needed.
+           -------------------------------------------------------- */
+
         /* Sponsor Logo Sprites */
         .sponsor-logo {
             background-image: url('sponsor_logos.jpg');
@@ -2308,7 +2504,7 @@
                     <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">AI Prompt</button>
                     <button class="mode-btn" id="rules-mode-btn" onclick="switchMode('rules')">Rules</button>
                     <button class="mode-btn" id="qrs-mode-btn" onclick="switchMode('qrs')">Reference Sheet</button>
-                    <button class="mode-btn" id="about-mode-btn" onclick="openAboutModal()" style="border: 1px solid rgba(245, 158, 11, 0.4); color: var(--glow-color);">About</button>
+                    <button class="mode-btn" id="settings-mode-btn" onclick="openSettingsModal()" style="border: 1px solid rgba(245, 158, 11, 0.4); color: var(--glow-color);">Settings</button>
                 </div>
 
             </div>
@@ -2812,6 +3008,103 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal" onclick="closeSettingsModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 580px; box-shadow: 0 0 35px var(--glow-shadow); border-color: var(--glow-color);">
+            <div class="modal-header">
+                <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>⚙️</span> Settings
+                </h3>
+                <button class="close-modal-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            
+            <div style="padding: 1.2rem 0.2rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                
+                <!-- 1. Hide AI Prompt Button Option -->
+                <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                        <div>
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary);">Hide AI Prompt Button</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Hide the "AI Prompt" navigation tab and chassis card prompt buttons.</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-hide-ai-prompt" onchange="toggleHideAiPrompt(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. Light / Dark Mode Option -->
+                <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.2rem;">
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary); margin-bottom: 0.25rem;">Theme Mode</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Select light, dark (red & black night vision), or follow your device settings.</div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;">
+                        <label class="theme-choice-label" id="theme-label-system" style="display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 0.75rem 0.4rem; border: 1px solid var(--card-border); border-radius: 8px; cursor: pointer; background: rgba(0,0,0,0.25); text-align: center; transition: all 0.2s;">
+                            <input type="radio" name="theme-setting" value="system" onchange="setThemeMode(this.value)" style="accent-color: var(--glow-color);">
+                            <span style="font-size: 1.15rem;">💻</span>
+                            <span style="font-size: 0.78rem; font-weight: bold;">System</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);">Auto-detect</span>
+                        </label>
+                        <label class="theme-choice-label" id="theme-label-dark" style="display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 0.75rem 0.4rem; border: 1px solid var(--card-border); border-radius: 8px; cursor: pointer; background: rgba(0,0,0,0.25); text-align: center; transition: all 0.2s;">
+                            <input type="radio" name="theme-setting" value="dark" onchange="setThemeMode(this.value)" style="accent-color: #ef4444;">
+                            <span style="font-size: 1.15rem;">🔴</span>
+                            <span style="font-size: 0.78rem; font-weight: bold; color: #ff5555;">Dark (Night)</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);">Red & Black</span>
+                        </label>
+                        <label class="theme-choice-label" id="theme-label-light" style="display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 0.75rem 0.4rem; border: 1px solid var(--card-border); border-radius: 8px; cursor: pointer; background: rgba(0,0,0,0.25); text-align: center; transition: all 0.2s;">
+                            <input type="radio" name="theme-setting" value="light" onchange="setThemeMode(this.value)" style="accent-color: var(--glow-color);">
+                            <span style="font-size: 1.15rem;">☀️</span>
+                            <span style="font-size: 0.78rem; font-weight: bold;">Light</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted);">High Contrast</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. Upload Team Sponsor Image Option -->
+                <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.2rem;">
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary); margin-bottom: 0.25rem;">Upload Team Sponsor Image</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Select a sponsor and upload a custom image. Custom images override the sprite sheet logo across all cards.</div>
+                    
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 170px;">
+                            <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem; text-transform: uppercase;">Select Sponsor Name</label>
+                            <select id="settings-sponsor-select" onchange="updateSettingsSponsorPreview()" style="width: 100%; padding: 0.45rem 0.6rem; background: #000; border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.82rem;">
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.7rem; background: rgba(0,0,0,0.25); border: 1px solid var(--card-border); border-radius: 8px;">
+                            <div id="settings-sponsor-preview-container" style="width: 58px; height: 50px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; border: 1px dashed var(--card-border); background: rgba(0,0,0,0.4); flex-shrink: 0;">
+                                <!-- Live sponsor logo preview -->
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <button class="btn btn-primary" onclick="triggerCustomSponsorUpload()" style="font-size: 0.75rem; padding: 0.35rem 0.7rem; white-space: nowrap;">📁 Upload Image</button>
+                                <button class="btn btn-danger" id="settings-sponsor-reset-btn" onclick="resetCustomSponsorLogo()" style="font-size: 0.68rem; padding: 0.2rem 0.5rem; display: none; white-space: nowrap;">Reset Default</button>
+                            </div>
+                            <input type="file" id="settings-sponsor-file-input" style="display: none;" accept="image/*" onchange="handleCustomSponsorUpload(event)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. About Option -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                        <div>
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary);">About & Info</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">View creator acknowledgments, disclaimer, and version info.</div>
+                        </div>
+                        <button class="btn" onclick="openAboutFromSettings()" style="padding: 0.45rem 1rem; border-color: var(--glow-color); color: var(--glow-color); font-size: 0.82rem; white-space: nowrap;">ℹ️ View About</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--card-border); padding-top: 0.8rem; margin-top: 0.4rem;">
+                <button class="btn btn-primary" onclick="closeSettingsModal()" style="padding: 0.45rem 1.4rem;">Done</button>
+            </div>
+        </div>
+    </div>
+
     <!-- About Modal -->
     <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 540px; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
@@ -2842,21 +3135,73 @@ Thanks to Mike for being ace.</p>
 
     <!-- Version / Changelog Modal -->
     <div class="modal-overlay" id="version-modal" onclick="closeVersionModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 580px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
             <div class="modal-header">
                 <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
                     <span>🏷️</span> Version History & Updates
                 </h3>
                 <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
             </div>
-            <div style="padding: 1.2rem 0.2rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">
-                <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 6px; padding: 0.8rem 1rem;">
-                    <div style="font-family: 'Orbitron', monospace, sans-serif; font-size: 0.88rem; color: var(--glow-color); font-weight: 700;">
-                        V 1.0.0 - Initial public release. - 28.10.26
+            <div style="padding: 1.2rem 0.5rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-primary); overflow-y: auto; max-height: calc(85vh - 130px);">
+                
+                <!-- v1.0.2 -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
+                            v1.0.2 - Current Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">01.11.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Settings Menu:</strong> Replaced the top navigation bar 'About' button with a unified 'Settings' modal.</li>
+                        <li><strong>Hide AI Prompt Button:</strong> Added a toggle switch in Settings to hide or show the AI Image Prompt buttons.</li>
+                        <li><strong>Custom Sponsor Logos:</strong> Upload custom team sponsor images (PNG, JPG, WEBP, SVG) with live preview, automatic local persistence, and instant reset.</li>
+                        <li><strong>Light & Dark (Night Vision) Modes:</strong>
+                            <ul style="margin-top: 0.2rem; padding-left: 1rem;">
+                                <li><strong>Light Mode:</strong> Original classic Camouflage & Desert Sand theme.</li>
+                                <li><strong>Dark Mode:</strong> Red and black theme designed specifically to preserve night vision in darkened rooms during tabletop play.</li>
+                                <li><strong>Follow System:</strong> Automatically follows your device's light/dark mode setting.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Version & Updates Access:</strong> Updated bottom-left indicator to v1.0.2 with double-click access to the full update changelog.</li>
+                    </ul>
+                </div>
+
+                <!-- v1.0.1 -->
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--card-border); border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 0.92rem; color: var(--accent-orange); font-weight: 700;">
+                            v1.0.1 - Rules, Multiplayer & Assets
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">31.10.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.35rem; color: var(--text-muted);">
+                        <li><strong style="color: var(--text-primary);">Vehicle Special Rules:</strong> Displayed directly on Play Mode cards.</li>
+                        <li><strong style="color: var(--text-primary);">Team & Sponsor Traits:</strong> Integrated on Play Mode vehicle cards.</li>
+                        <li><strong style="color: var(--text-primary);">Per-Vehicle Multiplayer Sync:</strong> Damage and hazards are now tracked and synced individually per vehicle rather than as a team total.</li>
+                        <li><strong style="color: var(--text-primary);">Audience Vote Perks:</strong> Added missing "Carpe Diem" perk.</li>
+                        <li><strong style="color: var(--text-primary);">Dice Roller Stability:</strong> Fixed white-screen crash when rolling dice while on fire; capped max dice count to 10.</li>
+                        <li><strong style="color: var(--text-primary);">Sponsor Rules Fix:</strong> Resolved persistent sponsor rules remaining when no sponsor is selected.</li>
+                        <li><strong style="color: var(--text-primary);">Sponsor Logos:</strong> Switched to official sprite sheet (<code>sponsor_logos.jpg</code>) and corrected Miyazaki and Mishkin sprite cropping.</li>
+                        <li><strong style="color: var(--text-primary);">AI Tools:</strong> Streamlined tools exclusively to the 3D Image Prompt Generator.</li>
+                    </ul>
+                </div>
+
+                <!-- v1.0.0 -->
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 0.88rem; color: var(--text-muted); font-weight: 700;">
+                            v1.0.0 - Initial Public Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">28.10.26</span>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">
+                        Initial public release featuring Garage roster builder, live Play dashboard, Audience votes, Quick Reference tables, Skid Dice roller, and P2P peer multiplayer sync.
                     </div>
                 </div>
+
             </div>
-            <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--card-border); padding-top: 0.8rem;">
+            <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--card-border); padding-top: 0.8rem; margin-top: auto;">
                 <button class="btn btn-primary" onclick="closeVersionModal()" style="padding: 0.45rem 1.4rem;">Close</button>
             </div>
         </div>
@@ -3523,6 +3868,249 @@ Thanks to Mike for being ace.</p>
             }
 
             modal.classList.add("active");
+        }
+
+        // ==========================================
+        // SETTINGS MODAL & USER CUSTOMIZATIONS
+        // ==========================================
+        const CUSTOM_SPONSORS_KEY = "gaslands_custom_sponsors";
+        const HIDE_AI_PROMPT_KEY = "gaslands_hide_ai_prompt";
+        const THEME_MODE_KEY = "gaslands_theme_mode";
+
+        function openSettingsModal() {
+            populateSettingsSponsors();
+            initSettingsUI();
+            const modal = document.getElementById("settings-modal");
+            if (modal) modal.classList.add("active");
+        }
+
+        function closeSettingsModal(event) {
+            if (event && event.target && event.target.id !== "settings-modal" && !event.target.classList.contains("close-modal-btn")) {
+                return;
+            }
+            const modal = document.getElementById("settings-modal");
+            if (modal) modal.classList.remove("active");
+        }
+
+        function openAboutFromSettings() {
+            closeSettingsModal();
+            openAboutModal();
+        }
+
+        // --- 1. Hide AI Prompt Button ---
+        function toggleHideAiPrompt(hide) {
+            if (hide) {
+                document.body.classList.add("hide-ai-prompt");
+                localStorage.setItem(HIDE_AI_PROMPT_KEY, "true");
+                if (appState.mode === "prompt") {
+                    switchMode("garage");
+                }
+                showNetworkToast("AI Prompt button hidden");
+            } else {
+                document.body.classList.remove("hide-ai-prompt");
+                localStorage.removeItem(HIDE_AI_PROMPT_KEY);
+                showNetworkToast("AI Prompt button visible");
+            }
+        }
+
+        function applyHideAiPromptPreference() {
+            const hidden = localStorage.getItem(HIDE_AI_PROMPT_KEY) === "true";
+            document.body.classList.toggle("hide-ai-prompt", hidden);
+            const toggle = document.getElementById("setting-hide-ai-prompt");
+            if (toggle) toggle.checked = hidden;
+        }
+
+        // --- 2. Light / Dark (Night Vision) Mode ---
+        let systemThemeMediaQuery = null;
+
+        function setThemeMode(mode) {
+            localStorage.setItem(THEME_MODE_KEY, mode);
+            applyThemeMode(mode);
+            updateThemeRadioUI(mode);
+        }
+
+        function applyThemeMode(mode) {
+            mode = mode || localStorage.getItem(THEME_MODE_KEY) || "system";
+            
+            document.body.classList.remove("theme-night-vision", "theme-light");
+            
+            let effectiveMode = mode;
+            if (mode === "system") {
+                const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+                effectiveMode = prefersDark ? "dark" : "light";
+            }
+
+            if (effectiveMode === "dark") {
+                document.body.classList.add("theme-night-vision");
+            } else {
+                // Light mode is the original classic colour scheme (Camouflage & Desert Sand)
+                // No theme-night-vision class is added.
+            }
+
+            // Re-apply sponsor theme so accents adapt
+            applySponsorTheme();
+        }
+
+        function updateThemeRadioUI(mode) {
+            mode = mode || localStorage.getItem(THEME_MODE_KEY) || "system";
+            const radios = document.getElementsByName("theme-setting");
+            radios.forEach(r => {
+                r.checked = (r.value === mode);
+                const parent = r.closest(".theme-choice-label");
+                if (parent) {
+                    parent.classList.toggle("active", r.value === mode);
+                }
+            });
+        }
+
+        function initSystemThemeListener() {
+            if (window.matchMedia) {
+                systemThemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+                systemThemeMediaQuery.addEventListener("change", () => {
+                    const saved = localStorage.getItem(THEME_MODE_KEY) || "system";
+                    if (saved === "system") {
+                        applyThemeMode("system");
+                    }
+                });
+            }
+        }
+
+        // --- 3. Custom Team Sponsor Image Uploads ---
+        function getCustomSponsorImages() {
+            try {
+                return JSON.parse(localStorage.getItem(CUSTOM_SPONSORS_KEY)) || {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function populateSettingsSponsors() {
+            const select = document.getElementById("settings-sponsor-select");
+            if (!select) return;
+            const currentVal = select.value || appState.sponsor || "Rutherford";
+            select.innerHTML = "";
+
+            SPONSORS.forEach(sp => {
+                const opt = document.createElement("option");
+                opt.value = sp.name;
+                opt.textContent = sp.name;
+                select.appendChild(opt);
+            });
+
+            select.value = currentVal;
+            updateSettingsSponsorPreview();
+        }
+
+        function updateSettingsSponsorPreview() {
+            const select = document.getElementById("settings-sponsor-select");
+            const container = document.getElementById("settings-sponsor-preview-container");
+            const resetBtn = document.getElementById("settings-sponsor-reset-btn");
+            if (!select || !container) return;
+
+            const spName = select.value;
+            const customs = getCustomSponsorImages();
+            const customImg = customs[spName];
+
+            if (customImg) {
+                container.innerHTML = `<img src="${customImg}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                if (resetBtn) resetBtn.style.display = "inline-block";
+            } else {
+                const sponsorClass = `logo-${spName.toLowerCase().replace(/'s/g, 's').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+                container.innerHTML = `<div class="sponsor-logo ${sponsorClass}" style="transform: scale(0.8);"></div>`;
+                if (resetBtn) resetBtn.style.display = "none";
+            }
+        }
+
+        function triggerCustomSponsorUpload() {
+            const fileInput = document.getElementById("settings-sponsor-file-input");
+            if (fileInput) fileInput.click();
+        }
+
+        function handleCustomSponsorUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const select = document.getElementById("settings-sponsor-select");
+            const spName = select ? select.value : appState.sponsor;
+            if (!spName) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const customs = getCustomSponsorImages();
+                customs[spName] = dataUrl;
+                try {
+                    localStorage.setItem(CUSTOM_SPONSORS_KEY, JSON.stringify(customs));
+                } catch (err) {
+                    alert("Storage quota exceeded. Image could not be saved.");
+                    return;
+                }
+
+                applyCustomSponsorStyles();
+                updateSettingsSponsorPreview();
+                renderVehicles();
+                showNetworkToast(`Custom logo uploaded for <strong>${spName}</strong>`);
+            };
+            reader.readAsDataURL(file);
+            event.target.value = "";
+        }
+
+        function resetCustomSponsorLogo() {
+            const select = document.getElementById("settings-sponsor-select");
+            const spName = select ? select.value : appState.sponsor;
+            if (!spName) return;
+
+            const customs = getCustomSponsorImages();
+            delete customs[spName];
+            localStorage.setItem(CUSTOM_SPONSORS_KEY, JSON.stringify(customs));
+
+            applyCustomSponsorStyles();
+            updateSettingsSponsorPreview();
+            renderVehicles();
+            showNetworkToast(`Restored default logo for <strong>${spName}</strong>`);
+        }
+
+        function applyCustomSponsorStyles() {
+            let styleTag = document.getElementById("custom-sponsor-styles");
+            if (!styleTag) {
+                styleTag = document.createElement("style");
+                styleTag.id = "custom-sponsor-styles";
+                document.head.appendChild(styleTag);
+            }
+
+            const customs = getCustomSponsorImages();
+            let css = "";
+            Object.entries(customs).forEach(([spName, imgUrl]) => {
+                const sponsorClass = `logo-${spName.toLowerCase().replace(/'s/g, 's').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+                css += `
+                    .sponsor-logo.${sponsorClass} {
+                        background-image: url('${imgUrl}') !important;
+                        background-size: contain !important;
+                        background-position: center !important;
+                        background-repeat: no-repeat !important;
+                        filter: none !important;
+                    }
+                `;
+                if (spName === "None (Sponsorless)" || spName === "Sponsorless") {
+                    css += `
+                        .sponsor-logo.logo-none-sponsorless,
+                        .sponsor-logo.logo-sponsorless {
+                            background-image: url('${imgUrl}') !important;
+                            background-size: contain !important;
+                            background-position: center !important;
+                            background-repeat: no-repeat !important;
+                            filter: none !important;
+                        }
+                    `;
+                }
+            });
+            styleTag.textContent = css;
+        }
+
+        function initSettingsUI() {
+            applyHideAiPromptPreference();
+            const mode = localStorage.getItem(THEME_MODE_KEY) || "system";
+            updateThemeRadioUI(mode);
         }
 
         function openAboutModal() {
@@ -4737,6 +5325,12 @@ Thanks to Mike for being ace.</p>
 
         // Initialize application
         window.addEventListener("DOMContentLoaded", () => {
+            // Initialize Settings, Theme, and Custom Sponsor Logos
+            applyHideAiPromptPreference();
+            applyThemeMode();
+            initSystemThemeListener();
+            applyCustomSponsorStyles();
+
             loadSponsorsList();
             setTimeout(() => { if (window.NetworkManager) window.NetworkManager.init(); }, 100);
             loadState();
@@ -4849,6 +5443,13 @@ Thanks to Mike for being ace.</p>
         }
 
         function applySponsorTheme() {
+            // In Night Vision (Red & Black) mode, preserve red glow to protect night vision
+            if (document.body.classList.contains("theme-night-vision")) {
+                document.documentElement.style.setProperty('--glow-color', '#ef4444');
+                document.documentElement.style.setProperty('--glow-shadow', 'rgba(239, 68, 68, 0.3)');
+                return;
+            }
+
             const sp = appState.sponsor;
             const theme = SPONSOR_THEMES[sp] || SPONSOR_THEMES["Sponsorless"];
             
@@ -8920,7 +9521,7 @@ Thanks to Mike for being ace.</p>
 
     </script>
     <!-- Background Watermarks -->
-    <div class="bg-watermark-left" onclick="openVersionModal()" title="View Version & Updates">v1.0.0 (Public)</div>
+    <div class="bg-watermark-left" ondblclick="openVersionModal()" title="Double-click to view version updates">v1.0.2</div>
     <div class="bg-watermark-right" onclick="openAboutModal()" title="About Unofficial Gaslands Game Manager">FRIEND OF GASLANDS</div>
 </body>
 </html>

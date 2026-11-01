@@ -63,12 +63,18 @@ Interactive vote counters with one-click vote spending:
   - **🏎️ In-Game Card Art:** Full-color concept art render isolated on solid white for transparent background cutout into vehicle cards.
 - Intelligently incorporates chassis type, mounted weapon placements, upgrades, flush bumper rams, team name, and sponsor decals.
 
-### 7. Official Rulebook & Quick Reference Sheet (QRS) Viewers
+### 7. Settings, Night Vision Mode & Custom Sponsors
+- **Night Vision Mode (Dark Theme):** Toggle between the classic Camouflage & Desert Sand theme and a dedicated Red & Black Night Vision theme engineered to preserve rod-cell night vision during tabletop play in darkened rooms. Also supports automatic OS theme matching.
+- **Custom Team Sponsor Logos:** Upload custom team sponsor images (PNG, JPG, SVG, WEBP) to replace the default sprite sheet logos across all cards, dashboards, and badges with persistent local storage and instant reset to defaults.
+- **Hide AI Prompt Toggle:** Option in Settings to toggle visibility of AI Image Prompt generator buttons across the interface.
+- **Double-Click Changelog:** Double-clicking the version badge (v1.0.2) in the bottom-left opens an interactive changelog modal detailing all historical and recent feature updates.
+
+### 8. Official Rulebook & Quick Reference Sheet (QRS) Viewers
 - Secure, client-side PDF reader for your locally linked official Gaslands: Refuelled rulebook and reference sheets.
 - **Live Search Query Tracking:** Split-glyph text indexing with animated canvas match highlights.
 - **Zoom & Page Rotation:** 90° canvas rotation and zoom controls for landscape table play.
 
-### 8. Standalone Custom Game Manager Suite
+### 9. Standalone Custom Game Manager Suite
 - Located in [`/game-manager/`](./game-manager/) for players running custom vehicular combat campaigns (Car Wars, Autokill, Dark Future, custom homebrews).
 - Custom equipment library editor, game branding editor, and full JSON ruleset export/import.
 
