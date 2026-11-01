@@ -74,10 +74,6 @@ Interactive vote counters with one-click vote spending:
 - **Live Search Query Tracking:** Split-glyph text indexing with animated canvas match highlights.
 - **Zoom & Page Rotation:** 90° canvas rotation and zoom controls for landscape table play.
 
-### 9. Standalone Custom Game Manager Suite
-- Located in [`/game-manager/`](./game-manager/) for players running custom vehicular combat campaigns (Car Wars, Autokill, Dark Future, custom homebrews).
-- Custom equipment library editor, game branding editor, and full JSON ruleset export/import.
-
 ---
 
 ## 🛠️ Getting Started
