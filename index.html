@@ -3271,7 +3271,7 @@
 
                 <div class="input-group">
                     <label>Prompt Purpose</label>
-                    <div style="display: flex; gap: 1.5rem; margin-top: 0.3rem;">
+                    <div style="display: flex; gap: 1.5rem; margin-top: 0.3rem; flex-wrap: wrap;">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem;">
                             <input type="radio" name="prompt-purpose" value="3d-model" checked onchange="updatePromptTabOutput()" style="accent-color: var(--glow-color); width: 16px; height: 16px;">
                             🧱 3D Model (Clay Render)
@@ -3281,6 +3281,13 @@
                             🎨 In-Game Card (Full Color, Transparent BG)
                         </label>
                     </div>
+                </div>
+
+                <div class="input-group" id="fdm-limit-group">
+                    <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; text-transform: none; color: var(--text-primary); user-select: none;">
+                        <input type="checkbox" id="prompt-fdm-limit" onchange="try { localStorage.setItem(\'gaslands_prompt_fdm_limit\', this.checked ? \'true\' : \'false\'); } catch(e){} updatePromptTabOutput();" style="accent-color: var(--glow-color); width: 18px; height: 18px; cursor: pointer;">
+                        <span>🖨️ <strong>4-Colour Limit for FDM Printing</strong> (Multi-Material / Bambu AMS Palette)</span>
+                    </label>
                 </div>
 
                 <div class="input-group">
@@ -3867,6 +3874,8 @@ Thanks to Mike for being ace.</p>
                         <li><strong>Fluid Swipeable Mode Navigation:</strong> Full-width horizontal swipe navigation bar with momentum scrolling on mobile devices.</li>
                         <li><strong>Garage Actions 2x2 Grid:</strong> Reorganized top garage buttons (Add Vehicle, Clear Team, Export Team, Import Team) into a clean, finger-friendly 2x2 grid.</li>
                         <li><strong>Multi-Homed LAN Server Architecture:</strong> Validated node static server daemon bound to <code>0.0.0.0:8080</code> with verified Windows Firewall private network permissions for seamless cross-device phone/tablet tabletop play over local Wi-Fi.</li>
+                        <li><strong>AI Prompt Generator Overhaul:</strong> Foremost untextured clay render prompts with 3D miniature printing optimization (watertight manifold geometry, 28mm–32mm scale), Bambu AMS multi-material 4-colour FDM palette selector, and cinematic action-movie crew postures (1 driver actively steering even if armed, remaining crew actively leaning out and firing config-chosen weapons).</li>
+
                     </ul>
                 </div>
 
@@ -9813,24 +9822,24 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
-            const baseInfo = VEHICLE_TYPES.find(t => t.name === v.type) || { weight: "Middleweight" };
+            const baseInfo = VEHICLE_TYPES.find(t => t.name === v.type) || { weight: "Middleweight", crew: 1 };
             
             const typeDescriptions = {
                 "Buggy": "lightweight off-road buggy with exposed roll cage frame and four medium-sized knobby off-road wheels",
                 "Car": "midsize armored sedan car with four standard-sized wheels",
                 "Performance Car": "low-profile aerodynamic high-speed performance sports car with four low-profile racing wheels",
                 "Truck": "midsize rugged pickup truck with four large heavy-duty off-road wheels",
-                "Heavy Truck": "heavy industrial transport truck with ten large commercial truck wheels",
-                "Bus": "large heavy passenger transit bus with six large commercial wheels",
-                "Drag Racer": "long-wheelbase drag racer with skinny small front tires and huge oversized rear drag slicks",
-                "Bike": "lightweight off-road combat motorcycle with two medium spoked wheels",
-                "Bike with Sidecar": "lightweight motorcycle with three medium spoked wheels including the sidecar wheel",
-                "Ice Cream Truck": "boxy delivery ice cream truck with four medium commercial wheels",
-                "Gyrocopter": "lightweight single-seat gyrocopter aircraft with three small landing gear wheels",
-                "Ambulance": "heavy boxy medical ambulance van with four medium heavy-duty wheels",
-                "Monster Truck": "massive monster truck suspension with four giant oversized rubber tractor wheels",
-                "Helicopter": "military combat helicopter with dual landing skids and no wheels",
-                "Tank": "tracked military combat tank with heavy metal tread tracks instead of wheels",
+                "Heavy Truck": "heavy-duty six-wheeled industrial haul truck with massive reinforced steel cab and dual rear axles",
+                "Bus": "armored transport bus with reinforced barred passenger windows and six heavy wheels",
+                "Bike": "nimble two-wheeled combat motorcycle with chunky off-road tires",
+                "Bike with Sidecar": "rugged combat motorcycle with an armored passenger sidecar equipped with a passenger seat and heavy all-terrain tires",
+                "Dragster": "long-wheelbase supercharged dragster with massive wide rear racing slicks and skinny front wheels",
+                "Gyrocopter": "lightweight combat gyrocopter with top spinning rotor blades and compact rolling landing gear",
+                "Helicopter": "armored military attack helicopter with heavy overhead rotor and tail rotor",
+                "Ice Cream Truck": "fortified boxy ice cream van with reinforced grilles, armored panels, and heavy wheels",
+                "Ambulance": "armored heavy emergency ambulance van with reinforced bumpers and rescue box body",
+                "Monster Truck": "high-clearance monster truck lifted high on massive 66-inch flotation tires with heavy-duty shock suspension",
+                "Tank": "heavy tracked armored combat tank with steel treads and low slung armored chassis",
                 "War Rig": "massive multi-wheeled articulated war rig semi-trailer truck with eighteen large commercial wheels"
             };
             const typeDesc = typeDescriptions[v.type] || `${baseInfo.weight.toLowerCase()} ${v.type.toLowerCase()}`;
@@ -9842,48 +9851,59 @@ Thanks to Mike for being ace.</p>
                 if (r.checked) purpose = r.value;
             }
 
-            let description = "";
-            let loadout = [];
-            let hasRam = false;
+            // Checkbox for 4-colour FDM printing limit (persisted in localStorage)
+            const fdmCheckbox = document.getElementById("prompt-fdm-limit");
+            if (fdmCheckbox && fdmCheckbox.dataset.initialized !== "true") {
+                const savedFdm = localStorage.getItem("gaslands_prompt_fdm_limit");
+                if (savedFdm !== null) {
+                    fdmCheckbox.checked = (savedFdm === "true");
+                }
+                fdmCheckbox.dataset.initialized = "true";
+            }
+            const hasFdmLimit = fdmCheckbox ? fdmCheckbox.checked : false;
+
             function isCrewWeapon(weapon) {
                 if (!weapon) return false;
                 if (weapon.category === "Crew Fired") return true;
                 if (weapon.special && weapon.special.toLowerCase().includes("crew fired")) return true;
                 const name = (weapon.name || "").toLowerCase().trim();
                 const crewList = [
-                    "handgun",
-                    "hand gun",
-                    "pistol",
-                    "magnum",
-                    "grenade",
-                    "grenades",
-                    "gas grenade",
-                    "gas grenades",
-                    "molotov",
-                    "molotovs",
-                    "molotov cocktail",
-                    "molotov cocktails",
-                    "shotgun",
-                    "blunderbuss",
-                    "steel net",
-                    "steel nets",
-                    "submachine gun",
-                    "sub-machine gun",
-                    "smg",
-                    "rifle"
+                    "handgun", "hand gun", "pistol", "magnum", "grenade", "grenades",
+                    "gas grenade", "gas grenades", "molotov", "molotovs", "molotov cocktail",
+                    "molotov cocktails", "shotgun", "blunderbuss", "steel net", "steel nets",
+                    "submachine gun", "sub-machine gun", "smg", "rifle"
                 ];
                 return crewList.some(c => name === c || name.startsWith(c + " ") || name.endsWith(" " + c));
             }
 
-            // Only include vehicle-mounted weapons (strictly exclude handheld Crew Fired weapons and RC Car Bombs)
-            v.weapons.forEach(w => {
+            function formatWeaponName(w) {
+                if (!w) return "";
+                const wl = w.toLowerCase().trim();
+                if (wl.endsWith("s") && !wl.endsWith("blunderbuss")) {
+                    return wl;
+                }
+                if (/^[aeiou]/.test(wl)) {
+                    return "an " + wl;
+                }
+                return "a " + wl;
+            }
+
+            // Mounted vehicle loadout (strictly exclude handheld Crew Fired weapons and RC Car Bombs)
+            let loadout = [];
+            let hasRam = false;
+            let crewWeapons = [];
+
+            (v.weapons || []).forEach(w => {
                 if (w.name === "Ram" || w.name === "Exploding Ram") hasRam = true;
-                if (!isCrewWeapon(w) && w.name.toLowerCase() !== "rc car bombs") {
+                if (isCrewWeapon(w)) {
+                    crewWeapons.push(w.name.toLowerCase());
+                } else if (w.name.toLowerCase() !== "rc car bombs") {
                     const facing = (w.facing && w.facing !== "360°") ? `${w.facing.toLowerCase()}-mounted ` : "";
                     loadout.push(`${facing}${w.name.toLowerCase()}`);
                 }
             });
-            v.upgrades.forEach(u => {
+
+            (v.upgrades || []).forEach(u => {
                 const uName = u.name.toLowerCase();
                 if (uName !== "extra crewmember") {
                     loadout.push(uName);
@@ -9894,7 +9914,7 @@ Thanks to Mike for being ace.</p>
             if (loadout.length > 0) {
                 loadoutText = `, customized with: ${loadout.join(', ')}`;
             } else {
-                loadoutText = `, customized with rusty metal spikes and protective armor plating`;
+                loadoutText = `, customized with welded armor plating and protective steel reinforcement`;
             }
 
             let ramInstructions = "";
@@ -9902,24 +9922,80 @@ Thanks to Mike for being ace.</p>
                 ramInstructions = " Any rams must be fitted completely flush to the front and/or rear bumper of the vehicle body with zero gap, acting directly as the vehicle's bumper. Absolutely no extensions, no poles, no struts, no bars, no stilts, and no connection brackets extending the ram away from the body frame. The ram is welded directly to the bumper.";
             }
 
+            // Crew calculations & Action-Movie seated posture description
+            const extraCrew = (v.upgrades || []).filter(u => u.name === "Extra Crewmember").length;
+            const totalCrew = Math.max(1, (baseInfo.crew || 1) + extraCrew);
+
+            let crewArmText = "";
+            if (crewWeapons.length > 0) {
+                const formattedCrewWeapons = crewWeapons.map(formatWeaponName);
+                if (formattedCrewWeapons.length === 1) {
+                    crewArmText = formattedCrewWeapons[0];
+                } else if (formattedCrewWeapons.length === 2) {
+                    crewArmText = `${formattedCrewWeapons[0]} and ${formattedCrewWeapons[1]}`;
+                } else {
+                    crewArmText = `${formattedCrewWeapons.slice(0, -1).join(', ')}, and ${formattedCrewWeapons[formattedCrewWeapons.length - 1]}`;
+                }
+            } else if (loadout.length > 0) {
+                crewArmText = "automatic sidearms and tactical firearms matching their vehicle loadout";
+            } else {
+                crewArmText = "compact sidearms";
+            }
+
+            const isBike = (v.type === "Bike" || v.type === "Bike with Sidecar");
+            let crewText = "";
+            if (totalCrew === 1) {
+                const steering = isBike ? "handlebars" : "steering wheel";
+                const driverTitle = isBike ? "rider" : "driver";
+                if (crewWeapons.length > 0) {
+                    crewText = `Vehicle crew of 1 seated ${driverTitle} inside actively steering behind the ${steering} even while armed with ${crewArmText} ready at hand`;
+                } else {
+                    crewText = `Vehicle crew of 1 seated ${driverTitle} inside actively steering behind the ${steering} with grim focus even if armed`;
+                }
+            } else if (totalCrew === 2) {
+                if (v.type === "Bike with Sidecar") {
+                    crewText = `Vehicle crew of 2 riders: 1 driver actively steering behind the handlebars even if armed, while 1 passenger is seated in the sidecar actively leaning out and firing out like an intense action movie scene, armed with ${crewArmText}`;
+                } else if (v.type === "Buggy") {
+                    crewText = `Vehicle crew consisting of 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the roll cage frame firing out like an intense action movie scene, armed with ${crewArmText}`;
+                } else {
+                    crewText = `Vehicle crew consisting of 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the side window firing out of the vehicle like an intense action movie scene, armed with ${crewArmText}`;
+                }
+            } else {
+                crewText = `Vehicle crew consisting of ${totalCrew} crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other ${totalCrew - 1} crew members are in seated positions actively leaning out and firing out of the open side and rear windows like an explosive action movie scene, armed with ${crewArmText}`;
+            }
+
             let teamSponsorDesc = "";
             if (appState.teamName) teamSponsorDesc += ` from the team '${appState.teamName}'`;
-            if (appState.sponsor && appState.sponsor !== "Sponsorless") teamSponsorDesc += `, sponsored by ${appState.sponsor} with custom decals`;
+            if (appState.sponsor && appState.sponsor !== "Sponsorless") teamSponsorDesc += `, sponsored by ${appState.sponsor}`;
 
+            const fdmPromptSnippet = hasFdmLimit 
+                ? " Strict 4-colour limit optimization for multi-material FDM 3D printing (multi-color / Bambu AMS): designed with a maximum palette of exactly 4 distinct solid filament colours, clean sharp color-separated boundaries, flat solid color zones with zero color blending or gradients, and solid layer transitions optimized for multi-color FDM color-swapping with minimal purge waste."
+                : "";
+
+            let description = "";
             if (purpose === "3d-model") {
-                // 3D Model render
-                description = `Isometric 3D model render of a post-apocalyptic Mad Max combat ${typeDesc}`;
+                // Clay Render: Foremost clay specification, completely untextured, 3D printing optimization
+                description = `Clay render 3D model, completely untextured, monochrome neutral matte grey clay material with zero textures and zero paint, post-apocalyptic Mad Max combat ${typeDesc}`;
                 if (v.name) description += ` named '${v.name}'`;
                 description += teamSponsorDesc;
                 description += loadoutText;
-                description += `. Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, clear solid white background, studio product lighting, 3d game asset, perfect for 3D modeling software input, highly detailed clay render. No text, no letters, no labels, no watermarks on the image.${ramInstructions}`;
+                description += `. ${crewText}.`;
+                if (ramInstructions) description += ramInstructions;
+                description += ` The 3D model is completely untextured and unpainted, pure monochrome smooth matte clay resin material with zero textures, zero decals, and zero surface maps, clearly showcasing the untextured 3D sculpted geometry and form.`;
+                description += ` Optimized for 3D printing: clean manifold watertight geometry with solid structural integrity, no non-manifold edges, no zero-thickness or paper-thin geometry, reinforced wheel axles, thick sturdy weapon mounts and armor connections, overhang-friendly angles, suitable for miniature 3D printing (28mm-32mm tabletop scale).`;
+                if (fdmPromptSnippet) description += fdmPromptSnippet;
+                description += ` Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, clear solid white background, studio product lighting, 3d game asset, perfect for 3D modeling software input, highly detailed clay render. No text, no letters, no labels, no watermarks on the image.`;
             } else {
                 // In-Game full color render
                 description = `Isometric 3D model render of a post-apocalyptic Mad Max combat ${typeDesc}`;
                 if (v.name) description += ` named '${v.name}'`;
                 description += teamSponsorDesc;
+                if (appState.sponsor && appState.sponsor !== "Sponsorless") description += ` with custom decals`;
                 description += loadoutText;
-                description += `. Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, full color concept art render, isolated on solid white background for transparency masking, studio product lighting, 3d game asset, perfect for game UI card art, highly detailed. No text, no letters, no labels, no watermarks on the image.${ramInstructions}`;
+                description += `. ${crewText}.`;
+                if (ramInstructions) description += ramInstructions;
+                if (fdmPromptSnippet) description += fdmPromptSnippet;
+                description += ` Floating in a pure white empty void with no ground plane and no floor surface, the wheels are not touching any ground. Completely shadowless, zero shadows, absolutely no drop shadows, no cast shadows, no ground shadows, no contact shadows under the wheels, and no ambient occlusion shadows under the vehicle chassis. Isometric projection, 3/4 angled view, full color concept art render, isolated on solid white background for transparency masking, studio product lighting, 3d game asset, perfect for game UI card art, highly detailed. No text, no letters, no labels, no watermarks on the image.`;
             }
 
             output.textContent = description;

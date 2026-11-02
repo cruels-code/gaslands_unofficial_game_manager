@@ -75,6 +75,7 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 - **Play Mode Header Compression:** Automatically hides Garage inputs on mobile/tablet during active play to maximize table dashboard space.
 - **Swipeable Mode Bar & 2x2 Garage Grid:** Full-width touch swipe mode navigation bar, plus a 2x2 grid for Garage team actions.
 - **Multi-Homed LAN Server Support:** Node.js static server daemon bound to `0.0.0.0:8080` with verified Windows Firewall private network permissions for instant phone/tablet LAN connectivity.
+- **AI Prompt Generator Overhaul:** Foremost untextured clay render prompts with 3D miniature printing optimization (watertight manifold geometry, 28mm–32mm scale), Bambu AMS multi-material 4-colour FDM palette selector, and cinematic action-movie crew postures (1 driver actively steering even if armed, remaining crew actively leaning out and firing config-chosen weapons).
 
 ### v1.0.4 (01.11.26)
 - **Adaptive Tablet & Smartphone Auto-Detection:** Integrated `DeviceManager` that dynamically detects device class (phone, tablet, desktop) and orientation (portrait, landscape), tailoring grids, layouts, and typography.
