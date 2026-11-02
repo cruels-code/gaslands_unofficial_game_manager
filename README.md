@@ -71,34 +71,33 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 ## 🏷️ Version History
 
 ### v1.0.5 - Current Release (02.11.26)
-- **Wasteland Vehicle Name Auto Generator:** Complete overhaul of vehicle naming with 150+ wasteland adjectives, 80+ suffixes, type-tailored noun matrices, and a 🎲 re-roll button on each garage card.
-- **Encrypted Peer-to-Peer Private Messaging:** Double-click any driver in the active comms roster to launch an independent direct message window. Seamless multi-conversation management, direct radio commands (`/msg`, `/query`), and real-time cross-network private transmission.
-- **Smartphone Portrait Tabletop Overhaul:** Full layout optimization for mobile phones (360px–430px portrait). Eliminated all horizontal stretching and overflow.
-- **Zero-Truncation Turn & Gear Phase Tracker:** Game Turn (`- 1 +`) and Gear Phase buttons (`[1][2][3][4][5][6]`) fit side-by-side on Row 1 without wrapping; Dice controls fit cleanly on Row 2.
-- **Collapsible Audience Votes HUB:** Compact counter with quick `+1 Vote` and collapsible `🎟️ Perks ▾` toggle to conserve 250px+ vertical dashboard height.
-- **Play Mode Header Compression:** Automatically hides Garage inputs on mobile/tablet during active play to maximize table dashboard space.
-- **Swipeable Mode Bar & 2x2 Garage Grid:** Full-width touch swipe mode navigation bar, plus a 2x2 grid for Garage team actions.
-- **Multi-Homed LAN Server Support:** Node.js static server daemon bound to `0.0.0.0:8080` with verified Windows Firewall private network permissions for instant phone/tablet LAN connectivity.
-- **AI Prompt Generator Overhaul:** Foremost untextured clay render prompts with 3D miniature printing optimization (watertight manifold geometry, 28mm–32mm scale), Bambu AMS multi-material 4-colour FDM palette selector, and cinematic action-movie crew postures (1 driver actively steering even if armed, remaining crew actively leaning out and firing config-chosen weapons).
+- **Vehicle Name Generator:** Overhauled name generator with hundreds of wasteland adjectives and chassis-specific names, plus a 🎲 quick-roll button on each vehicle card.
+- **Private Messaging:** Double-click any driver on the radio roster (or click 💬) to open a direct private message window.
+- **Mobile & Tablet Improvements:** Refined layouts for phones and tablets with smooth navigation, compact turn/phase trackers, and collapsible perks.
+- **Play Mode Dashboard:** Automatically hides garage setup during active play to focus on vehicles, with themed condition buttons (On Fire, Ghost, Distracted).
+- **Local Wi-Fi Play:** Easy multiplayer connection for phones and tablets on the same local network.
 
 ### v1.0.4 (01.11.26)
-- **Adaptive Tablet & Smartphone Auto-Detection:** Integrated `DeviceManager` that dynamically detects device class (phone, tablet, desktop) and orientation (portrait, landscape), tailoring grids, layouts, and typography.
-- **Touch-Optimized Hit Targets:** Hull boxes, hazard dots, and gear selector buttons enlarged to 36px–40px for error-free tabletop finger tapping.
-- **Responsive Grids:** 2-column balanced layouts for tablet portrait; clean single-column cards with hidden watermarks for smartphones.
-- **Tactical Radio Comms:** Split chat buffer and active driver roster with draggable/resizable window on desktop and bottom-sheet drawer on mobile.
-- **Audio FX Synthesizer:** Web Audio API sound chimes with a global "Mute All Sounds" toggle in Settings and the Comms window.
-- **Persistent Driver ID & Supporter System:** Persistent IDs, Ko-fi supporter links, and VIP flair activation.
-- **Online Lobby Default Routing:** Automatic lobby connection on launch before joining tables.
+- **Smart Device Adaptation:** Automatically adjusts layouts and card grids for phones, tablets, and desktops.
+- **Larger Touch Controls:** Bigger buttons and checkboxes for Hull, Hazards, and Gears to avoid mis-taps.
+- **Tactical Radio & Roster:** Live chat and active driver roster with desktop floating window and mobile drawer.
+- **Sound FX:** Audio alerts for radio messages with a mute toggle in Settings.
+- **Supporter Badges & IDs:** Persistent Driver IDs and special in-game badges for Ko-fi supporters.
+- **Online Lobby:** Central lobby to chat and find game tables.
 
 ### v1.0.3 (01.11.26)
-- **Online Table Lobby & Matchmaker:** Real-time lobby directory with instant player counts.
-- **Table Host Controls:** 👑 Host badge and player kick capability.
-- **Auto LAN Friendly Naming:** Custom naming for local network rooms.
-- **Default Garage Screen:** Automatic routing to Garage Mode upon load and join.
+- **Online Table Lobby:** Browse open game tables with live player counts.
+- **Host Controls:** Table hosts receive a 👑 badge and can kick players.
+- **Custom LAN Table Names:** Friendly naming for local Wi-Fi games.
+- **Default Garage View:** Starts directly in the garage when launching or joining games.
+- **Version & Update Log:** View new features and updates from the Settings menu.
 
 ### v1.0.2 (01.11.26)
-- **Night Vision Tactical Themes:** Authentic tactical red, amber, and green cockpit themes.
-- **Custom Sponsor System:** Upload custom logos with instant transparency extraction.
+- **Settings Menu:** Unified settings modal replacing the old About button.
+- **Night Vision Cockpit Themes:** Authentic red, amber, and green tabletop themes.
+- **Custom Sponsor Logos:** Upload custom team sponsor images with instant transparency.
+- **Hide AI Prompt Toggle:** Option in Settings to toggle AI prompt buttons.
+
 
 ---
 
