@@ -80,7 +80,17 @@
             padding: 0;
         }
 
+        html {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-darker);
             background-image: 
@@ -2200,356 +2210,683 @@
             text-shadow: 0 0 8px var(--glow-shadow);
         }
 
-        /* ============================================================== */
-        /* PLAY MODE: COMPACT 4-VEHICLE NO-SCROLL 2x2 SCREEN LAYOUT       */
-        /* ============================================================== */
-        body.play-mode-active header {
-            padding: 0.5rem 1rem 0.4rem 1rem;
-        }
-        body.play-mode-active header .logo h1 {
-            font-size: 1.0rem;
-            letter-spacing: 1px;
-        }
-        body.play-mode-active header .logo .tagline {
-            display: none;
-        }
-        body.play-mode-active main {
-            max-width: 1400px;
-            margin: 1.5rem auto 2rem auto;
-            padding: 0 1.5rem;
-        }
-        body.play-mode-active .turn-phase-tracker {
-            padding: 0.35rem 0.8rem;
-            margin-bottom: 0.4rem;
-            gap: 0.6rem;
-            border-radius: 8px;
-        }
-        body.play-mode-active .votes-hub {
-            padding: 0.35rem 0.8rem;
-            margin-bottom: 0.5rem;
-            gap: 0.6rem;
-            border-radius: 8px;
-        }
-        body.play-mode-active .votes-hud-left {
-            gap: 0.8rem;
-        }
-        body.play-mode-active .votes-counter-big {
-            padding-right: 0.6rem;
-        }
-        body.play-mode-active .votes-counter-big .val {
-            font-size: 1.25rem;
-        }
-        body.play-mode-active .votes-actions-grid {
-            gap: 0.3rem;
-        }
-        body.play-mode-active .vote-action-btn {
-            padding: 0.2rem 0.45rem;
-            min-width: 85px;
-            font-size: 0.68rem;
-        }
-        body.play-mode-active .turn-value {
-            font-size: 1.05rem;
-        }
-        body.play-mode-active .turn-btn {
-            font-size: 0.95rem;
-            padding: 0 0.25rem;
-        }
-        body.play-mode-active .phase-btn {
-            padding: 0.25rem 0.55rem;
-            font-size: 0.75rem;
-        }
-        body.play-mode-active .turn-controls {
-            padding: 0.15rem 0.4rem;
-            gap: 0.4rem;
+        /* ==========================================================================
+           ULTRA-OPTIMIZED RESPONSIVE ENGINE (MOBILE & TABLET PORTRAIT / LANDSCAPE)
+           ========================================================================== */
+
+        /* Global root boundary protections */
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
-        /* Play Mode Grid & Vehicle Cards: Vertical Card Layout Matching Garage Cards */
-        body.play-mode-active #play-vehicles-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-            align-items: start;
-        }
-
-        @media (max-width: 600px) {
-            body.play-mode-active #play-vehicles-container {
-                grid-template-columns: 1fr;
+        /* --------------------------------------------------------------------------
+           1. TOUCH & GLOBAL MOBILE FOUNDATION
+           -------------------------------------------------------------------------- */
+        @media (max-width: 1024px) {
+            * {
+                -webkit-tap-highlight-color: transparent;
+            }
+            button, a, input, select {
+                touch-action: manipulation;
+            }
+            body.play-mode-active #play-mode-view {
+                padding: 0 0.5rem !important;
+                margin: 0.5rem auto 1.5rem auto !important;
             }
         }
 
-        /* Play vehicle card: vertical flow like garage vehicle-card with natural height */
-        body.play-mode-active .play-dashboard-card {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 1.1rem !important;
-            padding: 1.5rem !important;
-            border-radius: 12px !important;
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            position: relative;
-        }
-
-        body.play-mode-active .play-dashboard-card .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 0.8rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .vehicle-name-block > span:first-child {
-            font-size: 1.25rem !important;
-            line-height: 1.2;
-        }
-
-        /* Status chips in header / action area in a single clean row */
-        .play-status-bar {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: nowrap;
-            align-items: center;
-            margin-top: 0.5rem;
-        }
-
-        .play-status-chip {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--card-border);
-            border-radius: 4px;
-            padding: 0.25rem 0.55rem;
-            font-size: 0.72rem;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.25s ease;
-            color: var(--text-muted);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .play-status-chip:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
-        }
-
-        .play-status-chip.on-fire.active {
-            background: rgba(249, 115, 22, 0.2);
-            border-color: #f97316;
-            color: #f97316;
-            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
-            animation: fire-pulse 1s infinite alternate;
-        }
-
-        .play-status-chip.ghost-rider.active {
-            background: rgba(6, 182, 212, 0.2);
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            box-shadow: 0 0 10px var(--accent-cyan-glow);
-        }
-
-        .play-status-chip.distracted.active {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--danger-red);
-            color: var(--danger-red);
-            box-shadow: 0 0 10px var(--danger-red-glow);
-        }
-
-        /* Hull & Hazard track styling under stats bar */
-        .play-trackers-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            background: rgba(0, 0, 0, 0.22);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 0.75rem 0.9rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hull-tracker {
-            gap: 0.35rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hull-points-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 0.3rem;
-            width: 100%;
-        }
-
-        body.play-mode-active .play-dashboard-card .hull-point-box {
-            aspect-ratio: 1 / 1;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            flex-shrink: 0;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        body.play-mode-active .play-dashboard-card .hull-point-box.damaged::after {
-            font-size: 1.1rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hazard-tracker {
-            gap: 0.35rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .hazard-dots-row {
-            padding: 0.35rem 0.6rem;
-            gap: 0.5rem;
-            border-radius: 6px;
-        }
-
-        body.play-mode-active .play-dashboard-card .hazard-dots {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 0.3rem;
-            flex-grow: 1;
-        }
-
-        body.play-mode-active .play-dashboard-card .hazard-dot {
-            aspect-ratio: 1 / 1;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            flex-shrink: 0;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        body.play-mode-active .play-dashboard-card .gearbox {
-            margin-top: 0.1rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .gear-selector {
-            gap: 0.35rem;
-            margin-top: 0.25rem;
-        }
-
-        body.play-mode-active .play-dashboard-card .gear-btn {
-            padding: 0.35rem 0;
-            font-size: 0.85rem;
-            border-radius: 6px;
-        }
-
-        /* Ammo checkboxes */
-        .ammo-spent-tracker {
-            display: flex;
-            gap: 0.25rem;
-            align-items: center;
-        }
-
-        .ammo-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1.5px solid var(--accent-cyan);
-            border-radius: 3px;
-            cursor: pointer;
-            position: relative;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .ammo-checkbox:hover {
-            border-color: #fff;
-            box-shadow: 0 0 5px var(--accent-cyan-glow);
-        }
-
-        .ammo-checkbox:checked {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--danger-red);
-        }
-
-        .ammo-checkbox:checked::after {
-            content: "✕";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 11px;
-            font-weight: 900;
-            color: var(--danger-red);
-            line-height: 1;
-        }
-    
-        /* =========================================================
-           ADAPTIVE DEVICE & ORIENTATION OPTIMIZATIONS (v1.0.4)
-           Auto-detected via DeviceManager & Media Queries
-           ========================================================= */
-
-        /* Prevent auto-zoom on mobile text inputs in iOS Safari */
-        body.device-phone input,
-        body.device-phone select,
-        body.device-phone textarea,
+        /* Prevent auto-zoom on mobile text inputs in iOS Safari without enlarging dice selects */
         @media (max-width: 640px) {
-            input, select, textarea {
+            .input-group input,
+            .input-group select,
+            .form-control,
+            .modal-content input,
+            .vehicle-name-input,
+            textarea {
                 font-size: 16px !important;
             }
         }
 
-        /* ---------------------------------------------------------
-           1. TOUCH TARGET ENHANCEMENTS (Touch Devices)
-           --------------------------------------------------------- */
-        body.touch-device button,
-        body.touch-device a,
-        body.touch-device input[type="button"],
-        body.touch-device input[type="submit"] {
-            touch-action: manipulation;
+        /* Hide quick mobile votes bar on desktop and tablet */
+        #votes-quick-actions {
+            display: none;
         }
 
-        body.touch-device .hull-point-box,
-        body.device-phone .hull-point-box {
-            min-width: 28px !important;
-            min-height: 28px !important;
-            border-radius: 5px !important;
-            cursor: pointer;
-            touch-action: manipulation;
+        /* In Play Mode on mobile/tablet: hide garage setup inputs to maximize screen */
+        @media (max-width: 800px) {
+            body.play-mode-active .controls-panel .input-group,
+            body.play-mode-active .controls-panel .cans-tracker {
+                display: none !important;
+            }
+            body.play-mode-active .controls-panel #net-status-pill {
+                flex: 1 1 100% !important;
+                margin-bottom: 0.25rem !important;
+            }
         }
 
-        body.touch-device .gear-btn,
-        body.device-phone .gear-btn {
-            min-height: 38px !important;
-            font-size: 0.85rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            touch-action: manipulation;
-        }
-
-        body.touch-device .hazard-dot,
-        body.device-phone .hazard-dot {
-            min-width: 24px !important;
-            min-height: 24px !important;
-            border-radius: 50% !important;
-            touch-action: manipulation;
-        }
-
-        body.touch-device .hazard-dots-row button,
-        body.device-phone .hazard-dots-row button {
-            min-width: 36px !important;
-            min-height: 36px !important;
-            touch-action: manipulation;
-        }
-
-        /* ---------------------------------------------------------
-           2. SMARTPHONE OPTIMIZATIONS (body.device-phone / <= 640px)
-           --------------------------------------------------------- */
-        body.device-phone header,
+        /* --------------------------------------------------------------------------
+           2. SMARTPHONES - PORTRAIT (<= 640px)
+           -------------------------------------------------------------------------- */
         @media (max-width: 640px) {
+            /* --- HEADER & TOP NAVIGATION --- */
+            header {
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100vw !important;
+                box-sizing: border-box !important;
+            }
+
             .header-content {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 0.5rem 0.6rem !important;
+                gap: 0.45rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .header-content .logo {
+                display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
-                padding: 0.6rem 0.5rem !important;
-                gap: 0.6rem !important;
+                text-align: center !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .header-content .logo h1 {
+                font-size: clamp(1.02rem, 4.6vw, 1.25rem) !important;
+                letter-spacing: 0.5px !important;
+                line-height: 1.2 !important;
+                margin: 0 !important;
+                text-align: center !important;
+                word-break: break-word !important;
+            }
+
+            .header-content .logo span {
+                font-size: clamp(0.92rem, 4.2vw, 1.05rem) !important;
+            }
+
+            .header-content .tagline {
+                font-size: 0.62rem !important;
+                margin-top: 2px !important;
+                text-align: center !important;
+            }
+
+            /* Swipeable, full-width Mode Bar */
+            .mode-toggle {
+                display: flex !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                background: rgba(18, 24, 15, 0.95) !important;
+                border: 1px solid var(--card-border) !important;
+                border-radius: 8px !important;
+                padding: 3px !important;
+                gap: 4px !important;
+                box-sizing: border-box !important;
+            }
+
+            .mode-toggle::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            .mode-btn {
+                flex: 1 0 auto !important;
+                min-height: 38px !important;
+                padding: 0.45rem 0.75rem !important;
+                font-size: 0.76rem !important;
+                font-family: 'Orbitron', sans-serif !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.5px !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+                border-radius: 6px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Garage Settings Controls Panel */
+            .controls-panel {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 0.45rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+            }
+
+            .controls-panel #net-status-pill {
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                justify-content: center !important;
+                min-height: 34px !important;
+                font-size: 0.78rem !important;
+                box-sizing: border-box !important;
+            }
+
+            .controls-panel .input-group {
+                flex: 1 1 calc(50% - 0.25rem) !important;
+                min-width: 120px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.2rem !important;
+                box-sizing: border-box !important;
+            }
+
+            .controls-panel .input-group label {
+                font-size: 0.65rem !important;
+                letter-spacing: 0.5px !important;
+                text-transform: uppercase !important;
+            }
+
+            .controls-panel .input-group input,
+            .controls-panel .input-group select {
+                width: 100% !important;
+                min-height: 36px !important;
+                box-sizing: border-box !important;
+                padding: 0.35rem 0.5rem !important;
+            }
+
+            .controls-panel .cans-tracker {
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                padding: 0.4rem 0.8rem !important;
+                min-height: auto !important;
+                box-sizing: border-box !important;
+            }
+
+            .controls-panel .cans-tracker .value {
+                font-size: 1.15rem !important;
+            }
+
+            /* --- GARAGE TOP ACTIONS (2x2 Grid) --- */
+            .garage-top-controls {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+                margin-bottom: 1rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .garage-top-controls .left,
+            .garage-top-controls .right {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .garage-top-controls .btn {
+                width: 100% !important;
+                min-height: 40px !important;
+                padding: 0.5rem 0.25rem !important;
+                font-size: 0.76rem !important;
+                text-align: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+            }
+
+            /* --- VEHICLES GRID (1-Column on Phone) --- */
+            main {
+                padding: 0.5rem 0.4rem 2rem 0.4rem !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .vehicles-grid,
+            #garage-vehicles-container,
+            #play-vehicles-container,
+            body.play-mode-active #play-vehicles-container {
+                display: grid !important;
+                grid-template-columns: 100% !important;
+                gap: 1rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* --- VEHICLE CARD (Garage Mode) --- */
+            .vehicle-card {
+                padding: 0.85rem !important;
+                border-radius: 10px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                background: rgba(18, 22, 16, 0.98) !important;
+            }
+
+            .vehicle-card .card-header {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem !important;
+                padding-bottom: 0.6rem !important;
+            }
+
+            .vehicle-card .card-header > div:first-child {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                gap: 0.5rem !important;
+                width: 100% !important;
+            }
+
+            .vehicle-card .card-header > div:last-child {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                width: 100% !important;
+                margin-left: 0 !important;
+                padding-top: 0.4rem !important;
+                border-top: 1px dashed rgba(255,255,255,0.08) !important;
+            }
+
+            .stats-badge-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 0.35rem !important;
+                padding: 0.45rem 0.25rem !important;
+                margin-top: 0.5rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .stat-badge .label {
+                font-size: 0.62rem !important;
+                letter-spacing: 0px !important;
+                white-space: nowrap !important;
+            }
+
+            .stat-badge .val {
+                font-size: 1.15rem !important;
+            }
+
+            .equipped-item {
+                flex-wrap: wrap !important;
+                gap: 0.4rem !important;
+                padding: 0.45rem 0.55rem !important;
+            }
+
+            .equipped-item .item-controls {
+                margin-left: auto !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.4rem !important;
+            }
+
+            /* --- PLAY MODE: TURN & GEAR PHASE TRACKER --- */
+            .turn-phase-tracker {
+                display: grid !important;
+                grid-template-columns: auto 1fr !important;
+                align-items: center !important;
+                gap: 0.35rem !important;
+                padding: 0.5rem 0.55rem !important;
+                margin-bottom: 0.75rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .turn-phase-tracker .tracker-group:first-child {
+                grid-column: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 2px !important;
+            }
+
+            .turn-phase-tracker .tracker-group:first-child .tracker-label {
+                font-size: 0.62rem !important;
+                letter-spacing: 0.5px !important;
+            }
+
+            .turn-phase-tracker .turn-controls {
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.25rem !important;
+            }
+
+            .turn-phase-tracker .turn-btn {
+                width: 28px !important;
+                min-width: 28px !important;
+                height: 28px !important;
+                min-height: 28px !important;
+                padding: 0 !important;
+                font-size: 0.85rem !important;
+            }
+
+            .turn-phase-tracker .turn-value {
+                font-size: 1.1rem !important;
+                min-width: 20px !important;
+                text-align: center !important;
+            }
+
+            .turn-phase-tracker .tracker-group:nth-child(2) {
+                grid-column: 2 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-end !important;
+                gap: 2px !important;
+            }
+
+            .turn-phase-tracker .tracker-group:nth-child(2) .tracker-label {
+                font-size: 0.62rem !important;
+                letter-spacing: 0.5px !important;
+            }
+
+            .turn-phase-tracker .phase-selector {
+                display: flex !important;
+                gap: 2px !important;
+                justify-content: flex-end !important;
+            }
+
+            .turn-phase-tracker .phase-btn {
+                width: 27px !important;
+                min-width: 26px !important;
+                height: 28px !important;
+                font-size: 0.75rem !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            /* Row 2: Dice Controls */
+            .turn-phase-tracker > div:last-child {
+                grid-column: 1 / -1 !important;
+                display: flex !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                align-items: center !important;
+                gap: 3px !important;
+                justify-content: space-between !important;
+                margin-left: 0 !important;
+                padding-top: 0.4rem !important;
+                border-top: 1px dashed rgba(255,255,255,0.08) !important;
+                box-sizing: border-box !important;
+                flex-wrap: nowrap !important;
+            }
+
+            .turn-phase-tracker #dice-type {
+                flex: 1.2 1 0 !important;
+                min-width: 0 !important;
+                height: 32px !important;
+                font-size: 0.72rem !important;
+                padding: 0 4px !important;
+                box-sizing: border-box !important;
+            }
+
+            .turn-phase-tracker #throw-dice-count {
+                flex: 0.9 1 0 !important;
+                min-width: 0 !important;
+                height: 32px !important;
+                font-size: 0.72rem !important;
+                padding: 0 4px !important;
+                box-sizing: border-box !important;
+            }
+
+            .turn-phase-tracker #api-key-btn,
+            .turn-phase-tracker #dice-log-toggle-btn {
+                width: 30px !important;
+                min-width: 28px !important;
+                height: 32px !important;
+                padding: 0 !important;
+                font-size: 0.95rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+            }
+
+            .turn-phase-tracker #throw-dice-btn {
+                flex: 1.3 1 0 !important;
+                min-width: 0 !important;
+                height: 32px !important;
+                font-size: 0.75rem !important;
+                font-weight: 700 !important;
+                text-align: center !important;
+                justify-content: center !important;
+                padding: 0 4px !important;
+                white-space: nowrap !important;
+            }
+
+            /* --- PLAY MODE: AUDIENCE VOTES HUB --- */
+            .votes-hub {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 0.5rem 0.65rem !important;
+                gap: 0.4rem !important;
+                margin-bottom: 0.75rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .votes-hub .votes-hud-left {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                width: 100% !important;
+            }
+
+            .votes-hub .votes-counter-big {
+                border-right: none !important;
+                padding-right: 0 !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 0.45rem !important;
+            }
+
+            .votes-hub .votes-counter-big .val {
+                font-size: 1.35rem !important;
+            }
+
+            #votes-quick-actions {
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.4rem !important;
+            }
+
+            /* Collapsible Perks Grid on Mobile */
+            .votes-hub:not(.perks-expanded) .votes-actions-grid,
+            .votes-hub:not(.perks-expanded) > div:last-child {
+                display: none !important;
+            }
+
+            .votes-hub.perks-expanded .votes-actions-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.35rem !important;
+                width: 100% !important;
+                margin-top: 0.4rem !important;
+            }
+
+            .votes-hub.perks-expanded > div:last-child {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.4rem !important;
+                width: 100% !important;
+                margin-top: 0.4rem !important;
+            }
+
+            .votes-hub .vote-action-btn {
+                min-height: 36px !important;
+                padding: 0.35rem 0.4rem !important;
+                font-size: 0.72rem !important;
+            }
+
+            .votes-hub > div:last-child .btn {
+                width: 100% !important;
+                font-size: 0.7rem !important;
+                padding: 0.4rem 0.2rem !important;
+                text-align: center !important;
+            }
+
+            /* --- PLAY MODE: VEHICLE DASHBOARD CARD --- */
+            .play-dashboard-card {
+                padding: 0.85rem !important;
+                border-radius: 10px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                background: rgba(18, 22, 16, 0.98) !important;
+            }
+
+            .play-dashboard-card .card-header {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.45rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+
+            .play-dashboard-card .card-header > div:first-child {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                width: 100% !important;
+            }
+
+            .play-dashboard-card .status-toggles {
+                display: flex !important;
+                gap: 0.35rem !important;
+                width: 100% !important;
+            }
+
+            .play-dashboard-card .status-toggles .btn {
+                flex: 1 !important;
+                min-height: 32px !important;
+                font-size: 0.68rem !important;
+                padding: 0.2rem 0.3rem !important;
+                text-align: center !important;
+            }
+
+            .play-dashboard-card .hull-points-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fill, minmax(26px, 1fr)) !important;
+                gap: 4px !important;
+                margin-top: 0.35rem !important;
+                width: 100% !important;
+            }
+
+            .play-dashboard-card .hull-point-box {
+                min-width: 26px !important;
+                min-height: 26px !important;
+                border-radius: 4px !important;
+            }
+
+            .play-dashboard-card .hazard-dots-row {
+                display: flex !important;
+                gap: 4px !important;
+                padding: 0.4rem 0.5rem !important;
+                flex-wrap: wrap !important;
+                width: 100% !important;
+            }
+
+            .play-dashboard-card .hazard-dot {
+                min-width: 24px !important;
+                min-height: 24px !important;
+            }
+
+            .play-dashboard-card .gear-selector {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(36px, 1fr)) !important;
+                gap: 4px !important;
+                margin-top: 0.35rem !important;
+                width: 100% !important;
+            }
+
+            .play-dashboard-card .gear-btn {
+                min-height: 38px !important;
+                font-size: 0.85rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .play-dashboard-card .garage-2col-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+                width: 100% !important;
+            }
+
+            /* --- WATERMARKS HIDDEN ON PHONES --- */
+            .bg-watermark-left,
+            .bg-watermark-right {
+                display: none !important;
+            }
+
+            /* --- MODALS ON PHONES --- */
+            .modal-content {
+                width: 95vw !important;
+                max-width: 95vw !important;
+                max-height: 90vh !important;
+                padding: 1rem 0.75rem !important;
+                margin: auto !important;
+                box-sizing: border-box !important;
+            }
+
+            /* --- COMMS BOTTOM DRAWER --- */
+            #chat-window {
+                position: fixed !important;
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 75vh !important;
+                max-height: 85vh !important;
+                min-width: 0 !important;
+                min-height: 0 !important;
+                border-radius: 14px 14px 0 0 !important;
+                resize: none !important;
+                margin: 0 !important;
+                box-shadow: 0 -8px 30px rgba(0,0,0,0.9) !important;
+                z-index: 10001 !important;
+            }
+
+            #comms-nicklist-pane.roster-hidden {
+                display: none !important;
+            }
+
+            #comms-nicklist-pane {
+                width: 110px !important;
+                min-width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+
+            #floating-comms-btn {
+                bottom: 12px !important;
+                right: 12px !important;
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           3. TABLETS - PORTRAIT & COMPACT DESKTOPS (641px - 1024px)
+           -------------------------------------------------------------------------- */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .header-content {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.75rem !important;
+                padding: 0.75rem 1rem !important;
+                box-sizing: border-box !important;
             }
 
             .header-content .logo {
@@ -2558,262 +2895,126 @@
             }
 
             .header-content .logo h1 {
-                font-size: 1.4rem !important;
-                letter-spacing: 1px !important;
+                font-size: 1.6rem !important;
             }
 
-            .header-content .logo span {
-                font-size: 0.68rem !important;
-            }
-
-            .header-controls {
-                flex-wrap: wrap !important;
-                justify-content: center !important;
-                gap: 0.4rem !important;
-                width: 100% !important;
-            }
-
-            /* Scrollable, touch-friendly mode tabs */
             .mode-toggle {
                 display: flex !important;
-                overflow-x: auto !important;
-                max-width: 100% !important;
-                white-space: nowrap !important;
-                -webkit-overflow-scrolling: touch !important;
-                scrollbar-width: none !important;
+                width: 100% !important;
+                justify-content: space-between !important;
+                background: rgba(18, 24, 15, 0.95) !important;
+                border-radius: 8px !important;
                 padding: 3px !important;
-                gap: 2px !important;
-            }
-
-            .mode-toggle::-webkit-scrollbar {
-                display: none;
+                box-sizing: border-box !important;
             }
 
             .mode-btn {
-                padding: 0.45rem 0.75rem !important;
-                font-size: 0.75rem !important;
-                white-space: nowrap !important;
+                flex: 1 !important;
+                text-align: center !important;
+                padding: 0.5rem 0.4rem !important;
+                font-size: 0.8rem !important;
                 min-height: 38px !important;
-                flex-shrink: 0 !important;
             }
 
-            /* Garage controls panel wraps cleanly */
             .controls-panel {
+                display: flex !important;
                 flex-wrap: wrap !important;
-                justify-content: center !important;
-                gap: 0.6rem !important;
+                gap: 0.75rem !important;
                 width: 100% !important;
+                align-items: flex-end !important;
+                justify-content: space-between !important;
             }
 
-            .controls-panel .global-stat {
-                flex: 1 1 calc(50% - 0.6rem) !important;
-                min-width: 110px !important;
+            .controls-panel #net-status-pill {
+                flex: 1 1 200px !important;
             }
 
-            .controls-panel select,
-            .controls-panel button {
-                width: 100% !important;
+            .controls-panel .input-group {
+                flex: 1 1 180px !important;
             }
 
-            /* Vehicle Grid single column on phones */
+            .controls-panel .cans-tracker {
+                flex: 1 1 120px !important;
+            }
+
+            /* 2-Column Balanced Vehicle Grids on Tablet Portrait */
             .vehicles-grid,
+            #garage-vehicles-container,
             #play-vehicles-container,
             body.play-mode-active #play-vehicles-container {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1.25rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .vehicle-card,
             .play-dashboard-card {
-                padding: 0.9rem !important;
-            }
-
-            /* Turn Phase Tracker on phone */
-            .turn-phase-tracker {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 0.6rem !important;
-                padding: 0.6rem 0.8rem !important;
-            }
-
-            .gear-phase-pills {
-                display: flex !important;
-                justify-content: space-between !important;
-                gap: 4px !important;
-                width: 100% !important;
-                overflow-x: auto !important;
-            }
-
-            .gear-phase-pill {
-                flex: 1 !important;
-                text-align: center !important;
-                padding: 0.4rem 0.2rem !important;
-                font-size: 0.72rem !important;
-                min-width: 36px !important;
-            }
-
-            /* Audience votes HUD */
-            .votes-hub {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 0.8rem !important;
-                padding: 0.75rem !important;
-            }
-
-            .votes-hud-left {
-                justify-content: space-between !important;
-                gap: 0.8rem !important;
-            }
-
-            .votes-counter-big {
-                border-right: none !important;
-                padding-right: 0 !important;
-            }
-
-            /* Modals fit phone screens safely */
-            .modal-content {
-                width: 95vw !important;
-                max-width: 95vw !important;
-                max-height: 92vh !important;
-                padding: 1rem 0.85rem !important;
-                margin: auto !important;
+                padding: 1rem !important;
+                border-radius: 10px !important;
                 box-sizing: border-box !important;
+                background: rgba(18, 22, 16, 0.98) !important;
             }
 
-            /* Watermarks hidden on phones for high contrast */
+            #chat-window {
+                width: min(90vw, 680px) !important;
+                max-height: 70vh !important;
+            }
+
             .bg-watermark-left,
             .bg-watermark-right {
+                opacity: 0.03 !important;
+                pointer-events: none !important;
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           4. SMARTPHONES - LANDSCAPE (max-height <= 500px)
+           -------------------------------------------------------------------------- */
+        @media (max-width: 950px) and (max-height: 500px) and (orientation: landscape) {
+            header {
+                padding: 0.2rem 0 !important;
+            }
+
+            .header-content {
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0.25rem 0.75rem !important;
+                gap: 0.5rem !important;
+            }
+
+            .header-content .logo h1 {
+                font-size: 1.15rem !important;
+            }
+
+            .header-content .tagline {
                 display: none !important;
             }
-        }
 
-        /* ---------------------------------------------------------
-           3. PHONE IN LANDSCAPE (body.device-phone.orientation-landscape)
-           Low profile header & tracker for limited vertical height
-           --------------------------------------------------------- */
-        body.device-phone.orientation-landscape header {
-            padding: 0.25rem 0 !important;
-        }
+            .mode-btn {
+                padding: 0.3rem 0.5rem !important;
+                font-size: 0.7rem !important;
+                min-height: 32px !important;
+            }
 
-        body.device-phone.orientation-landscape .header-content {
-            flex-direction: row !important;
-            justify-content: space-between !important;
-            padding: 0.25rem 0.75rem !important;
-            gap: 0.5rem !important;
-        }
+            .turn-phase-tracker {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 0.35rem 0.75rem !important;
+                margin-bottom: 0.75rem !important;
+            }
 
-        body.device-phone.orientation-landscape .header-content .logo h1 {
-            font-size: 1.15rem !important;
-        }
-
-        body.device-phone.orientation-landscape .header-content .logo span {
-            display: none !important;
-        }
-
-        body.device-phone.orientation-landscape .mode-btn {
-            padding: 0.3rem 0.55rem !important;
-            font-size: 0.7rem !important;
-            min-height: 32px !important;
-        }
-
-        body.device-phone.orientation-landscape .turn-phase-tracker {
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            padding: 0.35rem 0.75rem !important;
-            margin-bottom: 0.75rem !important;
-        }
-
-        body.device-phone.orientation-landscape .gear-phase-pills {
-            max-width: 320px !important;
-        }
-
-        /* ---------------------------------------------------------
-           4. TABLET OPTIMIZATIONS (body.device-tablet / 641px - 1024px)
-           --------------------------------------------------------- */
-        /* Tablet Portrait: 2-column balanced grid instead of 1 giant card */
-        body.device-tablet.orientation-portrait .vehicles-grid,
-        body.device-tablet.orientation-portrait #play-vehicles-container,
-        body.device-tablet.orientation-portrait.play-mode-active #play-vehicles-container,
-        @media (min-width: 641px) and (max-width: 900px) and (orientation: portrait) {
-            .vehicles-grid,
-            #play-vehicles-container,
-            body.play-mode-active #play-vehicles-container {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 1.1rem !important;
+            #chat-window {
+                height: 90vh !important;
+                max-height: 95vh !important;
+                bottom: 0 !important;
             }
         }
-
-        /* Tablet Landscape: 2 or 3 responsive columns */
-        body.device-tablet.orientation-landscape .vehicles-grid,
-        body.device-tablet.orientation-landscape #play-vehicles-container,
-        body.device-tablet.orientation-landscape.play-mode-active #play-vehicles-container,
-        @media (min-width: 901px) and (max-width: 1100px) and (orientation: landscape) {
-            .vehicles-grid,
-            #play-vehicles-container,
-            body.play-mode-active #play-vehicles-container {
-                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
-                gap: 1.25rem !important;
-            }
-        }
-
-        body.device-tablet .header-content {
-            flex-wrap: wrap !important;
-            justify-content: space-between !important;
-            gap: 0.8rem !important;
-        }
-
-        body.device-tablet .bg-watermark-left,
-        body.device-tablet .bg-watermark-right {
-            opacity: 0.05 !important;
-        }
-
-        /* ---------------------------------------------------------
-           5. TACTICAL RADIO COMMS (Mobile & Tablet Responsiveness)
-           --------------------------------------------------------- */
-        body.device-phone #chat-window {
-            position: fixed !important;
-            top: auto !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            height: 75vh !important;
-            max-height: 85vh !important;
-            min-width: 0 !important;
-            min-height: 0 !important;
-            border-radius: 14px 14px 0 0 !important;
-            resize: none !important;
-            margin: 0 !important;
-            box-shadow: 0 -8px 30px rgba(0,0,0,0.9) !important;
-            z-index: 10001 !important;
-        }
-
-        body.device-phone.orientation-landscape #chat-window {
-            height: 90vh !important;
-            max-height: 95vh !important;
-        }
-
-        body.device-tablet #chat-window {
-            width: min(92vw, 680px) !important;
-            max-height: 75vh !important;
-        }
-
-        /* Collapsible Roster Sidebar in Comms */
-        #comms-nicklist-pane.roster-hidden {
-            display: none !important;
-        }
-
-        @media (max-width: 600px) {
-            #comms-nicklist-pane {
-                width: 115px !important;
-                min-width: 100px !important;
-                font-size: 0.75rem !important;
-            }
-        }
-
-    </style>
+</style>
 </head>
 <body class="hide-ai-prompt">
     <!-- SVG color matrix filter to remove green background from logos -->
@@ -2964,6 +3165,10 @@
                     <div class="votes-counter-big">
                         <span class="val" id="votes-display-val">0</span>
                         <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Audience Votes</span>
+                    </div>
+                    <div id="votes-quick-actions" style="display:flex; align-items:center; gap:0.4rem;">
+                        <button class="btn btn-sm" onclick="adjustVotes(1)" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(34,197,94,0.18); border:1px solid rgba(34,197,94,0.4); color:#4ade80;">+1 Vote</button>
+                        <button id="votes-toggle-btn" class="btn btn-sm" onclick="toggleVotesAccordion()" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--glow-color); cursor:pointer;">🎟️ Perks ▾</button>
                     </div>
                     <div class="votes-actions-grid">
                         <button class="vote-action-btn" onclick="adjustVotes(1)">
@@ -3629,7 +3834,7 @@ Thanks to Mike for being ace.</p>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 0.8rem; gap: 0.8rem; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm" onclick="openVersionModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Orbitron', monospace, sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--glow-color); background: rgba(245, 158, 11, 0.12); border: 1px solid var(--glow-color); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to view applied updates & version history">
-                    <span>🏷️</span> v1.0.4 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
+                    <span>🏷️</span> v1.0.5 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
                 </button>
                 <button class="btn btn-primary" onclick="closeAboutModal()" style="padding: 0.45rem 1.4rem;">Close</button>
             </div>
@@ -3646,12 +3851,32 @@ Thanks to Mike for being ace.</p>
                 <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
             </div>
             <div style="padding: 1.2rem 0.5rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-primary); overflow-y: auto; max-height: calc(85vh - 130px);">
+                <!-- v1.0.5 -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
+                            v1.0.5 - Current Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">02.11.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Smartphone Portrait Tabletop Overhaul:</strong> Ultra-refined layouts specifically tailored for narrow mobile screens (360px–430px). Eliminated all horizontal viewport stretching and clipping.</li>
+                        <li><strong>Zero-Truncation Turn & Gear Phase Tracker:</strong> Engineered a compact 2-row tracker for mobile screens: Game Turn (<code>- 1 +</code>) and all 6 Gear Phase buttons (<code>[1][2][3][4][5][6]</code>) fit side-by-side on Row 1; Dice controls (Type, Count, Key, History, Roll) fit cleanly on Row 2 with flexible, non-overflowing controls.</li>
+                        <li><strong>Collapsible Audience Votes HUB:</strong> Integrated quick <code>+1 Vote</code> and collapsible <code>🎟️ Perks ▾</code> accordion on smartphones, preserving 250px+ vertical dashboard visibility while keeping canonical perks one tap away.</li>
+                        <li><strong>Play Mode Header Compression:</strong> Automatically hides Garage setup inputs (Team Name, Sponsor, Budget, Total Spent) on mobile/tablet when in Play Mode, bringing active vehicle dashboards to immediate thumb view.</li>
+                        <li><strong>Fluid Swipeable Mode Navigation:</strong> Full-width horizontal swipe navigation bar with momentum scrolling on mobile devices.</li>
+                        <li><strong>Garage Actions 2x2 Grid:</strong> Reorganized top garage buttons (Add Vehicle, Clear Team, Export Team, Import Team) into a clean, finger-friendly 2x2 grid.</li>
+                        <li><strong>Multi-Homed LAN Server Architecture:</strong> Validated node static server daemon bound to <code>0.0.0.0:8080</code> with verified Windows Firewall private network permissions for seamless cross-device phone/tablet tabletop play over local Wi-Fi.</li>
+                    </ul>
+                </div>
+
+
                 
                 <!-- v1.0.4 -->
                 <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
                         <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
-                            v1.0.4 - Current Release
+                            v1.0.4
                         </span>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">01.11.26</span>
                     </div>
@@ -5885,7 +6110,7 @@ Thanks to Mike for being ace.</p>
 
         // ==========================================
                 // ==========================================
-        // DEVICE & ORIENTATION MANAGER (v1.0.4)
+        // DEVICE & ORIENTATION MANAGER (v1.0.5)
         // Auto-detects device hardware & orientation
         // ==========================================
         const DeviceManager = {
@@ -7093,7 +7318,15 @@ Thanks to Mike for being ace.</p>
             applySponsorTheme();
             renderHeader();
             renderSponsorInfo();
-            switchMode("garage");
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlMode = urlParams.get("mode");
+            if (urlParams.get("demo") === "1" && appState.vehicles.length === 0) {
+                addVehicle(false);
+                if (appState.vehicles[0]) appState.vehicles[0].name = "War Rig Alpha";
+                addVehicle(false);
+                if (appState.vehicles[1]) appState.vehicles[1].name = "Rust Bucket";
+            }
+            switchMode(urlMode || "garage");
         });
 
         let diceToastTimer = null;
@@ -9432,6 +9665,14 @@ Thanks to Mike for being ace.</p>
         }
 
         // Votes
+        function toggleVotesAccordion() {
+            const hub = document.querySelector('.votes-hub');
+            const btn = document.getElementById('votes-toggle-btn');
+            if (!hub) return;
+            const isExp = hub.classList.toggle('perks-expanded');
+            if (btn) btn.innerHTML = isExp ? '🎟️ Perks ▴' : '🎟️ Perks ▾';
+        }
+
         function adjustVotes(val) {
             appState.votes = Math.max(0, appState.votes + val);
             renderHeader();

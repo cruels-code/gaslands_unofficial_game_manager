@@ -19,10 +19,14 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 - **Team / Sponsor Traits:** Active sponsor perks, traits, and house rules prominently visible on every card.
 - **Out-of-Gear Warnings:** Visual alerts when the active gear phase exceeds a vehicle's maximum allowable transmission gear.
 
-### 2. Adaptive Tablet & Smartphone Auto-Detection (v1.0.4)
+### 2. Adaptive Tablet & Smartphone Auto-Detection (v1.0.5)
 - **Automatic Device & Orientation Detection:** Integrated `DeviceManager` that learns the player's device type (`phone`, `tablet`, `desktop`) and orientation (`portrait`, `landscape`) in real-time.
-- **Touch-Optimized Tabletop Controls:** Enlarged 36px–40px tap targets for Hull boxes, Hazard dots, and Gear selectors so fingers never miss during chaotic tabletop games.
+- **Zero-Truncation Turn & Phase Tracker:** Game Turn (`- 1 +`) and all 6 Gear Phase buttons (`[1][2][3][4][5][6]`) sit side-by-side on Row 1; flexible Dice controls (`[Dice Type] [Dice Count] [🔑] [🕒] [🎲 Roll]`) sit on Row 2 with zero clipping.
+- **Collapsible Audience Votes Hub:** Quick `+1 Vote` and collapsible `🎟️ Perks ▾` accordion saves 250px+ of vertical screen space on phones until perks are needed.
+- **Play Mode Header Compression:** Garage inputs (Team Name, Sponsor, Budget, Total Spent) automatically hide during Play Mode on mobile and tablet devices, keeping vehicle dashboards front and center.
+- **Touch-Optimized Tabletop Controls:** Enlarged tap targets for Hull integrity checkboxes, Hazard tokens, and Gear selectors so fingers never miss during chaotic tabletop games.
 - **Adaptive Multi-Column Grids:** Tablet portrait displays balanced 2-column vehicle grids instead of stretched single cards; phones utilize clean single-column cards with touch-friendly spacing and hidden watermarks for maximum readability.
+- **Garage Actions 2x2 Grid:** Clean 2x2 grid for Garage top buttons (`+ Add Vehicle`, `🧹 Clear Team`, `📤 Export Team`, `📥 Import Team`).
 - **Compact Phone Landscape Viewports:** Streamlined low-profile headers and turn/phase trackers designed for smartphone landscape screens, keeping dashboards fully visible.
 
 ### 3. Tactical Radio Comms & Driver Roster (v1.0.4)
@@ -64,7 +68,15 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 
 ## 🏷️ Version History
 
-### v1.0.4 - Current Release (01.11.26)
+### v1.0.5 - Current Release (02.11.26)
+- **Smartphone Portrait Tabletop Overhaul:** Full layout optimization for mobile phones (360px–430px portrait). Eliminated all horizontal stretching and overflow.
+- **Zero-Truncation Turn & Gear Phase Tracker:** Game Turn (`- 1 +`) and Gear Phase buttons (`[1][2][3][4][5][6]`) fit side-by-side on Row 1 without wrapping; Dice controls fit cleanly on Row 2.
+- **Collapsible Audience Votes HUB:** Compact counter with quick `+1 Vote` and collapsible `🎟️ Perks ▾` toggle to conserve 250px+ vertical dashboard height.
+- **Play Mode Header Compression:** Automatically hides Garage inputs on mobile/tablet during active play to maximize table dashboard space.
+- **Swipeable Mode Bar & 2x2 Garage Grid:** Full-width touch swipe mode navigation bar, plus a 2x2 grid for Garage team actions.
+- **Multi-Homed LAN Server Support:** Node.js static server daemon bound to `0.0.0.0:8080` with verified Windows Firewall private network permissions for instant phone/tablet LAN connectivity.
+
+### v1.0.4 (01.11.26)
 - **Adaptive Tablet & Smartphone Auto-Detection:** Integrated `DeviceManager` that dynamically detects device class (phone, tablet, desktop) and orientation (portrait, landscape), tailoring grids, layouts, and typography.
 - **Touch-Optimized Hit Targets:** Hull boxes, hazard dots, and gear selector buttons enlarged to 36px–40px for error-free tabletop finger tapping.
 - **Responsive Grids:** 2-column balanced layouts for tablet portrait; clean single-column cards with hidden watermarks for smartphones.
