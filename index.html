@@ -597,47 +597,74 @@
             pointer-events: none;
         }
 
-        /* Status Toggles Bar */
-        .status-bar {
+        /* Status Toggles Bar (Themed Wasteland Chips) */
+        .status-bar,
+        .play-status-bar {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
+            margin-top: 0.35rem;
         }
 
-        .status-chip {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--card-border);
-            border-radius: 4px;
-            padding: 0.3rem 0.6rem;
-            font-size: 0.7rem;
+        .status-chip,
+        .play-status-chip {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.72rem;
             font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             cursor: pointer;
             user-select: none;
-            transition: all 0.3s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 5px rgba(0, 0, 0, 0.4);
+            outline: none;
+            line-height: 1.2;
         }
 
-        .status-chip.on-fire.active {
-            background: rgba(249, 115, 22, 0.15);
+        .status-chip:hover,
+        .play-status-chip:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .status-chip.on-fire.active,
+        .play-status-chip.on-fire.active {
+            background: rgba(249, 115, 22, 0.25);
             border-color: #f97316;
-            color: #f97316;
-            box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+            color: #ff9800;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.5), inset 0 0 8px rgba(249, 115, 22, 0.25);
+            text-shadow: 0 0 8px rgba(249, 115, 22, 0.7);
             animation: fire-pulse 1s infinite alternate;
         }
 
-        .status-chip.ghost-rider.active {
-            background: rgba(6, 182, 212, 0.15);
+        .status-chip.ghost-rider.active,
+        .play-status-chip.ghost-rider.active {
+            background: rgba(6, 182, 212, 0.25);
             border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            box-shadow: 0 0 8px var(--accent-cyan-glow);
+            color: #38bdf8;
+            box-shadow: 0 0 12px var(--accent-cyan-glow), inset 0 0 8px rgba(6, 182, 212, 0.25);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
         }
 
-        .status-chip.distracted.active {
-            background: rgba(239, 68, 68, 0.15);
+        .status-chip.distracted.active,
+        .play-status-chip.distracted.active {
+            background: rgba(239, 68, 68, 0.25);
             border-color: var(--danger-red);
-            color: var(--danger-red);
+            color: #fca5a5;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), inset 0 0 8px rgba(239, 68, 68, 0.25);
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
         }
 
         /* Dashboard Gearbox */
@@ -2740,18 +2767,22 @@
                 width: 100% !important;
             }
 
-            .play-dashboard-card .status-toggles {
+            .play-dashboard-card .status-toggles,
+            .play-dashboard-card .play-status-bar {
                 display: flex !important;
                 gap: 0.35rem !important;
                 width: 100% !important;
             }
 
-            .play-dashboard-card .status-toggles .btn {
+            .play-dashboard-card .status-toggles .btn,
+            .play-dashboard-card .status-chip,
+            .play-dashboard-card .play-status-chip {
                 flex: 1 !important;
                 min-height: 32px !important;
                 font-size: 0.68rem !important;
-                padding: 0.2rem 0.3rem !important;
+                padding: 0.25rem 0.35rem !important;
                 text-align: center !important;
+                justify-content: center !important;
             }
 
             .play-dashboard-card .hull-points-grid {
