@@ -1,10 +1,8 @@
 
 --- BIKE ---
 Festering Thrasher
-Motherfucking Handlebar
 Ashen Cleanser
 The Frothing Peg Bender
-Motherfucking Sprocket
 The Exhaust Foaming
 Handlebar Bitch
 The Skinned Throttle Burner
@@ -21,13 +19,11 @@ Sprocket Shitter
 The Sweaty Frame Butcher
 The Grip Welded
 Murder Chain Mangler
-Motherfucking Frame
 Gouged Burner
 The Scorched Exhaust
 Weaponized Throttle Desecrator
 Screeching Exile
 The Busted Pedal Terror
-Motherfucking Pedal
 The Sun-Baked Kickstand
 The Melting Spoke
 Saddle of Gnarly Doom
@@ -56,8 +52,6 @@ Savage Axle Dicer
 Riveted Tire Spitter
 Manic Fork Slicer
 The Exhaust Gouged
-Motherfucking Peg
-Motherfucking Wheel
 The Axle Stinking
 Rabid Terror
 Screaming Exhaust Defiler
@@ -69,7 +63,6 @@ Spitting Basher
 Throttle Impaler
 Chain of Burning Doom
 Manic Tire from Hell
-Motherfucking Throttle
 The Rotting Sprocket Ruiner
 The Wasted Spoke
 The Barbed Fork
@@ -81,7 +74,6 @@ Gutted Spoke from Hell
 Quaking Defiler
 Throttle of Grinding Doom
 Caustic Handlebar Snapper
-Motherfucking Tire
 Wheel of Scorched Doom
 The Twisted Fork Mangler
 Peg Shredder
@@ -91,10 +83,8 @@ Saddle of Blighted Doom
 Chain of Oil-Stained Doom
 Mutant Impaler
 The Scab Peg
-Motherfucking Axle
 The Saddle Hellish
 Blighted Throttle Destroyer
-Motherfucking Kickstand
 The Charred Exhaust Twister
 Gagging Frame from Hell
 The Vicious Exhaust
@@ -124,8 +114,6 @@ The Sun-Baked Clutch
 Seething Wheel from Hell
 The Unstable Frame
 Vomit Outcast
-Motherfucking Clutch
-Motherfucking Chain
 Riveted Saddle Cleanser
 The Seething Kickstand Outlaw
 The Clutch Wasted
@@ -176,7 +164,6 @@ Wasted Clutch from Hell
 The Grease-Slicked Exhaust
 Rusty Chain Choker
 The Axle Frothing
-Motherfucking Exhaust
 Spiteful Strut from Hell
 Spoke of Nuke Doom
 Sizzling Saddle from Hell
@@ -208,7 +195,6 @@ Radioactive Slut
 The Jagged Coffin Vomiter
 The Fatal Slab Impaler
 The Bone Coffin
-Motherfucking Growth
 Flayed Blister from Hell
 Parasite Purger
 The Tumor Charred
@@ -219,16 +205,13 @@ Bucket Grinder
 The Wart Gutted
 Bucket of Toxic Doom
 Appendage Ripper
-Motherfucking Pouch
 Twin Fucker
 Coffin Bastard
 Venomous Tumor Raider
 Pouch of Ash-Choked Doom
-Motherfucking Bucket
 Twin Outcast
 Crushed Annihilator
 Spiteful Parasite from Hell
-Motherfucking Barnacle
 Appendage of Vomit Doom
 Howling Appendage from Hell
 Coffin of Welded Doom
@@ -249,16 +232,13 @@ The Wailing Pouch
 The Hate Leech Bitch
 The Tumor Seething
 Groaning Thrasher
-Motherfucking Cyst
 Luggage of Wretched Doom
 Appendage Basher
 Blighted Flayer
-Motherfucking Parasite
 Blister Puncher
 Sun-Baked Obliterator
 Wretched Twin from Hell
 Riveted Drowner
-Motherfucking Blister
 Unhinged Leech Exile
 The Bucket Bloody
 Leech of Wasted Doom
@@ -273,7 +253,6 @@ The Bucket Barbed
 The Volatile Bucket Kicker
 The Parasite Armored
 The Mangled Leech
-Motherfucking Wart
 The Tumor Twisted
 Slab Annihilator
 Burning Coffin Eviscerator
@@ -287,9 +266,7 @@ The Plagued Leech
 Melting Twister
 The Barnacle Lethal
 The Frothing Twin
-Motherfucking Tumor
 Deranged Wart from Hell
-Motherfucking Luggage
 Volatile Growth Annihilator
 Parasite of Atomic Doom
 Unhinged Melter
@@ -311,7 +288,6 @@ Mutilated Growth Destroyer
 The Twin Lethal
 Barren Bitch
 Scorched Tumor Destroyer
-Motherfucking Burden
 Gristle Wart Stomper
 The Rotting Barnacle Threat
 Spiked Leech from Hell
@@ -352,14 +328,11 @@ Rancid Slab Menace
 Burden Scavenger
 Atomic Twin Butcher
 Burden of Scorched Doom
-Motherfucking Appendage
 Appendage of Unstable Doom
 Slab Violator
 Growth Shredder
-Motherfucking Slab
 Cyst of Rattling Doom
 The Caustic Leech
-Motherfucking Leech
 Bucket Threat
 Melting Gutter
 Appendage Loser
@@ -404,7 +377,6 @@ Leaking Coffin from Hell
 The Grinding Blister
 
 --- BUGGY ---
-Motherfucking Toad
 Gutted Hopper from Hell
 The Beetle Barbed
 Bloody Kicker
@@ -423,7 +395,6 @@ Unhinged Scarab from Hell
 Spiteful Tearer
 Locust of Blood-Soaked Doom
 Plagued Centipede from Hell
-Motherfucking Gnat
 The Putrid Cricket
 The Feral Centipede
 Mantis of Defiled Doom
@@ -461,19 +432,16 @@ Skinned Maggot Looter
 Gore Drowner
 The Crushed Locust Purger
 Retching Spider from Hell
-Motherfucking Scorpion
 Weeping Centipede Convict
 The Vomit Flea
 Locust Purger
 The Guttural Mite Eviscerator
 Retching Toad from Hell
-Motherfucking Hopper
 Mantis of Plagued Doom
 The Gnashing Maggot
 Mutant Flea from Hell
 The Gnat Rotting
 Scarab of Trembling Doom
-Motherfucking Cricket
 The Centipede Screaming
 Skinned Scarab Stomper
 Scab Maggot from Hell
@@ -532,11 +500,8 @@ The Shattered Gnat
 Oozing Grub Desecrator
 Tick Impaler
 Stinking Hopper Fucker
-Motherfucking Scarab
 Deranged Tick from Hell
-Motherfucking Tick
 The Blood-Soaked Grub
-Motherfucking Maggot
 The Seething Tick
 Unhinged Roach Basher
 Howling Eviscerator
@@ -544,7 +509,6 @@ Centipede Defiler
 The Flaming Centipede Violator
 Beetle Threat
 The Grub Grim
-Motherfucking Centipede
 The Boiling Ant
 The Bloody Mite
 The Dust-Caked Hopper
@@ -559,7 +523,6 @@ Tick of Volatile Doom
 Rabid Gnat Skinner
 Volatile Mantis Loser
 Mantis Bastard
-Motherfucking Flea
 Caustic Hazard
 Centipede of Scab Doom
 Toad Kicker
@@ -590,7 +553,6 @@ Gouged Eater
 Spider of Barbed Doom
 The Scrap Beetle
 The Wretched Centipede
-Motherfucking Mantis
 Murder Tick Chomper
 Locust Basher
 Doom Roach from Hell
@@ -599,14 +561,12 @@ The Sludge Ant Kicker
 Flea Eviscerator
 Gore Locust from Hell
 The Rancid Hopper Breaker
-Motherfucking Roach
 Ant Beheader
 Flesh Stinker
 The Tick Scrap
 The Chewing Scorpion Snapper
 
 --- DRAG RACER ---
-Motherfucking Rocket
 Javelin Chomper
 Wailing Meteor from Hell
 Charred Rail Melter
@@ -627,16 +587,13 @@ Rocket Smasher
 Weeping Rocket from Hell
 The Busted Bolt Bastard
 The Gristle Arrow Slut
-Motherfucking Needle
 The Rusted Rail
 The Gagging Meteor
 Infectious Javelin Skinner
 Vomit Spitter
 Blood-Soaked Spear from Hell
 The Reeking Comet
-Motherfucking Bullet
 The Bolt Wretched
-Motherfucking Spear
 Barren Biter
 The Projectile Mutant
 The Slag Slingshot
@@ -668,13 +625,11 @@ The Gristle Rocket Obliterator
 Howling Meteor Ruiner
 The Trembling Missile Cleanser
 Rocket of Frothing Doom
-Motherfucking Projectile
 The Blistering Arrow Eradicator
 The Sizzling Needle
 Riveted Scourge
 Vomit Comet Smasher
 The Bloody Arrow
-Motherfucking Missile
 The Vile Meteor Annihilator
 Melting Threat
 Warped Bullet from Hell
@@ -682,11 +637,8 @@ Riveted Meteor Exile
 Streak of Scrap Doom
 Leaking Bullet from Hell
 The Ruined Rocket
-Motherfucking Streak
 Laser of Shrieking Doom
 The Meteor Rattling
-Motherfucking Javelin
-Motherfucking Meteor
 Grease-Slicked Spear from Hell
 Puking Laser Ripper
 Laser Puker
@@ -696,7 +648,6 @@ Comet Carver
 Hellish Missile from Hell
 The Ashen Rocket Choker
 Javelin of Blood-Soaked Doom
-Motherfucking Torpedo
 The Streak Wasted
 The Torpedo Rancid
 Streak Outcast
@@ -761,15 +712,12 @@ Streak of Frothing Doom
 Busted Needle Bandit
 The Scorched Streak
 Crusty Slicer
-Motherfucking Bolt
 Spear Thrasher
 The Slingshot Bleeding
 The Arrow Radioactive
 The Mutant Comet
 Comet of Melting Doom
-Motherfucking Laser
 The Volatile Bullet
-Motherfucking Comet
 Arrow of Diseased Doom
 Howling Projectile Bane
 Oil-Stained Bullet from Hell
@@ -813,14 +761,12 @@ Seething Bed Disemboweler
 Quaking Gurney from Hell
 Twisted Threat
 Hearse Eater
-Motherfucking Suture
 The Asylum Filthy
 Unstable Ruiner
 Howling Bandage Smasher
 The Scalpel Bleeding
 Gnashing Exile
 The Asylum Gristle
-Motherfucking Morgue
 Busted Obliterator
 The Crazed IV
 The Ward Toxic
@@ -855,12 +801,10 @@ Medic of Shattered Doom
 Jagged Morgue from Hell
 Howling Disemboweler
 Choking Stretcher from Hell
-Motherfucking Bed
 The Sun-Baked Bandaid Wrecker
 Charred Corpse-Hauler from Hell
 Syringe of Flaming Doom
 The Nuke Meatwagon
-Motherfucking IV
 The Stinking Scalpel Gutter
 The Rattling Hospice Outlaw
 Morgue of Rusty Doom
@@ -870,15 +814,12 @@ Hospice of Melting Doom
 Weeping Suture from Hell
 The Psychotic Gurney
 Scorched Gouger
-Motherfucking Syringe
 Infectious Gurney Obliterator
 The Filthy Hospice Bitch
 The Acidic Morgue Thief
 The Ward Choking
 The Groaning Bandage
-Motherfucking Scalpel
 Diseased Medic from Hell
-Motherfucking Asylum
 The IV Chewing
 Charred Bandage from Hell
 Bandaid Ruiner
@@ -897,7 +838,6 @@ Blood-Soaked Morgue Reject
 The Bloody Bandaid
 Hearse Biter
 The Corpse-Hauler Cursed
-Motherfucking Meatwagon
 The Clinic Bastardized
 The Manic Asylum
 Asylum of Terminal Doom
@@ -912,7 +852,6 @@ The Plagued Hearse
 The Hospice Flesh
 Feral Loser
 Corpse-Hauler Obliterator
-Motherfucking Hearse
 Gnarly Gutter
 Savage Defiler
 Asylum Looter
@@ -926,7 +865,6 @@ Ward Hazard
 The Pissed Syringe Hazard
 Meatwagon of Psychotic Doom
 The Medic Trash
-Motherfucking Stretcher
 Armored Gutter
 The IV Stinking
 The Asylum Rotting
@@ -948,8 +886,6 @@ The Meatwagon Unstable
 The Putrid Hearse
 Hospice Cleaver
 The Sweaty Ward Basher
-Motherfucking Bandage
-Motherfucking Clinic
 The Howling Corpse-Hauler
 The Sweaty IV
 Cannibal Medic Eater
@@ -960,7 +896,6 @@ Pissed Smasher
 Cursed Chomper
 The Vomit Meatwagon
 The Scrap Bandage Grinder
-Motherfucking Gurney
 Gurney of Gore Doom
 Skinned IV from Hell
 Jagged Bandage from Hell
@@ -1012,7 +947,6 @@ The Shrieking Corpse-Hauler
 --- CAR ---
 The Plagued Clunker Purger
 Death Coupe from Hell
-Motherfucking Sedan
 Terminal Hatchback from Hell
 Chassis of Vicious Doom
 Murder Heap Vomiter
@@ -1024,7 +958,6 @@ The Jalopy Busted
 Clunker Pounder
 The Sedan Desolate
 Pinto Puncher
-Motherfucking Lemon
 Ride Shredder
 Weeping Wagon from Hell
 The Bone Banger Dicer
@@ -1040,10 +973,7 @@ The Puking Wagon
 The Coupe Gagging
 The Skinned Sedan
 Drooling Banger Mower
-Motherfucking Beater
-Motherfucking Coupe
 Hatchback Menace
-Motherfucking Wreck
 Bone Rustbucket from Hell
 The Venomous Hatchback Dumper
 Wreck of Oozing Doom
@@ -1067,14 +997,12 @@ The Frothing Coupe Terror
 Bucket Pounder
 The Rustbucket Oil-Stained
 Bloody Cruiser Grinder
-Motherfucking Bucket
 Banger Butcher
 Flesh Hatchback from Hell
 Acidic Scourge
 Banger Terror
 Radioactive Carver
 The Manic Clunker
-Motherfucking Rustbucket
 Spiteful Heap from Hell
 Blistering Clunker from Hell
 Groaning Ride from Hell
@@ -1082,7 +1010,6 @@ Ash-Choked Basher
 Spiked Puker
 Hatchback of Smashed Doom
 Cruiser Breaker
-Motherfucking Ride
 Wagon of Rancid Doom
 The Reeking Bucket Ruiner
 Gnarly Drowner
@@ -1091,7 +1018,6 @@ Crusty Coupe from Hell
 Manic Sedan Vomiter
 Heap Outlaw
 Lemon of Volatile Doom
-Motherfucking Heap
 Rustbucket Eater
 Pissed Slicer
 Pinto Stomper
@@ -1142,7 +1068,6 @@ The Volatile Rustbucket
 Pinto Bender
 Choking Heap Hazard
 Beater of Savage Doom
-Motherfucking Clunker
 The Deranged Wagon Smasher
 Grease-Slicked Cruiser from Hell
 The Volatile Clunker Cleaver
@@ -1187,21 +1112,15 @@ Diseased Rustbucket Skinner
 The Clunker Spewing
 The Wagon Flesh
 The Busted Ride Decapitator
-Motherfucking Wagon
-Motherfucking Banger
 Defiled Chassis Puker
 The Caustic Jalopy Bandit
 Vile Wreck Swallower
 Pinto Terror
-Motherfucking Cruiser
 The Cruiser Howling
 The Rattling Hooptie Loser
 The Clunker Guttural
 Vomit Ripper
-Motherfucking Hatchback
-Motherfucking Pinto
 Crazed Ride from Hell
-Motherfucking Hooptie
 The Coupe Savage
 Jalopy of Smoldering Doom
 Busted Swallower
@@ -1224,7 +1143,6 @@ Fly of Crushed Doom
 The Mosquito Vile
 Choking Mosquito Violator
 The Hover Stinking
-Motherfucking Fly
 Filthy Fan Shitter
 Scab Whirly from Hell
 Pissed Vortex Defiler
@@ -1241,7 +1159,6 @@ The Oozing Mosquito
 Drooling Outlaw
 Wretched Twister Crusher
 Fan Breaker
-Motherfucking Hover
 The Barbed Cyclone Defiler
 The Spinner Crusty
 The Smashed Blade
@@ -1260,7 +1177,6 @@ Nuke Mosquito from Hell
 The Bolted Hover
 The Gale Weaponized
 Hate Snapper
-Motherfucking Chopper
 Grinding Cleaver
 The Twister Acidic
 Fly of Wasted Doom
@@ -1270,7 +1186,6 @@ Crazed Loser
 Festering Hover from Hell
 The Spitting Cyclone
 Mosquito of Spiked Doom
-Motherfucking Buzz
 Gale of Toxic Doom
 The Grease-Slicked Rotor
 The Spewing Mosquito
@@ -1282,7 +1197,6 @@ Unhinged Gale from Hell
 Oil-Stained Cyclone Destroyer
 The Diseased Whirly
 Drone of Smashed Doom
-Motherfucking Rotor
 The Savage Buzz
 The Chewing Fly Hazard
 The Cannibal Twister Bandit
@@ -1290,7 +1204,6 @@ Defiled Buzz Terror
 Whirly Purger
 The Moaning Chopper
 Kite of Mutilated Doom
-Motherfucking Mosquito
 Spinner Destroyer
 The Gristle Blade
 The Reeking Cyclone
@@ -1305,13 +1218,9 @@ Flaming Exile
 Mosquito of Puking Doom
 Vortex Cleaver
 The Scrap Chopper Snapper
-Motherfucking Twister
 Wretched Fly Bandit
 Glider of Scab Doom
-Motherfucking Propeller
-Motherfucking Glider
 Propeller of Trash Doom
-Motherfucking Blade
 The Crushed Whirly
 Biting Choker
 Trash Drone from Hell
@@ -1347,12 +1256,9 @@ Cyclone Breaker
 Death Gale from Hell
 Burning Gale from Hell
 The Hellish Twister
-Motherfucking Whirly
 The Defiled Rotor
 Charred Whirly from Hell
-Motherfucking Cyclone
 Dripping Glider from Hell
-Motherfucking Vortex
 The Fly Terminal
 The Oozing Fan Looter
 Chopper Melter
@@ -1406,7 +1312,6 @@ Skinned Vortex from Hell
 Glider Crusher
 The Wasted Whirly Outlaw
 Chopper Chewer
-Motherfucking Gale
 The Bloody Drone Puker
 The Sizzling Mosquito Bandit
 Puking Buzz Purger
@@ -1415,11 +1320,9 @@ Cursed Kite from Hell
 
 --- ICE CREAM TRUCK ---
 Meltdown Mangler
-Motherfucking Meltdown
 The Rattling Sugar-Rush Scavenger
 Blighted Chiller Stomper
 Seething Cavity from Hell
-Motherfucking Gelato
 The Scrap Freezer
 Venomous Jingle Vomiter
 Boiling Gelato from Hell
@@ -1456,18 +1359,15 @@ The Retching Sundae
 The Jingle Rancid
 Atomic Freezer Spitter
 The Doom Lolly
-Motherfucking Freezer
 Syrup Slut
 Stinking Chiller from Hell
 The Smashed Popsicle Exile
 Cavity Crapper
 Sweaty Strangler
-Motherfucking Lolly
 Chiller Obliterator
 The Blood-Soaked Meltdown Strangler
 Cone of Ashen Doom
 Sweet-Tooth Puncher
-Motherfucking Wafer
 Gutted Gelato from Hell
 Nuke Sweet-Tooth Eviscerator
 Gouged Meltdown from Hell
@@ -1482,14 +1382,12 @@ Cursed Impaler
 Chiller Scalper
 Meaty Sweet-Tooth Annihilator
 Wretched Chiller Desecrator
-Motherfucking Sundae
 Chiller of Acidic Doom
 Seething Sprinkle from Hell
 The Sundae Bone
 The Gelato Gouged
 Wafer Scourge
 Scrap Strangler
-Motherfucking Sweet-Tooth
 Popsicle Bandit
 The Blighted Sweet-Tooth Shitter
 Sugar-Rush of Mutilated Doom
@@ -1498,9 +1396,7 @@ Stinking Sweet-Tooth from Hell
 The Sprinkle Cannibal
 Jagged Cavity from Hell
 Plagued Cone from Hell
-Motherfucking Chiller
 Mangled Chiller Twister
-Motherfucking Jingle
 Biting Sugar-Rush from Hell
 Atomic Sundae from Hell
 The Chime Drooling
@@ -1516,7 +1412,6 @@ Meltdown Biter
 Spewing Gelato from Hell
 Howling Freezer Tearer
 Syrup of Armored Doom
-Motherfucking Cavity
 Freezer Violator
 The Sweet-Tooth Crushed
 Lolly Thief
@@ -1581,7 +1476,6 @@ Bolted Jingle from Hell
 Blood-Soaked Meltdown from Hell
 Radioactive Decapitator
 Cone of Spiked Doom
-Motherfucking Slushie
 Gutted Wafer Dumper
 Lolly of Flesh Doom
 The Cone Scorched
@@ -1592,7 +1486,6 @@ The Meltdown Bone
 Popsicle Mower
 Seething Slushie from Hell
 Armored Menace
-Motherfucking Popsicle
 The Sweaty Slushie Dumper
 The Caustic Lolly
 Grim Gouger
@@ -1618,7 +1511,6 @@ The Slushie Grinding
 --- MOTORHOME ---
 Bastardized Hovel Pounder
 The Shattered Shed
-Motherfucking Awning
 The Sizzling Outhouse Smasher
 Ashen Scalper
 Toilet Skinner
@@ -1629,16 +1521,13 @@ Hovel Carver
 Campsite of Unstable Doom
 Charred Hovel from Hell
 Winnebago Loser
-Motherfucking Tent
 The Clanking Shack Slicer
 Porta-John Outcast
 The Retching Shed
 Groaning Beheader
 Flayed Toilet Bitch
 Pissed Melter
-Motherfucking Toilet
 The Winnebago Leaking
-Motherfucking Bungalow
 Porta-John of Blistering Doom
 The Smoldering Caravan Mower
 Reeking Shed from Hell
@@ -1650,18 +1539,15 @@ Outhouse of Volatile Doom
 Desolate Drowner
 Chewing Exile
 Camper Twister
-Motherfucking Trailer
 Fatal Hovel Looter
 The Bloody Hut
 Sweaty Hovel Eradicator
 Cabin Thief
 Retching Winnebago Choker
 Lethal Hazard
-Motherfucking Hovel
 Festering RV Ruiner
 Crazed Porta-John Outcast
 Shack Eviscerator
-Motherfucking Hut
 Oozing Violator
 The Porta-John Blood-Soaked
 Brutal Shed Choker
@@ -1703,7 +1589,6 @@ The Blighted Hut Convict
 Gristle Hovel from Hell
 Retching Hovel from Hell
 The Weaponized Hut Slut
-Motherfucking Campsite
 Death Breaker
 Hellish Cabin Twister
 Psychotic Toilet Choker
@@ -1713,10 +1598,8 @@ Shed of Chewing Doom
 Hovel Reject
 Meaty Camper from Hell
 The Shed Stinking
-Motherfucking Shed
 The Hellish RV Chomper
 The Savage Hovel
-Motherfucking Porta-John
 Chewing Violator
 The Shed Blighted
 Hut Choker
@@ -1787,7 +1670,6 @@ Leaking Spitter
 The Scrap Bungalow Gutter
 Lethal Camper Thief
 Melting Choker
-Motherfucking Camper
 The Sizzling Shack
 Volatile Tent Purger
 The Riveted Hut Skinner
@@ -1798,18 +1680,15 @@ Porta-John of Rotting Doom
 Mutant Camper Butcher
 The Acidic Hut
 Choking Grinder
-Motherfucking Cabin
 The Boiling Tent
 The Unhinged Trailer Gouger
 The Spiteful Camper Desecrator
 Caravan Cleanser
 The Winnebago Puking
-Motherfucking Shack
 The Crushed Awning
 Hut of Radioactive Doom
 The Smashed Trailer
 Smashed Winnebago from Hell
-Motherfucking RV
 Death Disemboweler
 The Atomic Awning
 Chewing Cabin Horror
@@ -1820,7 +1699,6 @@ Charred Shack from Hell
 --- PERFORMANCE CAR ---
 Ruined Viper Raider
 Nitrous of Dust-Caked Doom
-Motherfucking Muscle
 Pony of Barbed Doom
 The Spoiler Rattling
 Cannibal Drifter from Hell
@@ -1852,7 +1730,6 @@ The Barren Drifter Outlaw
 The Rim Nuke
 The Ruined Alloy
 Brat Skinner
-Motherfucking Brat
 Drifter Basher
 The Alloy Pissed
 Nitrous Menace
@@ -1875,7 +1752,6 @@ Pony of Wasted Doom
 Sludge Nitrous from Hell
 The Showoff Gnashing
 Desolate Flash from Hell
-Motherfucking Cheetah
 The Crusty Rim
 Cheetah Stinker
 The Flash Frothing
@@ -1888,7 +1764,6 @@ Pony Skinner
 The Reeking Spoiler
 Grease-Slicked Nitrous from Hell
 Manic Crusher
-Motherfucking Stallion
 Sleaze of Vomit Doom
 Viper Raider
 The Mangled Sleaze
@@ -1897,14 +1772,12 @@ Death Dumper
 Spoiler Menace
 Spoiler Looter
 Riveted Muscle from Hell
-Motherfucking Drifter
 The Rim Pissed
 Nitrous Exterminator
 The Blistering Cheetah
 Acidic Exotic Stomper
 The Cobra Hacking
 The Brat Slag
-Motherfucking Flash
 Vomit Reject
 Grease-Slicked Swallower
 Cobra of Groaning Doom
@@ -1935,14 +1808,12 @@ Stallion Bitch
 The Drooling Exotic Eradicator
 The Muscle Trembling
 Crazed Showoff from Hell
-Motherfucking Pony
 Chewing Rim Chewer
 Gutted Pimp from Hell
 Wailing Pimp Squeezer
 The Viper Caustic
 Gristle Viper Dumper
 The Flash Ash-Choked
-Motherfucking Showoff
 Rim of Rotting Doom
 The Reeking Flash
 The Sizzling Alloy Purger
@@ -1950,9 +1821,7 @@ Mutilated Showoff Dumper
 Barbed Tearer
 Trembling Cobra from Hell
 Quaking Muscle from Hell
-Motherfucking Viper
 Pony Chomper
-Motherfucking Exotic
 Warped Flash from Hell
 The Oil-Stained Cobra Bender
 Unhinged Exotic from Hell
@@ -1970,7 +1839,6 @@ Volatile Eater
 The Bone Rim
 The Scrap Cobra Beheader
 The Drooling Viper Pounder
-Motherfucking Sleaze
 The Cobra Barbed
 Frothing Pony Crapper
 Foaming Nitrous Spitter
@@ -2000,7 +1868,6 @@ Exploding Swallower
 The Jagged Nitrous Crapper
 Turbo of Crusty Doom
 Crushed Destroyer
-Motherfucking Cobra
 Weaponized Rim from Hell
 The Muscle Foaming
 Brat Dicer
@@ -2009,7 +1876,6 @@ The Shattered Pony Crapper
 The Pimp Wailing
 Slag Turbo Exile
 Atomic Drifter from Hell
-Motherfucking Pimp
 The Sun-Baked Spoiler
 Drifter Hazard
 The Nitrous Flesh
@@ -2038,17 +1904,11 @@ Chewing Bed from Hell
 Boiling Beast from Hell
 Bed Dicer
 Leaking Hitch from Hell
-Motherfucking Hauler
 The Retching Camel Eater
-Motherfucking Camel
 Acidic Bender
-Motherfucking Mule
-Motherfucking Donkey
 Caustic Raider
 The Smashed Dually Dicer
 Beast Tearer
-Motherfucking Hitch
-Motherfucking Winch
 The Armored Mule
 Trembling Skinner
 The Spewing Ass
@@ -2059,7 +1919,6 @@ Feral Tow from Hell
 The Gnashing Cargo Cleaver
 The Infectious Flatbed
 Blood-Soaked Mule Threat
-Motherfucking Tow
 The Screeching Hitch
 Trash Ass Outcast
 The Tailgate Rusty
@@ -2074,7 +1933,6 @@ Bed Terror
 Beast Swallower
 The Frothing Flatbed Puncture
 Mangled Ass from Hell
-Motherfucking Brahman
 Brutal Grinder
 The Psychotic Cargo Shitter
 Puking Smasher
@@ -2110,7 +1968,6 @@ Manic Ox from Hell
 Donkey Scourge
 Bed of Spiteful Doom
 The Donkey Dust-Caked
-Motherfucking Beast
 Flatbed of Puking Doom
 The Trash Camel Pounder
 The Frothing Tow Exterminator
@@ -2122,9 +1979,7 @@ Winch Horror
 Ox of Cannibal Doom
 The Frothing Mule Smasher
 Beast of Spiteful Doom
-Motherfucking Workhorse
 Acidic Workhorse from Hell
-Motherfucking Flatbed
 The Screaming Camel Choker
 Camel Breaker
 Tow Convict
@@ -2206,7 +2061,6 @@ Sludge Annihilator
 Bed Mower
 The Lethal Bed Reject
 Gutted Wrecker
-Motherfucking Bed
 Tow Ruiner
 Camel Menace
 Hauler of Plagued Doom
@@ -2231,17 +2085,14 @@ Ass Terror
 Ass of Burning Doom
 Vicious Ox Mangler
 Donkey of Crusty Doom
-Motherfucking Brahman
 Ashen Flatbed Ruiner
 Barren Beast Slicer
 The Deranged Cab
-Motherfucking Cargo
 The Meaty Camel Basher
 The Mule Blistering
 Clanking Tailgate from Hell
 Festering Donkey Smasher
 Bed of Sludge Doom
-Motherfucking Dually
 Tow of Warped Doom
 Ox of Gore Doom
 Cargo Grinder
@@ -2261,10 +2112,7 @@ Infectious Scourge
 Terminal Winch from Hell
 Seething Ox Annihilator
 Rancid Tailgate Horror
-Motherfucking Bed
-Motherfucking Hauler
 Donkey Hazard
-Motherfucking Cab
 The Workhorse Rusted
 Crazed Tow Pounder
 Biting Workhorse Swallower
@@ -2279,13 +2127,11 @@ Ox of Melting Doom
 Hauler Kicker
 The Gutted Flatbed Desecrator
 Foaming Tailgate Thrasher
-Motherfucking Tailgate
 Cannibal Cab from Hell
 Trash Exile
 The Tailgate Cursed
 Brahman Chopper
 Biting Bed from Hell
-Motherfucking Beast
 The Ash-Choked Camel Puncture
 The Venomous Tailgate
 Deranged Tow Gouger
@@ -2296,7 +2142,6 @@ The Choking Workhorse Raider
 The Oil-Stained Tow
 Barbed Cargo from Hell
 Tow Kicker
-Motherfucking Hitch
 Donkey of Scrap Doom
 Infectious Melter
 The Hacking Cab
@@ -2315,12 +2160,9 @@ Brahman Chomper
 Retching Bandit
 Rattling Donkey from Hell
 Desolate Mangler
-Motherfucking Mule
 Ass Scalper
 Workhorse Annihilator
 The Winch Barbed
-Motherfucking Camel
-Motherfucking Tow
 Mule Chewer
 Savage Beast Tearer
 The Psychotic Camel Stomper
@@ -2357,7 +2199,6 @@ Smashed Dually Impaler
 Radioactive Flatbed Twister
 The Slag Winch Bandit
 Dust-Caked Cab from Hell
-Motherfucking Workhorse
 The Hate Flatbed
 The Hauler Gouged
 Tow of Twisted Doom
@@ -2427,7 +2268,6 @@ Hauler Eradicator
 The Grim Ironclad
 The Chewing Vault
 Vault Ruiner
-Motherfucking Brick
 The Spiked Armadillo
 Rhino of Jagged Doom
 Lethal Exterminator
@@ -2439,7 +2279,6 @@ Ironclad of Charred Doom
 The Turtle Festering
 The Rampart Wasted
 Gagging Shield from Hell
-Motherfucking Safe
 Citadel of Barbed Doom
 The Barren Turtle
 The Desolate Slab Exile
@@ -2449,7 +2288,6 @@ Weeping Block Vomiter
 Shield Pounder
 The Skinned Brick
 The Diseased Bunker
-Motherfucking Anvil
 The Flaming Phalanx Disemboweler
 The Block Frothing
 The Ash-Choked Rhino
@@ -2469,7 +2307,6 @@ The Drooling Turtle Cleanser
 The Unhinged Pillbox
 Barren Vault Shitter
 Burning Pillbox from Hell
-Motherfucking Pillbox
 The Blood-Soaked Slab
 The Foaming Plating Chomper
 The Groaning Rhino Swallower
@@ -2479,14 +2316,12 @@ The Pillbox Rancid
 The Citadel Dust-Caked
 Weeping Citadel from Hell
 Boiling Plating from Hell
-Motherfucking Phalanx
 Foaming Vault Scalper
 Scab Chewer
 The Slag Bunker
 The Vicious Fortress Bane
 Brick Tearer
 Turtle of Hellish Doom
-Motherfucking Citadel
 Guttural Citadel from Hell
 Brick Loser
 Anvil of Sweaty Doom
@@ -2539,10 +2374,8 @@ Citadel Violator
 Guttural Chomper
 Ashen Mangler
 Drooling Rhino Swallower
-Motherfucking Bunker
 The Blood-Soaked Anvil
 The Meaty Turtle Chewer
-Motherfucking Slab
 Ironclad Choker
 Melting Anvil from Hell
 The Diseased Pillbox Tearer
@@ -2576,7 +2409,6 @@ The Anvil Guttural
 Rhino of Gnarly Doom
 Bunker Exterminator
 The Venomous Slab Tearer
-Motherfucking Rhino
 Rhino of Festering Doom
 Clanking Brick from Hell
 Reeking Flayer
@@ -2594,7 +2426,6 @@ The Spiteful Vault Smasher
 Rotting Vault from Hell
 The Gnashing Plating
 Frothing Plating from Hell
-Motherfucking Fortress
 Stinking Slab Burner
 Crusty Turtle Reject
 Ruined Disemboweler
@@ -2626,15 +2457,11 @@ Hate Block Skinner
 The Putrid Bunker Ruiner
 
 --- BUS ---
-Motherfucking Cruiser
-Motherfucking School
 Wretched Convict
 Sludge Puncture
 Mutilated People-Eater Biter
 The Shortbus Reeking
 Shortbus Destroyer
-Motherfucking Ark
-Motherfucking Shuttle
 Festering Shuttle Disemboweler
 The Vessel Hacking
 The Ferry Brutal
@@ -2687,7 +2514,6 @@ Zeppelin of Gristle Doom
 Volatile Ferry Convict
 Grim Tram Loser
 Coach Dumper
-Motherfucking Tram
 The Nuke Barge
 Tram Cleaver
 The Clanking Galleon
@@ -2699,7 +2525,6 @@ The Venomous Transit Disemboweler
 Transit Bane
 Putrid Crapper
 Spiked Shuttle from Hell
-Motherfucking Carrier
 The Shuttle Welded
 The Choking Transit
 The Clanking Ferry Scourge
@@ -2773,7 +2598,6 @@ The Spiteful People-Eater
 The Galleon Slag
 Chewing Cruiser from Hell
 The Sun-Baked Barge
-Motherfucking Transport
 Transport of Wasted Doom
 The Defiled Carrier Skinner
 Galleon of Bastardized Doom
@@ -2790,21 +2614,17 @@ The Unhinged Zeppelin Cleaver
 The Shuttle Riveted
 Transit of Diseased Doom
 Shortbus Choker
-Motherfucking Omnibus
 Exploding Carver
 The Defiled Trolley
-Motherfucking Barge
 Barge Obliterator
 The Shortbus Mutant
 Foaming School from Hell
 Flaming Reject
-Motherfucking Zeppelin
 The Doom Zeppelin Thrasher
 The Scorched Zeppelin Decapitator
 Carrier Strangler
 Retching Snapper
 Gutted Shortbus Gutter
-Motherfucking Vessel
 The Spiked Transport Eradicator
 Diseased Trolley from Hell
 The Death Ferry Swallower
@@ -2829,7 +2649,6 @@ Bastardized Trolley from Hell
 
 --- HEAVY TRUCK ---
 Dripping Mangler
-Motherfucking Rig
 The Lethal Soot
 Lorry Shitter
 Juggernaut Swallower
@@ -2837,12 +2656,10 @@ Fumes of Gagging Doom
 The Shattered Chimney
 Freight Snapper
 The Dust-Caked Lorry
-Motherfucking Hauler
 Blistering Chopper
 Cargo Annihilator
 Grinding Thrasher
 Smog of Spitting Doom
-Motherfucking Semi
 The Warped Juggernaut
 Hauler Exterminator
 Reeking Cargo Grinder
@@ -2875,8 +2692,6 @@ Howling Bender
 Semi of Flesh Doom
 Blighted Gouger
 Semi of Nuke Doom
-Motherfucking Diesel
-Motherfucking Smog
 Ruined Eighteen-Wheeler Spitter
 The Bloody Diesel Impaler
 The Mutilated Diesel
@@ -2887,7 +2702,6 @@ The Bloody Rig
 Psychotic Trailer from Hell
 The Soot Death
 Gore Butcher
-Motherfucking Trailer
 Chimney Obliterator
 The Lorry Charred
 The Quaking Diesel
@@ -2895,7 +2709,6 @@ Diseased Lorry Melter
 Caustic Annihilator
 Melting Skinner
 The Chimney Puking
-Motherfucking Eighteen-Wheeler
 The Hellish Smog
 Wretched Defiler
 Cab of Gutted Doom
@@ -2914,13 +2727,9 @@ Crushed Pusher from Hell
 The Vicious Juggernaut Spitter
 The Semi Gristle
 Warped Cab Bane
-Motherfucking Cargo
 Psychotic Slut
-Motherfucking Freight
 The Freight Savage
-Motherfucking Soot
 The Wasted Smog
-Motherfucking Cab
 The Rusted Hauler Obliterator
 Putrid Soot Bender
 Trailer of Weeping Doom
@@ -2928,10 +2737,8 @@ Juggernaut of Venomous Doom
 Blighted Hauler from Hell
 Bone Mangler
 The Leaking Lorry
-Motherfucking Lorry
 Pusher of Atomic Doom
 Riveted Chomper
-Motherfucking Chimney
 The Mutant Cab Breaker
 The Crushed Trailer
 Hauler of Flayed Doom
@@ -2956,7 +2763,6 @@ The Nuke Chimney Ripper
 Soot of Crusty Doom
 Groaning Soot Looter
 Eighteen-Wheeler of Rusted Doom
-Motherfucking Pusher
 Feral Cargo from Hell
 Diesel Flayer
 The Cab Terminal
@@ -2966,7 +2772,6 @@ The Tractor Unhinged
 Diesel Mower
 The Diesel Spewing
 Smog of Infectious Doom
-Motherfucking Fumes
 Mutilated Exterminator
 Unhinged Loser
 Trailer Hazard
@@ -3037,14 +2842,12 @@ The Vulture Trash
 Eagle Puncture
 Weeping Menace
 Stinking Wyvern Bane
-Motherfucking Vulture
 Dust-Caked Obliterator
 Infectious Gargoyle Chomper
 Bird Breaker
 Weaponized Bird Squeezer
 Harpy Slut
 The Riveted Condor
-Motherfucking Owl
 The Shrieking Bat Bitch
 Spewing Ruiner
 The Vulture Desolate
@@ -3063,23 +2866,19 @@ The Owl Wretched
 The Bat Sun-Baked
 The Crusty Hawk Pounder
 Bird Drowner
-Motherfucking Bat
 Seething Chewer
 The Hornet Foaming
 Crazed Exterminator
 The Smashed Bat
-Motherfucking Wasp
 Foaming Owl from Hell
 The Spitting Pterodactyl Stomper
 Raven Grinder
 The Eagle Desolate
 Crow Gutter
-Motherfucking Gargoyle
 The Hawk Vicious
 Harpy Outlaw
 The Slag Pterodactyl Stinker
 Raven Convict
-Motherfucking Falcon
 The Howling Eagle
 The Crow Bolted
 Bird of Rusty Doom
@@ -3133,7 +2932,6 @@ Putrid Owl Menace
 Wretched Eagle Skinner
 Vulture Stomper
 Dust-Caked Shredder
-Motherfucking Dragon
 Reeking Vulture Loser
 Vulture of Vomit Doom
 Smashed Gargoyle Cleaver
@@ -3141,7 +2939,6 @@ Armored Basher
 Pterodactyl Breaker
 The Unstable Falcon Burner
 Acidic Wasp from Hell
-Motherfucking Condor
 Drooling Raven from Hell
 Condor Squeezer
 Crow of Crusty Doom
@@ -3159,7 +2956,6 @@ Hellish Butcher
 The Diseased Eagle Disemboweler
 The Foaming Dragon
 Condor Scavenger
-Motherfucking Crow
 Skinned Hornet from Hell
 Groaning Crow Ruiner
 Psychotic Bat from Hell
@@ -3185,7 +2981,6 @@ Smashed Harpy from Hell
 Spiteful Vulture from Hell
 Sweaty Hornet Chopper
 Bird of Rusted Doom
-Motherfucking Wyvern
 Puking Outcast
 The Sun-Baked Condor Stomper
 The Filthy Locust
@@ -3213,7 +3008,6 @@ Dragon Cleaver
 The Ruined Vulture
 Wyvern Basher
 Bleeding Dragon Ruiner
-Motherfucking Hornet
 Puking Scourge
 The Owl Mutant
 Locust of Crushed Doom
@@ -3229,14 +3023,12 @@ The Boiling Raven
 The Rancid Eagle Hazard
 Guttural Twister
 The Crow Sweaty
-Motherfucking Locust
 
 --- MONSTER TRUCK ---
 The Behemoth Guttural
 Foaming Quake Pounder
 Barbed Roller Exile
 Manic Boot from Hell
-Motherfucking Boot
 Quake Twister
 Trembling Stomper Puncher
 Wailing Kicker
@@ -3244,12 +3036,10 @@ Tread Chopper
 Grim Swallower
 The Bastardized Godzilla Purger
 Acidic Menace
-Motherfucking Crusher
 The Crusher Flayed
 Meaty Crusher from Hell
 Goliath of Acidic Doom
 The Giant Unstable
-Motherfucking Troll
 Wailing Ogre from Hell
 The Behemoth Grinding
 Vile Troll from Hell
@@ -3272,7 +3062,6 @@ The Gutted Tread Obliterator
 The Leaking Titan Flayer
 Kong of Skinned Doom
 Titan Cleanser
-Motherfucking Goliath
 The Boiling Tremor Spitter
 The Giant Doom
 Rancid Tread Breaker
@@ -3291,7 +3080,6 @@ Barbed Ogre Melter
 The Wretched Ogre Breaker
 The Behemoth Stinking
 Retching Troll Slicer
-Motherfucking Colossus
 The Doom Crusher Convict
 Spewing Tremor from Hell
 The Rabid Roller Crapper
@@ -3314,10 +3102,8 @@ Radioactive Godzilla Slut
 Godzilla of Clanking Doom
 The Quaking Troll Reject
 Manic Crusher from Hell
-Motherfucking Kong
 Troll Hazard
 Kong of Crusty Doom
-Motherfucking Godzilla
 Boot Eradicator
 The Doom Quake
 Crushed Thief
@@ -3372,7 +3158,6 @@ Ashen Colossus Loser
 Murder Flayer
 The Scorched Behemoth
 The Giant Guttural
-Motherfucking Roller
 The Trembling Colossus
 The Mangled Stomper
 Ogre Chewer
@@ -3389,7 +3174,6 @@ The Busted Boot
 Titan Bane
 The Scrap Tremor Grinder
 The Trash Kong Skinner
-Motherfucking Quake
 The Foot Murder
 The Oil-Stained Cyclops Gutter
 Hate Foot Horror
@@ -3409,11 +3193,9 @@ Kong Defiler
 The Smashed Titan Menace
 Terminal Ruiner
 Nuke Convict
-Motherfucking Tremor
 Murder Titan from Hell
 Vile Cleaver
 Boot of Foaming Doom
-Motherfucking Tread
 Ashen Cyclops Destroyer
 Savage Crusher Reject
 The Crusher Leaking
@@ -3423,10 +3205,8 @@ Giant Wrecker
 The Tread Feral
 The Exploding Titan Melter
 Manic Colossus Exile
-Motherfucking Behemoth
 Caustic Ogre Fucker
 Tread Bane
-Motherfucking Foot
 Defiled Foot Crusher
 The Mutilated Giant Eradicator
 Tremor of Nuke Doom
@@ -3434,14 +3214,12 @@ Cannibal Bane
 Terminal Colossus Reject
 
 --- TANK ---
-Motherfucking Tread
 The Armor Unstable
 The Death Panzer Scourge
 Gatling of Guttural Doom
 The Shell Pissed
 Boiling Melter
 The Siege Warped
-Motherfucking Turret
 Gristle Skinner
 Trench Destroyer
 Rattling Mortar from Hell
@@ -3449,7 +3227,6 @@ Flak Purger
 Flaming Flak from Hell
 Boiling Siege Annihilator
 Howitzer of Jagged Doom
-Motherfucking Track
 The Brutal Mortar Grinder
 Trash Artillery Carver
 Festering Cannon Gutter
@@ -3476,7 +3253,6 @@ Smashed Mortar from Hell
 Defiled Panzer from Hell
 Ruined Panzer Bender
 Plagued Tusks Beheader
-Motherfucking Armor
 Sun-Baked Flak from Hell
 The Mortar Bleeding
 Siege Bender
@@ -3493,26 +3269,21 @@ The Groaning Siege Gutter
 Barrel Mower
 Radioactive Trench Drowner
 Caustic Gutter
-Motherfucking Mortar
 Gatling Mangler
 The Siege Unstable
 Bunker-Buster Thief
 The Wailing Trench
-Motherfucking Gatling
 The Artillery Bloody
 Howitzer of Dripping Doom
 The Grim Gatling
-Motherfucking Tusks
 The Desolate Artillery Swallower
 The Howitzer Crushed
 The Slag Trench
 The Cannon Grinding
 Biting Blitz from Hell
 Barrel of Nuke Doom
-Motherfucking Shell
 The Blitz Choking
 Gatling Cleaver
-Motherfucking Artillery
 Grinding Tread Eradicator
 The Hate Tread Slicer
 Blood-Soaked Scourge
@@ -3535,7 +3306,6 @@ The Barrel Manic
 Tusks of Sun-Baked Doom
 The Mutilated Howitzer Slut
 Mortar Annihilator
-Motherfucking Flak
 Rotting Blitz Smasher
 The Volatile Howitzer
 The Gatling Twisted
@@ -3558,14 +3328,11 @@ Twisted Trench Exterminator
 Spiked Flak from Hell
 Caustic Siege Horror
 The Manic Mortar Crapper
-Motherfucking Blitz
-Motherfucking Siege
 Flak of Dust-Caked Doom
 The Murder Mortar Mower
 Scorched Looter
 Barrel Gouger
 The Psychotic Cannon Breaker
-Motherfucking Panzer
 Armor of Mangled Doom
 Oozing Pounder
 The Howitzer Defiled
@@ -3610,7 +3377,6 @@ Weaponized Stinker
 Charred Menace
 Gore Mortar Bastard
 The Skinned Panzer
-Motherfucking Barrel
 The Panzer Vicious
 Atomic Bandit
 Blitz of Terminal Doom
@@ -3628,21 +3394,16 @@ The Welded Bunker-Buster
 The Screaming Gatling
 Ashen Ripper
 Grease-Slicked Skinner
-Motherfucking Trench
 Tusks Twister
 Guttural Cannon Puker
 The Festering Tread
 Flak Twister
-Motherfucking Howitzer
 
 --- WAR RIG ---
 The Bloody Leviathan Bender
-Motherfucking Fortress
-Motherfucking Beast
 Blighted Swarm from Hell
 The Retching Swarm
 Bolted Horde from Hell
-Motherfucking Bastion
 Venomous Dreadnought Purger
 The Titan Screaming
 Mammoth of Warped Doom
@@ -3675,7 +3436,6 @@ Riveted Kraken from Hell
 Horde of Radioactive Doom
 Moaning Looter
 The Convoy Drooling
-Motherfucking Monolith
 Megalodon of Sizzling Doom
 The Megalodon Spitting
 Burning Bandit
@@ -3690,7 +3450,6 @@ The Bastardized Beast
 The Frothing Armada Chomper
 Exploding Decapitator
 Scab Chewer
-Motherfucking Titan
 Gnashing Leviathan Threat
 Mastodon of Filthy Doom
 Citadel Butcher
@@ -3701,7 +3460,6 @@ Swarm Grinder
 Cannibal Smasher
 The Gutted Kraken Loser
 Gargantua Bane
-Motherfucking Horde
 Choking Fortress from Hell
 The Spitting Mammoth
 The Convoy Slag
@@ -3713,9 +3471,6 @@ Moaning Twister
 The Titan Murder
 The Ashen Bastion Kicker
 Groaning Mastodon from Hell
-Motherfucking Swarm
-Motherfucking Mastodon
-Motherfucking Convoy
 The Megalodon Infectious
 The Meaty Train Puncher
 The Feral Bastion Bandit
@@ -3754,7 +3509,6 @@ The Swarm Ash-Choked
 Monolith Vomiter
 The Mammoth Murder
 The Horde Venomous
-Motherfucking Mammoth
 Bastion of Flayed Doom
 Titan of Rusty Doom
 Rusty Convoy from Hell
@@ -3801,15 +3555,12 @@ Scrap Kraken from Hell
 The Sun-Baked Monolith
 Foaming Megalodon Puker
 The Gargantua Hellish
-Motherfucking Armada
 Unhinged Titan Desecrator
 Fortress Choker
 The Blistering Megalodon
 The Howling Convoy
 Bastion Defiler
 The Bleeding Mastodon
-Motherfucking Kraken
-Motherfucking Citadel
 The Mammoth Frothing
 Rotting Citadel from Hell
 Choking Bastion Decapitator
@@ -3817,7 +3568,6 @@ The Manic Leviathan Crusher
 Deranged Citadel from Hell
 The Flayed Horde
 Frothing Armada from Hell
-Motherfucking Megalodon
 Citadel Slicer
 The Fortress Dripping
 The Infectious Titan
