@@ -35,6 +35,7 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 - **Mobile-Adaptive Comms Sheet:** Floating resizable/draggable window on desktop; sleek slide-up bottom-sheet drawer with collapsible roster on phones.
 - **Audio FX Synthesizer:** Pure Web Audio API synthesizers provide retro radio and alert chimes, with a global "Mute All Sounds" toggle in Settings and the Comms window.
 - **Driver Call-Signs & Commands:** Set persistent nicknames or use IRC-style slash commands (`/nick`, `/me`, `/clear`, `/help`).
+  - **Direct Private Messaging Windows:** Double-clicking any driver on the right-hand active roster (or tapping their 💬 icon) opens a private message window between those two users. Features multi-window conversation support, unread counters, audio chimes, and `/msg` / `/query` radio commands.
 
 ### 4. Full Garage Vehicle Builder
 - **Complete Ruleset Database:** All official vehicle chassis (Buggy, Car, Performance Car, Truck, Heavy Truck, Monster Truck, Bus, Gyrocopter, Tank, War Rig, Helicopter, Ambulance, etc.).
@@ -69,6 +70,7 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 ## 🏷️ Version History
 
 ### v1.0.5 - Current Release (02.11.26)
+- **Encrypted Peer-to-Peer Private Messaging:** Double-click any driver in the active comms roster to launch an independent direct message window. Seamless multi-conversation management, direct radio commands (`/msg`, `/query`), and real-time cross-network private transmission.
 - **Smartphone Portrait Tabletop Overhaul:** Full layout optimization for mobile phones (360px–430px portrait). Eliminated all horizontal stretching and overflow.
 - **Zero-Truncation Turn & Gear Phase Tracker:** Game Turn (`- 1 +`) and Gear Phase buttons (`[1][2][3][4][5][6]`) fit side-by-side on Row 1 without wrapping; Dice controls fit cleanly on Row 2.
 - **Collapsible Audience Votes HUB:** Compact counter with quick `+1 Vote` and collapsible `🎟️ Perks ▾` toggle to conserve 250px+ vertical dashboard height.
