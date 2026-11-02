@@ -3900,6 +3900,8 @@ Thanks to Mike for being ace.</p>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">02.11.26</span>
                     </div>
                     <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Wasteland Vehicle Name Auto Generator:</strong> Deep vehicle-type-specific name generator matrix (150+ adjectives, 80+ suffixes, tailored noun dictionaries for all 16 chassis) plus a 🎲 quick-roll button on every garage vehicle card.</li>
+
                         <li><strong>Direct Private Messaging Windows:</strong> Double-clicking any driver on the right-hand active roster (or clicking their 💬 quick button) opens an independent private message window between those two users. Includes multi-window floating chats, unread counters, audio chimes, and <code>/msg</code> &amp; <code>/query</code> radio commands.</li>
 
                         <li><strong>Smartphone Portrait Tabletop Overhaul:</strong> Ultra-refined layouts specifically tailored for narrow mobile screens (360px–430px). Eliminated all horizontal viewport stretching and clipping.</li>
@@ -4371,14 +4373,105 @@ Thanks to Mike for being ace.</p>
             "Rusty's Bootleggers": { color: "#b45309", glow: "rgba(180, 83, 9, 0.25)" }
         };
 
-        const RANDOM_NAMES = [
-            "Road Warrior", "V8 Interceptor", "Rusty Bullet", "Desert Fox", "Death Dealer",
-            "Chrome Fury", "Asphalt Assassin", "Doomsday Rider", "Bone Shaker", "Oil Slicker",
-            "Mishkin's Wrath", "Idris Speedster", "Miyazaki Drift", "Rutherford Tank",
-            "The Warden's Coffin", "Scarlett Sails", "Highway Interceptor", "Verney's Monster",
-            "Maxxine's Swan", "Infernal Engine", "Beverly's Ghost", "Rusty's Moonshine",
-            "Slime's Chook", "Spike Striker", "Nitro Beast", "Thunder Road", "War Rig Cab"
+// ==========================================
+        // VEHICLE TYPE SPECIFIC NAME AUTO GENERATOR
+        // ==========================================
+        const VEHICLE_NAME_ADJECTIVES = [
+            "Pissed", "Bloody", "Feral", "Rabid", "Gutted", "Rusty", "Screaming", 
+            "Vomit", "Hellish", "Gore", "Scab", "Putrid", "Savage", "Mutant", 
+            "Filthy", "Slag", "Nuke", "Trash", "Bone", "Flesh", "Scrap", "Murder", 
+            "Death", "Grim", "Vile", "Toxic", "Sludge", "Doom", "Hate", "Spiteful",
+            "Gristle", "Shattered", "Spiked", "Barbed", "Mutilated", "Ashen",
+            "Rancid", "Rotting", "Blistering", "Radioactive", "Festering", "Sizzling", 
+            "Mangled", "Scorched", "Vicious", "Brutal", "Psychotic", "Manic", 
+            "Frothing", "Dripping", "Oozing", "Crusty", "Sweaty", "Stinking", "Reeking", 
+            "Guttural", "Shrieking", "Howling", "Crazed", "Deranged", "Unhinged", 
+            "Bastardized", "Defiled", "Ruined", "Cursed", "Wretched", "Twisted", 
+            "Warped", "Gnarly", "Jagged", "Leaking", "Rusted", "Busted", "Smashed", 
+            "Crushed", "Welded", "Bolted", "Riveted", "Armored", "Weaponized", 
+            "Lethal", "Fatal", "Terminal", "Infectious", "Diseased", "Plagued", 
+            "Blighted", "Ash-Choked", "Dust-Caked", "Sun-Baked", "Blood-Soaked", 
+            "Oil-Stained", "Grease-Slicked", "Venomous", "Acidic", "Caustic", 
+            "Burning", "Charred", "Smoldering", "Flaming", "Exploding", "Volatile", 
+            "Unstable", "Atomic", "Wasted", "Barren", "Desolate", "Cannibal", 
+            "Meaty", "Skinned", "Flayed", "Bleeding", "Spewing", "Hacking", 
+            "Choking", "Gagging", "Puking", "Retching", "Foaming", "Seething", 
+            "Boiling", "Melting", "Quaking", "Trembling", "Rattling", "Clanking", 
+            "Grinding", "Screeching", "Moaning", "Groaning", "Weeping", "Wailing", 
+            "Gnashing", "Biting", "Chewing", "Spitting", "Drooling", "Gouged"
         ];
+
+        const VEHICLE_NAME_SUFFIXES = [
+            "Bastard", "Bitch", "Fucker", "Slut", "Eater", "Grinder", "Smasher", 
+            "Spitter", "Stomper", "Ripper", "Tearer", "Pounder", "Basher", "Mangler", 
+            "Mower", "Burner", "Melter", "Crusher", "Shredder", "Thrasher", "Gouger",
+            "Kicker", "Puncher", "Breaker", "Snapper", "Bender", "Twister", "Squeezer", 
+            "Choker", "Strangler", "Drowner", "Impaler", "Puncture", "Slicer", "Dicer", 
+            "Chopper", "Cleaver", "Butcher", "Carver", "Flayer", "Skinner", "Scalper", 
+            "Beheader", "Decapitator", "Gutter", "Disemboweler", "Eviscerator", 
+            "Chewer", "Chomper", "Biter", "Swallower", "Vomiter", "Puker", "Shitter", 
+            "Crapper", "Dumper", "Stinker", "Defiler", "Desecrator", "Violator", 
+            "Ruiner", "Wrecker", "Destroyer", "Annihilator", "Obliterator", "Eradicator", 
+            "Exterminator", "Purger", "Cleanser", "Scourge", "Bane", "Terror", "Horror", 
+            "Menace", "Threat", "Hazard", "Loser", "Reject", "Outcast", "Exile", 
+            "Scavenger", "Looter", "Raider", "Thief", "Bandit", "Outlaw", "Convict"
+        ];
+
+        const VEHICLE_NOUNS_BY_TYPE = {
+            "Bike": ["Pedal", "Spoke", "Saddle", "Wheel", "Chain", "Handlebar", "Kickstand", "Sprocket", "Fork", "Peg", "Axle", "Grip", "Tire", "Frame", "Clutch", "Throttle", "Exhaust", "Strut"],
+            "Bike with Sidecar": ["Coffin", "Twin", "Growth", "Tumor", "Parasite", "Barnacle", "Appendage", "Wart", "Blister", "Cyst", "Leech", "Burden", "Luggage", "Slab", "Pouch", "Bucket"],
+            "Buggy": ["Flea", "Tick", "Roach", "Hopper", "Toad", "Cricket", "Locust", "Mantis", "Beetle", "Scarab", "Grub", "Maggot", "Spider", "Scorpion", "Centipede", "Ant", "Mite", "Gnat"],
+            "Drag Racer": ["Dart", "Missile", "Bullet", "Spear", "Rocket", "Streak", "Torpedo", "Javelin", "Arrow", "Spike", "Needle", "Bolt", "Laser", "Comet", "Meteor", "Slingshot", "Rail", "Projectile"],
+            "Ambulance": ["Hearse", "Meatwagon", "Bandage", "Corpse-Hauler", "Bed", "Gurney", "Stretcher", "IV", "Syringe", "Scalpel", "Morgue", "Clinic", "Ward", "Asylum", "Hospice", "Medic", "Bandaid", "Suture"],
+            "Car": ["Sedan", "Jalopy", "Wreck", "Bucket", "Clunker", "Ride", "Hooptie", "Banger", "Heap", "Rustbucket", "Lemon", "Pinto", "Chassis", "Coupe", "Wagon", "Cruiser", "Hatchback", "Beater"],
+            "Gyrocopter": ["Chopper", "Blade", "Whirly", "Rotor", "Fly", "Buzz", "Mosquito", "Drone", "Propeller", "Fan", "Spinner", "Glider", "Kite", "Hover", "Vortex", "Cyclone", "Twister", "Gale"],
+            "Ice Cream Truck": ["Sundae", "Cone", "Lolly", "Sweet-Tooth", "Chime", "Popsicle", "Gelato", "Wafer", "Sprinkle", "Syrup", "Freezer", "Chiller", "Meltdown", "Sugar-Rush", "Cavity", "Slushie", "Jingle"],
+            "Motorhome": ["Trailer", "Shack", "Cabin", "Toilet", "RV", "Shed", "Camper", "Awning", "Outhouse", "Bungalow", "Tent", "Hut", "Hovel", "Caravan", "Winnebago", "Campsite", "Porta-John"],
+            "Performance Car": ["Sleaze", "Pimp", "Flash", "Showoff", "Brat", "Turbo", "Nitrous", "Spoiler", "Rim", "Alloy", "Exotic", "Drifter", "Pony", "Muscle", "Stallion", "Viper", "Cobra", "Cheetah"],
+            "Pickup Truck": ["Bed", "Hauler", "Flatbed", "Mule", "Ass", "Ox", "Tailgate", "Tow", "Hitch", "Winch", "Dually", "Cab", "Cargo", "Donkey", "Beast", "Workhorse", "Brahman", "Camel"],
+            "Truck": ["Bed", "Hauler", "Flatbed", "Mule", "Ass", "Ox", "Tailgate", "Tow", "Hitch", "Winch", "Dually", "Cab", "Cargo", "Donkey", "Beast", "Workhorse", "Brahman", "Camel"],
+            "APC": ["Brick", "Block", "Safe", "Bunker", "Vault", "Slab", "Pillbox", "Fortress", "Shield", "Plating", "Phalanx", "Rampart", "Citadel", "Ironclad", "Turtle", "Armadillo", "Rhino", "Anvil"],
+            "Bus": ["Transit", "Coach", "School", "Shortbus", "People-Eater", "Trolley", "Tram", "Omnibus", "Shuttle", "Carrier", "Transport", "Vessel", "Barge", "Ferry", "Cruiser", "Galleon", "Ark", "Zeppelin"],
+            "Heavy Truck": ["Rig", "Lorry", "Tractor", "Cab", "Diesel", "Smog", "Semi", "Trailer", "Eighteen-Wheeler", "Freight", "Cargo", "Juggernaut", "Hauler", "Pusher", "Grinder", "Soot", "Fumes", "Chimney"],
+            "Helicopter": ["Bird", "Hawk", "Vulture", "Condor", "Bat", "Wasp", "Hornet", "Eagle", "Falcon", "Crow", "Raven", "Owl", "Gargoyle", "Harpy", "Wyvern", "Dragon", "Pterodactyl", "Locust"],
+            "Monster Truck": ["Foot", "Boot", "Tread", "Roller", "Behemoth", "Giant", "Titan", "Goliath", "Colossus", "Ogre", "Troll", "Cyclops", "Kong", "Godzilla", "Stomper", "Crusher", "Quake", "Tremor"],
+            "Tank": ["Barrel", "Track", "Shell", "Armor", "Cannon", "Trench", "Turret", "Tread", "Howitzer", "Artillery", "Mortar", "Panzer", "Blitz", "Gatling", "Flak", "Bunker-Buster", "Siege", "Tusks"],
+            "War Rig": ["Leviathan", "Train", "Convoy", "Dreadnought", "Titan", "Beast", "Kraken", "Mastodon", "Mammoth", "Monolith", "Gargantua", "Megalodon", "Fortress", "Citadel", "Bastion", "Armada", "Horde", "Swarm"]
+        };
+
+        function generateVehicleName(vehicleType) {
+            const nouns = VEHICLE_NOUNS_BY_TYPE[vehicleType] || VEHICLE_NOUNS_BY_TYPE["Car"] || ["Jalopy", "Wreck", "Rustbucket"];
+            const adj = VEHICLE_NAME_ADJECTIVES[Math.floor(Math.random() * VEHICLE_NAME_ADJECTIVES.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            const suffix = VEHICLE_NAME_SUFFIXES[Math.floor(Math.random() * VEHICLE_NAME_SUFFIXES.length)];
+
+            const formats = [
+                `The ${adj} ${noun}`,
+                `${adj} ${suffix}`,
+                `${noun} ${suffix}`,
+                `The ${noun} ${adj}`,
+                `${adj} ${noun} ${suffix}`,
+                `Motherfucking ${noun}`,
+                `${adj} ${noun} from Hell`,
+                `${noun} of ${adj} Doom`,
+                `The ${adj} ${noun} ${suffix}`
+            ];
+
+            return formats[Math.floor(Math.random() * formats.length)];
+        }
+        window.generateVehicleName = generateVehicleName;
+
+        function randomizeVehicleName(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            v.name = generateVehicleName(v.type);
+            saveState();
+            renderVehicles();
+            if (window.ChatManager && typeof window.ChatManager.refreshNicklist === 'function') {
+                window.ChatManager.refreshNicklist();
+            }
+        }
+        window.randomizeVehicleName = randomizeVehicleName;
     </script>
 
     <!-- App State and Controller Logic -->
@@ -8068,7 +8161,7 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
-            const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
+            const randomName = generateVehicleName(defaultType);
             const newVehicle = {
                 id: Date.now() + Math.random().toString(36).substr(2, 9),
                 name: randomName,
@@ -8880,7 +8973,10 @@ Thanks to Mike for being ace.</p>
                         <div class="card-header">
                             <div style="display: flex; gap: 0.5rem; align-items: center; flex: 1; min-width: 120px;">
                                 <div class="vehicle-name-block" style="flex: 1;">
-                                    <input type="text" class="vehicle-title-input" value="${vehicle.name}" onchange="updateVehicleName('${vehicle.id}', this.value)" placeholder="Car Name">
+                                    <div style="display: flex; gap: 5px; align-items: center;">
+                                        <input type="text" class="vehicle-title-input" value="${vehicle.name}" onchange="updateVehicleName('${vehicle.id}', this.value)" placeholder="Car Name" style="flex: 1;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="randomizeVehicleName('${vehicle.id}')" title="Generate New ${vehicle.type} Wasteland Name" style="padding: 2px 7px; font-size: 0.85rem; height: 30px; line-height: 1; border-color: var(--card-border); cursor: pointer;">🎲</button>
+                                    </div>
                                     <div style="font-size: 0.75rem; font-weight: normal; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px;">
                                         <span style="font-size: 0.75rem; font-weight: normal;">${baseInfo.weight} • ${vehicle.type}</span>
                                     </div>

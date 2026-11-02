@@ -38,6 +38,7 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
   - **Direct Private Messaging Windows:** Double-clicking any driver on the right-hand active roster (or tapping their 💬 icon) opens a private message window between those two users. Features multi-window conversation support, unread counters, audio chimes, and `/msg` / `/query` radio commands.
 
 ### 4. Full Garage Vehicle Builder
+  - **Wasteland Name Auto Generator:** Massively expanded vehicle-type-specific name generator featuring 150+ gritty wasteland adjectives, 80+ brutal suffixes, and type-specific noun matrices across all 16 chassis (Bikes, War Rigs, Gyrocopters, Monster Trucks, Tanks, Ambulances, Ice Cream Trucks, etc.). Features an instant 🎲 quick-roll button on every vehicle card.
 - **Complete Ruleset Database:** All official vehicle chassis (Buggy, Car, Performance Car, Truck, Heavy Truck, Monster Truck, Bus, Gyrocopter, Tank, War Rig, Helicopter, Ambulance, etc.).
 - **Weapons, Upgrades & Perks:** Accurate Can cost calculations, Build Slot constraints, crew limits, and weapon mount facings (Front, Rear, Left, Right, 360° Turret).
 - **Official Sponsors:** Full roster including Rutherford, Miyazaki, Mishkin, Idris, Slime, Rusty's Bootleggers, The Warden, Order of the Inferno, Beverly, Highway Patrol, Verney, Maxxine, and Scarlett.
@@ -70,6 +71,7 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 ## 🏷️ Version History
 
 ### v1.0.5 - Current Release (02.11.26)
+- **Wasteland Vehicle Name Auto Generator:** Complete overhaul of vehicle naming with 150+ wasteland adjectives, 80+ suffixes, type-tailored noun matrices, and a 🎲 re-roll button on each garage card.
 - **Encrypted Peer-to-Peer Private Messaging:** Double-click any driver in the active comms roster to launch an independent direct message window. Seamless multi-conversation management, direct radio commands (`/msg`, `/query`), and real-time cross-network private transmission.
 - **Smartphone Portrait Tabletop Overhaul:** Full layout optimization for mobile phones (360px–430px portrait). Eliminated all horizontal stretching and overflow.
 - **Zero-Truncation Turn & Gear Phase Tracker:** Game Turn (`- 1 +`) and Gear Phase buttons (`[1][2][3][4][5][6]`) fit side-by-side on Row 1 without wrapping; Dice controls fit cleanly on Row 2.
