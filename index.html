@@ -1195,6 +1195,10 @@
             text-shadow: 0 0 10px var(--glow-shadow);
         }
 
+        #votes-toggle-btn {
+            display: none;
+        }
+
         .votes-actions-grid {
             display: flex;
             gap: 0.5rem;
@@ -2724,6 +2728,10 @@
                 gap: 0.4rem !important;
             }
 
+            #votes-toggle-btn {
+                display: inline-block !important;
+            }
+
             /* Collapsible Perks Grid on Mobile */
             .votes-hub:not(.perks-expanded) .votes-actions-grid,
             .votes-hub:not(.perks-expanded) > div:last-child {
@@ -2831,8 +2839,8 @@
             }
 
             .play-dashboard-card .hazard-dot {
-                min-width: 24px !important;
-                min-height: 24px !important;
+                min-width: 18px !important;
+                min-height: 18px !important;
             }
 
             .play-dashboard-card .gear-selector {
@@ -3081,6 +3089,58 @@
             background: rgba(255,255,255,0.2);
             border-radius: 3px;
         }
+
+        /* ========================================================
+           GASLANDS 3E BETA UI & THEME STYLES
+           ======================================================== */
+        .ruleset-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .ruleset-pill.pill-v3 {
+            border: 1px solid #eab308 !important;
+            background: rgba(234, 179, 8, 0.18) !important;
+            color: #facc15 !important;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.35);
+        }
+        .ruleset-pill.pill-v2 {
+            border: 1px solid var(--glow-color) !important;
+            background: rgba(245, 158, 11, 0.12) !important;
+            color: var(--glow-color) !important;
+        }
+        .v3-activation-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .vehicle-card.activated-card {
+            opacity: 0.72;
+            border-color: rgba(255,255,255,0.15) !important;
+            box-shadow: none !important;
+        }
+        .vehicle-card.activated-card:hover {
+            opacity: 0.95;
+        }
+        .pole-position-badge {
+            transition: all 0.25s ease;
+        }
+        .pole-position-badge:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.2);
+        }
+        .v3-wreck-container {
+            border-left: 4px solid var(--danger-red) !important;
+            animation: pulse-wreck 2s infinite ease-in-out;
+        }
+        @keyframes pulse-wreck {
+            0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.45); }
+        }
+
 </style>
 </head>
 <body class="hide-ai-prompt">
@@ -3140,6 +3200,7 @@
                     <button class="mode-btn" id="rules-mode-btn" onclick="switchMode('rules')">Rules</button>
                     <button class="mode-btn" id="qrs-mode-btn" onclick="switchMode('qrs')">Reference Sheet</button>
                     <button class="mode-btn" id="settings-mode-btn" onclick="openSettingsModal()" style="border: 1px solid rgba(245, 158, 11, 0.4); color: var(--glow-color);">Settings</button>
+                    <button class="mode-btn ruleset-pill-btn" id="header-ruleset-badge" onclick="openSettingsModal()" title="Current Ruleset Edition. Click to change in Settings." style="font-family:'Orbitron', sans-serif; font-weight:700; font-size:0.75rem; letter-spacing:0.5px; border-radius:6px; padding:0.35rem 0.7rem; border:1px solid #eab308; color:#facc15; background:rgba(234, 179, 8, 0.15); cursor:pointer;">⚡ V3 BETA</button>
                 </div>
 
             </div>
@@ -3174,25 +3235,51 @@
         <!-- PLAY VIEW -->
         <div id="play-view" class="view-section">
             
-            <!-- Game Turn & Phase Tracker -->
-            <div class="turn-phase-tracker">
-                <div class="tracker-group">
-                    <span class="tracker-label">Game Turn</span>
-                    <div class="turn-controls">
-                        <button class="turn-btn" onclick="adjustTurn(-1)">-</button>
-                        <span class="turn-value" id="turn-display-val">1</span>
-                        <button class="turn-btn" onclick="adjustTurn(1)">+</button>
+            <!-- Game Turn & Phase Tracker (v2) or Round & Pole Position Tracker (v3) -->
+            <div class="turn-phase-tracker" id="play-turn-tracker-container">
+                <!-- v2 Refuelled Tracker Panel -->
+                <div id="v2-tracker-panel" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div class="tracker-group">
+                        <span class="tracker-label">Game Turn</span>
+                        <div class="turn-controls">
+                            <button class="turn-btn" onclick="adjustTurn(-1)">-</button>
+                            <span class="turn-value" id="turn-display-val">1</span>
+                            <button class="turn-btn" onclick="adjustTurn(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="tracker-group">
+                        <span class="tracker-label">Gear Phase</span>
+                        <div class="phase-selector">
+                            <button class="phase-btn active" id="phase-btn-1" onclick="setPhase(1)">1</button>
+                            <button class="phase-btn" id="phase-btn-2" onclick="setPhase(2)">2</button>
+                            <button class="phase-btn" id="phase-btn-3" onclick="setPhase(3)">3</button>
+                            <button class="phase-btn" id="phase-btn-4" onclick="setPhase(4)">4</button>
+                            <button class="phase-btn" id="phase-btn-5" onclick="setPhase(5)">5</button>
+                            <button class="phase-btn" id="phase-btn-6" onclick="setPhase(6)">6</button>
+                        </div>
                     </div>
                 </div>
-                <div class="tracker-group">
-                    <span class="tracker-label">Gear Phase</span>
-                    <div class="phase-selector">
-                        <button class="phase-btn active" id="phase-btn-1" onclick="setPhase(1)">1</button>
-                        <button class="phase-btn" id="phase-btn-2" onclick="setPhase(2)">2</button>
-                        <button class="phase-btn" id="phase-btn-3" onclick="setPhase(3)">3</button>
-                        <button class="phase-btn" id="phase-btn-4" onclick="setPhase(4)">4</button>
-                        <button class="phase-btn" id="phase-btn-5" onclick="setPhase(5)">5</button>
-                        <button class="phase-btn" id="phase-btn-6" onclick="setPhase(6)">6</button>
+
+                <!-- v3 3E Beta Tracker Panel -->
+                <div id="v3-tracker-panel" style="display: none; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div class="tracker-group">
+                        <span class="tracker-label">Game Round</span>
+                        <div class="turn-controls">
+                            <button class="turn-btn" onclick="adjustRound(-1)">-</button>
+                            <span class="turn-value" id="round-display-val">1</span>
+                            <button class="turn-btn" onclick="adjustRound(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="tracker-group">
+                        <span class="tracker-label">Pole Position</span>
+                        <button id="pole-position-btn" class="pole-position-badge" onclick="togglePolePosition()" title="Click to pass pole position clockwise" style="background: rgba(0,0,0,0.5); border: 1px solid #eab308; color: #facc15; padding: 0.35rem 0.75rem; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; font-weight: bold; cursor: pointer; transition: all 0.2s;">
+                            👑 POLE POSITION: YOU
+                        </button>
+                    </div>
+                    <div class="tracker-group round-action-group">
+                        <button class="btn btn-primary" onclick="executeCleanUpPhase()" style="font-family:'Orbitron', sans-serif; font-size:0.75rem; font-weight:bold; padding: 0.38rem 0.85rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.15)); border: 1px solid #eab308; color: #facc15; cursor:pointer;" title="Clean Up Phase: reset activation tokens, remove 1 ignition token from wrecks, advance round">
+                            🧹 Clean Up &amp; Next Round
+                        </button>
                     </div>
                 </div>
                 <!-- Throw Dice controls -->
@@ -3235,7 +3322,8 @@
                     </div>
                     <div id="votes-quick-actions" style="display:flex; align-items:center; gap:0.4rem;">
                         <button class="btn btn-sm" onclick="adjustVotes(1)" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(34,197,94,0.18); border:1px solid rgba(34,197,94,0.4); color:#4ade80;">+1 Vote</button>
-                        <button id="votes-toggle-btn" class="btn btn-sm" onclick="toggleVotesAccordion()" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--glow-color); cursor:pointer;">🎟️ Perks ▾</button>
+                        <button id="team-perks-btn" class="btn btn-sm" onclick="openTeamPerksModal()" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(234,179,8,0.18); border:1px solid rgba(234,179,8,0.4); color:#facc15; cursor:pointer;" title="View all equipped team perks, driver abilities, and vote rules">🎟️ Perks</button>
+                        <button id="votes-toggle-btn" class="btn btn-sm" onclick="toggleVotesAccordion()" style="font-family:'Orbitron',sans-serif; font-size:0.75rem; padding:0.35rem 0.65rem; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text-muted); cursor:pointer;" title="Toggle Audience Vote Spend actions">⚡ Spends ▾</button>
                     </div>
                     <div class="votes-actions-grid">
                         <button class="vote-action-btn" onclick="adjustVotes(1)">
@@ -3736,6 +3824,67 @@
         </div>
     </div>
 
+    <!-- Team Perks & Audience Votes Reference Modal -->
+    <div class="modal-overlay" id="team-perks-modal" onclick="closeTeamPerksModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 650px; box-shadow: 0 0 35px var(--glow-shadow); border-color: var(--glow-color);">
+            <div class="modal-header">
+                <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🎟️</span> Team Perks &amp; Driver Reference
+                </h3>
+                <button class="close-modal-btn" onclick="closeTeamPerksModal()">&times;</button>
+            </div>
+            
+            <div style="padding: 1.2rem 0.2rem; display: flex; flex-direction: column; gap: 1.2rem; max-height: 75vh; overflow-y: auto;">
+                <!-- Team Drivers & Equipped Perks -->
+                <div>
+                    <h4 style="margin: 0 0 0.6rem 0; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: #facc15; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.35rem;">
+                        🏎️ ACTIVE TEAM VEHICLES &amp; PERKS
+                    </h4>
+                    <div id="team-perks-content-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Generated by openTeamPerksModal -->
+                    </div>
+                </div>
+
+                <!-- Audience Vote Spends Quick Reference -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem;">
+                    <h4 style="margin: 0 0 0.6rem 0; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: #4ade80; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.35rem;">
+                        🎟️ AUDIENCE VOTE SPENDS CHEAT SHEET
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.6rem;">
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Thunderous Applause (1 Vote)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Select a friendly vehicle to remove D6 Hazard tokens from it.</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Burn Rubber (1 Vote)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Select a friendly vehicle: immediately shift gear +/- 1 and gain 1 Hazard.</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Carpe Diem (2 Votes)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Immediately take Pole Position, or prevent Pole Position from moving next time.</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Reload Weapon (2 Votes)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Add 1 Ammo Token to a limited-ammo weapon or upgrade on one of your vehicles.</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Intervention (2 Votes)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Choose an enemy vehicle. It gains Hazard Tokens until it has 5 Hazards.</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem;">
+                            <div style="font-weight: bold; color: #facc15; font-size: 0.78rem;">Respawn Wreck (3 / 1 Vote)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Respawn a wrecked vehicle at half Hull Points. (Costs 1 Vote if Beverly).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--card-border); padding-top: 0.8rem; display: flex; justify-content: flex-end;">
+                <button class="btn" onclick="closeTeamPerksModal()" style="font-family:'Orbitron',sans-serif; font-size:0.8rem; padding:0.4rem 1rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal" onclick="closeSettingsModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 580px; box-shadow: 0 0 35px var(--glow-shadow); border-color: var(--glow-color);">
@@ -3768,6 +3917,45 @@
                         <!-- Populated dynamically: Verified badge or code redemption box -->
                     </div>
                 </div>
+
+                
+                <!-- Ruleset Edition Switcher (v2 Refuelled vs v3 Beta) -->
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 8px; padding: 1.0rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
+                            <span>⚡</span> Game Rule Set Edition
+                        </div>
+                        <span id="ruleset-status-tag" style="font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: bold; font-family: 'Orbitron', sans-serif; background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4);">RULES EDITION</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem; line-height: 1.4;">
+                        Select which ruleset the game manager uses for chassis stats, weapons, upgrades, round structure, and dice mechanics.
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <!-- v2 Refuelled Option -->
+                        <div id="ruleset-card-v2" onclick="setRuleset('v2')" style="border: 2px solid var(--card-border); border-radius: 8px; padding: 0.8rem 0.6rem; cursor: pointer; background: rgba(0,0,0,0.25); transition: all 0.2s; display: flex; flex-direction: column; gap: 0.3rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-family: 'Orbitron', sans-serif; font-size: 0.88rem; font-weight: bold; color: var(--glow-color);">🏎️ Refuelled (v2)</span>
+                                <input type="radio" name="ruleset-choice" id="ruleset-radio-v2" value="v2" onchange="setRuleset(this.value)" style="accent-color: var(--glow-color);">
+                            </div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; margin-top: 0.2rem;">
+                                Classic 6-Gear Phases, Skid Dice (Shift, Slide, Spin, Hazard), Audience Votes HUB, and original weapon tables.
+                            </div>
+                        </div>
+
+                        <!-- v3 3E Beta Option -->
+                        <div id="ruleset-card-v3" onclick="setRuleset('v3')" style="border: 2px solid var(--card-border); border-radius: 8px; padding: 0.8rem 0.6rem; cursor: pointer; background: rgba(0,0,0,0.25); transition: all 0.2s; display: flex; flex-direction: column; gap: 0.3rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-family: 'Orbitron', sans-serif; font-size: 0.88rem; font-weight: bold; color: #facc15;">⚡ V3 Beta (v5.2)</span>
+                                <input type="radio" name="ruleset-choice" id="ruleset-radio-v3" value="v3" onchange="setRuleset(this.value)" style="accent-color: #facc15;">
+                            </div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; margin-top: 0.2rem;">
+                                Handling Dice (Focus &amp; Fury), Armour &amp; Weight (1-6), Round Activations, Pole Position, and Wreck Ignition mechanics.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <!-- 1. AI Prompt Button Visibility Option -->
                 <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.2rem;">
@@ -3908,7 +4096,7 @@ Thanks to Mike for being ace.</p>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 0.8rem; gap: 0.8rem; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm" onclick="openVersionModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Orbitron', monospace, sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--glow-color); background: rgba(245, 158, 11, 0.12); border: 1px solid var(--glow-color); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to view applied updates & version history">
-                    <span>🏷️</span> v1.0.5 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
+                    <span>🏷️</span> v1.1.0 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
                 </button>
                 <button class="btn btn-primary" onclick="closeAboutModal()" style="padding: 0.45rem 1.4rem;">Close</button>
             </div>
@@ -3925,11 +4113,28 @@ Thanks to Mike for being ace.</p>
                 <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
             </div>
             <div style="padding: 1.2rem 0.5rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-primary); overflow-y: auto; max-height: calc(85vh - 130px);">
+                                <!-- v1.1.0 -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
+                            v1.1.0 - Current Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">06.11.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Gaslands V3 Beta Support:</strong> Switch between classic Refuelled (v2) and the new V3 Beta ruleset anytime in Settings.</li>
+                        <li><strong>V3 Vehicles &amp; Drivers:</strong> Added new vehicle classes, Armour and Weight stats, and free specialist driver archetypes.</li>
+                        <li><strong>Expanded Hazard Tracker:</strong> Hazards now track up to 10 tokens with automatic wipeout danger warnings.</li>
+                        <li><strong>Play Mode Upgrades:</strong> Added Round tracker, Pole Position marker, Focus &amp; Fury handling dice, and wreck ignition recovery.</li>
+                        <li><strong>In-Game Perks Guide:</strong> Instant cheat sheet for team perks, driver abilities, and Audience Vote spends.</li>
+                    </ul>
+                </div>
+
                 <!-- v1.0.5 -->
                 <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
                         <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
-                            v1.0.5 - Current Release
+                            v1.0.5
                         </span>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">02.11.26</span>
                     </div>
@@ -4193,6 +4398,299 @@ Thanks to Mike for being ace.</p>
         });
 
         // Database arrays
+        
+        // ========================================================
+        // GASLANDS 3E BETA (v5.2 / v5.3) DATA CONSTANTS & ARRAYS
+        // ========================================================
+        const VEHICLE_TYPES_V3 = [
+            // Common Vehicles
+            { name: "Buggy", tier: "Common", weight: 1, armour: 0, hull: 8, handling: 5, maxGear: 4, crew: 2, slots: 2, cost: 13, special: "Roll Cage: When this vehicle wipes out, ignore the damage received from the Crunch substep." },
+            { name: "Hot Rod", tier: "Common", weight: 1, armour: 0, hull: 8, handling: 3, maxGear: 6, crew: 1, slots: 2, cost: 12, special: "Redline: During Handling Checks, spend 1 Focus or 2 Fury (+1 Hazard) to set Current Gear to 5." },
+            { name: "Monster Truck", tier: "Common", weight: 4, armour: 1, hull: 12, handling: 4, maxGear: 5, crew: 2, slots: 2, cost: 20, special: "All Terrain: Ignores Treacherous surfaces. Up And Over: In Plough Through, may gain hazards to ignore vehicles/obstacles, and ignores Distracted for rest of activation." },
+            { name: "Muscle Car", tier: "Common", weight: 3, armour: 1, hull: 12, handling: 3, maxGear: 6, crew: 2, slots: 3, cost: 18, special: "Redline: During Handling Checks, spend 1 Focus or 2 Fury (+1 Hazard) to set Current Gear to 5." },
+            { name: "Passenger Car", tier: "Common", weight: 2, armour: 1, hull: 12, handling: 4, maxGear: 4, crew: 2, slots: 3, cost: 15, special: "Standard wasteland chassis." },
+            { name: "Pickup", tier: "Common", weight: 3, armour: 1, hull: 14, handling: 3, maxGear: 4, crew: 3, slots: 4, cost: 16, special: "Heavy cargo bed provides 4 build slots and 3 crew members." },
+            { name: "Sports Car", tier: "Common", weight: 2, armour: 0, hull: 10, handling: 5, maxGear: 6, crew: 1, slots: 2, cost: 20, special: "Downforce: Gain 1 Hazard to declare movement template as if 1 gear slower." },
+            { name: "Van", tier: "Common", weight: 4, armour: 1, hull: 14, handling: 3, maxGear: 3, crew: 4, slots: 3, cost: 18, special: "Utility Vehicle: May purchase Electrical weapons and upgrades; reduce Build Slots of up to 3 Upgrades by 1 (minimum 0)." },
+            // Rare Vehicles (Max 1 of each per team)
+            { name: "Bike", tier: "Rare", weight: 1, armour: 0, hull: 6, handling: 5, maxGear: 6, crew: 1, slots: 1, cost: 12, special: "Redline. Mob: The first Bike does not count towards vehicle/team limits or rare choices." },
+            { name: "Heavy Truck", tier: "Rare", weight: 5, armour: 2, hull: 16, handling: 3, maxGear: 3, crew: 4, slots: 6, cost: 28, special: "Sluggish: Cannot declare a template that is hazardous in its current gear." },
+            { name: "Bus", tier: "Rare", weight: 5, armour: 2, hull: 16, handling: 3, maxGear: 3, crew: 8, slots: 3, cost: 30, special: "Sluggish: Cannot declare a template that is hazardous in its current gear." },
+            { name: "Gyrocopter", tier: "Rare", weight: 1, armour: 0, hull: 4, handling: 4, maxGear: 4, crew: 1, slots: 2, cost: 15, special: "Airborne: Ignores other vehicles and terrain while moving, cannot trigger dropped weapons or collisions. Suffer +2 damage on Wipeout Crunch." },
+            { name: "Helicopter", tier: "Rare", weight: 3, armour: 1, hull: 8, handling: 4, maxGear: 4, crew: 3, slots: 4, cost: 30, special: "Airborne: Ignores other vehicles and terrain while moving, cannot trigger dropped weapons or collisions. Suffer +2 damage on Wipeout Crunch." },
+            { name: "Tank", tier: "Rare", weight: 6, armour: 5, hull: 16, handling: 3, maxGear: 3, crew: 3, slots: 5, cost: 36, special: "All Terrain. Hefty (cannot be shunted). Turret (Turret Mount takes 0 slots). Up And Over." },
+            { name: "War Rig", tier: "Rare", weight: 6, armour: 4, hull: 20, handling: 3, maxGear: 3, crew: 6, slots: 8, cost: 40, special: "Articulated (separate tractor/trailer; Tanker Anchor: 1 Fury = -1 gear & +1 hazard). Hefty. Sluggish." }
+        ];
+
+        const WEAPONS_V3 = [
+            // Common Weapons
+            { name: "Machine Gun", range: "Double", dice: "3D6", special: "", slots: 1, cost: 1, category: "Common" },
+            { name: "Heavy Machine Gun", range: "Double", dice: "4D6", special: "", slots: 1, cost: 2, category: "Common" },
+            { name: "Mini-Gun", range: "Double", dice: "6D6", special: "", slots: 2, cost: 3, category: "Common" },
+            { name: "Scrap Cannon", range: "Large Burst", dice: "4D6", special: "Splash", slots: 1, cost: 2, category: "Common" },
+            { name: "Rockets", range: "Double", dice: "4D6", special: "Ammo (3). Blast. Rattle.", slots: 2, cost: 2, ammo: 3, category: "Common" },
+            { name: "Mortar", range: "Double", dice: "6D6", special: "Blast. Indirect.", slots: 3, cost: 3, category: "Common" },
+            { name: "Missiles", range: "Double", dice: "8D6", special: "Ammo (3). Blast. Rattle.", slots: 3, cost: 4, ammo: 3, category: "Common" },
+            { name: "Flamethrower", range: "Large Burst", dice: "6D6", special: "Ammo (3). Fire. Splash.", slots: 2, cost: 3, ammo: 3, category: "Common" },
+            // Hand Weapons (360º arc)
+            { name: "Handgun", range: "Medium", dice: "1D6", special: "360º Arc.", slots: 0, cost: 0, category: "Hand" },
+            { name: "Bazooka", range: "Medium", dice: "3D6", special: "360º. Ammo (1). Ignores Armour (1). Blast.", slots: 0, cost: 2, ammo: 1, category: "Hand" },
+            { name: "Grenades", range: "Medium", dice: "2D6", special: "360º. Rattle. Indirect.", slots: 0, cost: 2, category: "Hand" },
+            { name: "Magnum", range: "Double", dice: "2D6", special: "360º Arc.", slots: 0, cost: 2, category: "Hand" },
+            { name: "Molotov Cocktails", range: "Medium", dice: "2D6", special: "360º. Fire.", slots: 0, cost: 2, category: "Hand" },
+            { name: "Shotgun", range: "Long", dice: "*", special: "360º. 3D6 at Short, 2D6 at Medium, 1D6 at Long.", slots: 0, cost: 2, category: "Hand" },
+            { name: "Submachine Gun", range: "Medium", dice: "3D6", special: "360º Arc.", slots: 0, cost: 4, category: "Hand" },
+            { name: "Thunder Sticks", range: "Short", dice: "2D6", special: "360º. Ignores Armour (2). Ignores Distracted.", slots: 0, cost: 3, category: "Hand" },
+            // Dropped Weapons
+            { name: "Oil Slick Dropper", range: "Dropped", dice: "-", special: "Ammo (3). Large Burst. Treacherous Surface.", slots: 0, cost: 1, ammo: 3, category: "Dropped" },
+            { name: "Smoke Dropper", range: "Dropped", dice: "-", special: "Ammo (3). Large Burst. Cover/Distracted.", slots: 0, cost: 1, ammo: 3, category: "Dropped" },
+            { name: "Glue Dropper", range: "Dropped", dice: "-", special: "Ammo (3). Large Burst. Reduces gear by 2.", slots: 0, cost: 1, ammo: 3, category: "Dropped" },
+            { name: "Caltrop Dropper", range: "Dropped", dice: "(3D6)", special: "Ammo (3). Small Burst. Rattle. Treacherous.", slots: 0, cost: 2, ammo: 3, category: "Dropped" },
+            { name: "Mine Dropper", range: "Dropped", dice: "(5D6)", special: "Ammo (3). Small Burst. Ignores Armour (2).", slots: 0, cost: 3, ammo: 3, category: "Dropped" },
+            { name: "Napalm Dropper", range: "Dropped", dice: "(5D6)", special: "Ammo (3). Small Burst. Fire. Treacherous.", slots: 0, cost: 3, ammo: 3, category: "Dropped" },
+            { name: "RC Car Bombs", range: "Dropped", dice: "-", special: "Ammo (3). Mobile RC explosive car.", slots: 0, cost: 4, ammo: 3, category: "Dropped" },
+            { name: "Sentry Gun", range: "Dropped", dice: "(6D6)", special: "Ammo (3). Automated sentry attacks in Clean Up.", slots: 0, cost: 4, ammo: 3, category: "Dropped" },
+            // Rare Weapons (Max 1 each per team)
+            { name: "Arc Lightning Gun", range: "Double", dice: "6D6", special: "Ammo (1). Electrical. Chains to targets in Short range.", slots: 2, cost: 4, ammo: 1, electrical: true, category: "Rare" },
+            { name: "Combat Laser", range: "Double", dice: "3D6", special: "Electrical. Ignores Armour (2).", slots: 2, cost: 3, electrical: true, category: "Rare" },
+            { name: "BFG", range: "Double", dice: "20D6", special: "Ammo (1). Blast. Shunts targets on 1+ dmg. Suffer 2 dmg & +2 hazards.", slots: 5, cost: 5, ammo: 1, category: "Rare" },
+            { name: "Grav Gun", range: "Double", dice: "(3D6)", special: "Electrical. Ignores Armour (3). Tactical: alters target Weight by 1.", slots: 2, cost: 3, electrical: true, category: "Rare" },
+            { name: "Harpoon", range: "Double", dice: "(5D6)", special: "Tactical. Winches lighter vehicle toward heavier on hits.", slots: 2, cost: 3, category: "Rare" },
+            { name: "Kinetic Super Booster", range: "Double", dice: "(6D6)", special: "Ammo (1). Electrical. Tactical: force moves target forward.", slots: 2, cost: 3, ammo: 1, electrical: true, category: "Rare" },
+            { name: "Sonic Cannon", range: "Long", dice: "(6D6)", special: "Ammo (1). Electrical. Tactical. Splash. Rattle.", slots: 1, cost: 1, ammo: 1, electrical: true, category: "Rare" },
+            { name: "Tank Cannon", range: "Double", dice: "8D6", special: "Ammo (3). Ignores Armour (3).", slots: 4, cost: 5, ammo: 3, category: "Rare" },
+            { name: "Thumper", range: "Medium", dice: "-", special: "Ammo (1). Electrical. Indirect. 360º. Flip & hazard shocks.", slots: 2, cost: 5, ammo: 1, electrical: true, category: "Rare" },
+            { name: "Wreck Lobber", range: "Double/Dropped", dice: "-", special: "Ammo (3). Launches wrecked car into combat window.", slots: 4, cost: 3, ammo: 3, category: "Rare" },
+            { name: "Wrecking Ball", range: "Short", dice: "(Weight)", special: "360º. Smash attack with all in Short range.", slots: 3, cost: 2, category: "Rare" }
+        ];
+
+        const UPGRADES_V3 = [
+            // Common Upgrades
+            { name: "Big Tyres", slots: 0, cost: 1, special: "Ignore Treacherous Surfaces.", category: "Common" },
+            { name: "Bull Bar", slots: 0, cost: 1, special: "Declare facing. Smash on facing: target gets 1 hazard, you get +1 Smash die.", category: "Common" },
+            { name: "Buzzblades", slots: 0, cost: 3, special: "Declare facing. Smash collision on facing gains Ignores Armour (2).", category: "Common" },
+            { name: "CB Radio", slots: 0, cost: 1, special: "Give Way for free without gaining a Hazard token.", category: "Common" },
+            { name: "Extra Armour", slots: 1, cost: 3, special: "Increase Armour stat by +1.", category: "Common" },
+            { name: "Extra Crewmember", slots: 0, cost: 2, special: "Increase Crew stat by +1.", category: "Common" },
+            { name: "Heavy Frame", slots: 1, cost: 1, special: "Increase Weight stat by +1.", category: "Common" },
+            { name: "Infuriating Jingle", slots: 0, cost: 2, electrical: true, special: "Electrical. Enemies within Medium must target this vehicle if able.", category: "Common" },
+            { name: "Magnetic Jammer", slots: 0, cost: 2, electrical: true, special: "Electrical. Enemies in Medium checking ammo roll D6: on 4+ take 1 damage.", category: "Common" },
+            { name: "Nitro Booster", slots: 0, cost: 3, ammo: 1, special: "Ammo (1). Gain 3 Hazards to link Medium Straight, Long Straight or Long 30º.", category: "Common" },
+            { name: "Ram", slots: 1, cost: 2, special: "Declare facing. +2 Smash Attack Dice, ignore first collision hazard on this facing.", category: "Common" },
+            { name: "Ramshackle Hull Plating", slots: 1, cost: 1, special: "Increase Hull Points stat by +2.", category: "Common" },
+            { name: "Roll Cage", slots: 1, cost: 2, special: "Ignore damage from Crunch substep in Wipeouts.", category: "Common" },
+            { name: "Siren", slots: 0, cost: 2, special: "End of attack step, enemy in Med rolls D6 under gear -> -1 gear or +2 hazards.", category: "Common" },
+            { name: "Spikes", slots: 0, cost: 2, special: "When another vehicle declares a Smash attack against you, they suffer 1 damage.", category: "Common" },
+            { name: "Tank Tracks", slots: 1, cost: 3, special: "+1 Handling, -1 Max Gear, ignore Treacherous Surfaces.", category: "Common" },
+            { name: "Trailer (Lightweight)", slots: 0, cost: 2, special: "Provides +1 Build Slot. Gains Articulated rule.", category: "Common" },
+            { name: "Trailer (Middleweight)", slots: 0, cost: 4, special: "Req Weight 2+. Provides +2 Build Slots. Gains Articulated and Hefty rules.", category: "Common" },
+            { name: "Trailer (Heavyweight)", slots: 0, cost: 6, special: "Req Weight 4+. Provides +3 Build Slots. Gains Articulated, Hefty and Sluggish rules.", category: "Common" },
+            { name: "V10 Engine", slots: 0, cost: 5, special: "Increase Max Gear stat by +1 (maximum 6).", category: "Common" },
+            { name: "Wheel Scythes", slots: 0, cost: 1, special: "Smash attacks gain the Rattle special rule.", category: "Common" },
+            // Rare Upgrades (Max 1 each per team)
+            { name: "Experimental Nuclear Engine", slots: 1, cost: 5, electrical: true, special: "Electrical. Once/round suffer 2 dmg to declare template as Gear 6. Explodes on wreck (2x Weight, no respawn).", category: "Rare" },
+            { name: "Experimental Teleporter", slots: 1, cost: 3, ammo: 1, electrical: true, special: "Ammo (1). Electrical. Start of activation: teleport attempt with penny and straight template.", category: "Rare" },
+            { name: "Exploding Ram", slots: 0, cost: 2, ammo: 1, special: "Ammo (1). Front collision: +6 Smash Dice. Suffer 1 dmg per 1 or 2 rolled.", category: "Rare" },
+            { name: "Grabber Arm", slots: 2, cost: 1, special: "Once per activation, shunt vehicle -> gain 1 hazard to pick up and place within Short range.", category: "Rare" },
+            { name: "Improvised Sludge Thrower", slots: 2, cost: 1, special: "May place dropped weapon templates anywhere within Medium range, 360º arc.", category: "Rare" },
+            { name: "Magnetic Clamps", slots: 0, cost: 2, special: "Can only be shunted if aggressor causes 3+ damage in collision.", category: "Rare" },
+            { name: "Rubber Bumpers", slots: 0, cost: 2, special: "Always shunt victim in collisions regardless of damage caused (unless victim Weight +2 or Hefty).", category: "Rare" },
+            { name: "Turret Mount", slots: 1, cost: 2, special: "Selected weapon gains 360º arc of fire. (Cost: 2 + weapon cost).", category: "Rare" },
+            { name: "Wall Of Amplifiers", slots: 3, cost: 3, special: "End of movement, take up to 1 hazard from each friend in Med, place on any vehicle in Med.", category: "Rare" }
+        ];
+
+        const DRIVER_ARCHETYPES_V3 = [
+            { name: "Standard Driver", perkClass: "none", ability: "Standard wasteland driver with no archetype special rule. (Cost: 0 Cans / Free)." },
+            { name: "Arsonist", perkClass: "pyromania", ability: "At the start of its activation, if this vehicle is On Fire, it discards 3 hazard tokens. When this vehicle sets a vehicle On Fire, this vehicle discards 2 hazard tokens. When this vehicle attacks a vehicle that is On Fire, this vehicle discards 1 hazard token." },
+            { name: "Blackfinger", perkClass: "wrench", ability: "Once per activation, when rolling Handling Dice for this vehicle, you may spend 2 Focus results to take the Field Repairs action, recovering 2 lost HP." },
+            { name: "Brawler", perkClass: "aggression", ability: "If this vehicle rolls 8+ Smash Attack Dice in a single Smash Attack, it discards 2 Hazard Tokens." },
+            { name: "Gremlin", perkClass: "mischief", ability: "After a vehicle within Long Range of this vehicle makes a Wipeout Check or an Explosion Check, you can force them to re-roll it." },
+            { name: "Gun Nut", perkClass: "fireworks", ability: "Once per round, after this vehicle attacks with a shooting weapon with the Ammo rule, it may suffer 1 Damage to attack with it again, checking off another Ammo box. This additional attack ignores the Crew limitation." },
+            { name: "Hauler", perkClass: "wrench", ability: "If this vehicle has 2+ Hull Points at the start of an attack roll, it cannot be reduced to less than 1 Hull Point by this attack roll." },
+            { name: "Hunter", perkClass: "pursuit", ability: "When attacking a vehicle that has already activated this round, you may re-roll any of your Attack Dice once when checking for hits." },
+            { name: "Mystic", perkClass: "mischief", ability: "At the start of the game, roll a die and set it aside as this vehicle's Sacred Bone. After you roll dice for this vehicle, you may swap 1 of the rolled dice with your Sacred Bone. Set the swapped out die aside as your new Sacred Bone." },
+            { name: "Professional", perkClass: "precision", ability: "Once per round, you may give this vehicle 1 Hazard token to change one Handling Die from a Focus to a Fury, or from a Fury to a Focus." },
+            { name: "Psycho", perkClass: "reckless", ability: "Once per round, this vehicle may give 1 of its Hazard tokens to another vehicle within Medium range." },
+            { name: "Raider", perkClass: "rowdy", ability: "This vehicle may ignore the Distracted rule." },
+            { name: "Road Warrior", perkClass: "badass", ability: "The first time this vehicle causes damage to a given enemy vehicle in a round, discard 1 Hazard. You can trigger this multiple times if you damage multiple enemies." },
+            { name: "Rough Rider", perkClass: "daring", ability: "After resolving a collision with an obstacle, you may pivot this vehicle up to 90º in either direction, as long as it does not end in contact with any vehicle or obstacle." },
+            { name: "Spark", perkClass: "tech", ability: "When you declare a shooting attack with this vehicle, you can gain 1 Hazard to either increase a weapon’s range from Medium to Long, or add Fire, Blast, or Indirect. Vehicles in team may purchase Electrical weapons/upgrades." },
+            { name: "Speed Demon", perkClass: "speed", ability: "At the start of this vehicle's activation: if it is in Gear 1 or 2, it gains 1 Hazard token; if it is in Gear 6, it discards 3 Hazard tokens." },
+            { name: "Stunt Driver", perkClass: "daring", ability: "Once during this vehicle’s Movement Step, it may gain 2 Hazards to ignore one obstacle or vehicle for the rest of this Movement Step." },
+            { name: "Warlord", perkClass: "military", ability: "Once per round, in this vehicle’s Attack Step, select another friendly vehicle within Long range: that vehicle may gain 2 Hazard tokens to attack with one of their weapons as if it were their attack phase." }
+        ];
+
+        const SPONSORS_V3 = [
+            { name: "None (Sponsorless)", perks: ["aggression", "badass", "daring", "electric", "heavy", "horror", "leadership", "military", "precision", "pursuit", "pyromania", "reckless", "speed", "stunt", "tech", "tuning"], sponsored: [], desc: "No restrictions. Any Driver Archetype and perk class allowed." },
+            { name: "Sponsorless", perks: ["aggression", "badass", "daring", "electric", "heavy", "horror", "leadership", "military", "precision", "pursuit", "pyromania", "reckless", "speed", "stunt", "tech", "tuning"], sponsored: [], desc: "No restrictions. Any Driver Archetype and perk class allowed." },
+            { name: "Chivo", req: "All vehicles must cost >= 25 Cans.", perks: ["precision", "stunt"], sponsored: ["Lowrider: While this vehicle has no hazard tokens, it gains +1 Handling."], desc: "Luxury wasteland chic. +1 Handling while hazard-free. Min 25 Cans per car." },
+            { name: "Highway Patrol", req: "Must include Passenger Car, Pickup, or Muscle Car.", perks: ["speed", "pursuit"], sponsored: ["Hot Pursuit: Designate an enemy Bogey. Free move if Bogey is in front Arc past Double range.", "Siren: Bogey in rear Arc must reduce gear by 1 or gain 2 hazards."], desc: "Vigilante law enforcement hunting the designated Bogey." },
+            { name: "Idris", req: "Cannot purchase Gyrocopters.", perks: ["precision", "speed"], sponsored: ["N2O Addict: Buy Nitro Booster upgrade at half cost (2 Cans).", "Cult of Speed: Selecting Long Straight template in Gear 1-3 grants 1 Audience Vote."], desc: "Fanatical speed-worshipers. Fast straights reward audience votes." },
+            { name: "Jumbo", req: "Only Weight 4+ vehicles allowed.", perks: ["heavy", "badass"], sponsored: ["Monster Mass: When shunting lighter vehicles, cause +1 damage per weight difference."], desc: "Heavy iron behemoths. Massive collision smash power." },
+            { name: "Mishkin", req: "Electrical specialists.", perks: ["military", "tech", "electric"], sponsored: ["Thumpermonkey: Permitted to purchase Electrical weapons and upgrades.", "Dynamo: Regain 1 Ammo on electrical weapon after activating in Gear 4+."], desc: "Mad science and high-voltage arc weaponry." },
+            { name: "Miyazaki", req: "Vehicles must have base Handling >= 3.", perks: ["daring", "precision"], sponsored: ["Virtuoso: First Push It in each activation is hazard-free.", "Showing Off: Resolving a Drift and Gear Change grants Showing Off token (converts to votes)."], desc: "High-handling drift artisans and acrobats." },
+            { name: "Order of the Inferno", req: "Pyromaniacs.", perks: ["pyromania", "horror"], sponsored: ["Fire Walk With Me: Reduce Fire damage taken by up to 3 (minimum 1).", "Burning Man: While On Fire, gain +1 Armour."], desc: "Worshipers of the flame. Armour increases while burning." },
+            { name: "Rutherford", req: "Cannot purchase Weight 1 vehicles.", perks: ["badass", "military"], sponsored: ["Might Is Right: Heavy surplus only. No Weight 1 chassis.", "Well Stocked: Ammo 3 weapons start with Ammo 4 instead."], desc: "Paramilitary ordnance with increased ammunition capacity." },
+            { name: "Scarlett", req: "Must have crew >= 2.", perks: ["tuning", "aggression"], sponsored: ["Crew Quarters: Buy Extra Crewmember upgrade for 1 Can.", "Boarding Parties: Crew can inflict direct hits on enemy hulls in contact."], desc: "Desert pirates utilizing aggressive boarding actions." },
+            { name: "Slime", req: "Demolition derby experts.", perks: ["tuning", "reckless"], sponsored: ["Pinball: Smash attack along side edges allows resolving another Movement Step.", "Spiked Fist: Ram upgrade requires 0 Build Slots."], desc: "Australian wasteland pinball brawlers with slotless rams." },
+            { name: "The Warden", req: "Prison work gang.", perks: ["aggression", "badass"], sponsored: ["Prison Cars: Weight 2-3 cars can take Prison Car conversion (-4 Cans, -2 Hull).", "Fireworks: Exploding wrecks grant Audience Votes."], desc: "Prison workgangs in explosive steel coffins." },
+            { name: "Beverly", req: "Haunted spectres.", perks: ["horror", "stunt"], sponsored: ["Graveyard Shift: Vehicles start as Ghost Riders.", "Soul Harvest: Passing through enemy vehicles gathers Soul tokens to heal or gain votes."], desc: "Ghost cars passing through steel barriers and souls." },
+            { name: "Verney", req: "Frankenstein customizer.", perks: ["tech", "heavy"], sponsored: ["MicroPlate Armour: Upgrade option (0 slots, +1 Armour for 3 Cans).", "Trunk of Junk: May drop multiple dropped weapons per activation."], desc: "Ingenious scavengers with extra armour and dropped weapon volleys." },
+            { name: "Rusty's Bootleggers", req: "Must use trailers or War Rig.", perks: ["reckless", "heavy"], sponsored: ["Dutch Courage: Only Wipeout at 8+ Hazard tokens.", "Party Hard: Gain votes based on nearby enemy hazards."], desc: "Moonshiners with articulated haulers and high hazard tolerances." }
+        ];
+
+        const PERKS_V3 = [
+            // Daring
+            { name: "Barrel Roll", cost: 1, class: "daring", desc: "If involved in a collision during Movement Step, can choose to wipe out in Wipeout Step." },
+            { name: "Dust Clouds", cost: 4, class: "daring", desc: "During Handling Check, spend 2 Fury (+2 Hazards) to become untargetable by shooting this activation." },
+            { name: "Handbrake Turn", cost: 3, class: "daring", desc: "During Handling Check, spend 1 Focus or 2 Fury to pivot vehicle up to 90 degrees." },
+            { name: "Powerslide", cost: 3, class: "daring", desc: "May resolve Slides using Turn or Swerve movement templates." },
+            { name: "Daredevil", cost: 2, class: "daring", desc: "Gain 1 Audience Vote whenever you execute a Drift or Push It at Gear 4+." },
+            // Military
+            { name: "Bullet-time", cost: 3, class: "military", desc: "If you resolve a slide, select one weapon to count as 360º for the rest of the round." },
+            { name: "Drive By", cost: 3, class: "military", desc: "Leave movement templates in play until end of Attack Step; measure side/360 fire from templates." },
+            { name: "Headshot", cost: 3, class: "military", desc: "Critical hits (rolls of 6) inflict 3 Hits instead of 2." },
+            { name: "Rapid Fire", cost: 2, class: "military", desc: "Once per round, a weapon may attack an additional time during Attack Step." },
+            // Precision
+            { name: "Chrome-Whisperer", cost: 4, class: "precision", desc: "Spend 2 Fury results: shift down up to 3 gears and discard that many Hazard tokens." },
+            { name: "Delicate Touch", cost: 3, class: "precision", desc: "Do not consider any template Hazardous (ignore hazard icons and Sluggish)." },
+            { name: "Needle Eye", cost: 2, class: "precision", desc: "May re-roll 1 Handling Die on any Handling Check." },
+            // Pyromania
+            { name: "Burning Man", cost: 3, class: "pyromania", desc: "While On Fire, this vehicle gains +1 Armour stat (including when evading)." },
+            { name: "Fire Walk With Me", cost: 1, class: "pyromania", desc: "Reduce damage suffered from Fire or On Fire by 3 (minimum 1)." },
+            { name: "Inferno Trail", cost: 2, class: "pyromania", desc: "When moving while On Fire, leave a burning Napalm trail template behind." },
+            // Rowdy
+            { name: "Bring Your Friends", cost: 4, class: "rowdy", desc: "Increase Crew value by +1." },
+            { name: "Distracting Behaviour", cost: 3, class: "rowdy", desc: "Enemy vehicles within Medium range cannot roll more than 3 Handling Dice." },
+            // Tech
+            { name: "Afterburners", cost: 4, class: "tech", desc: "Before rolling wipeout dice, may shift directly into Max Gear." },
+            { name: "Automated Weapon Systems", cost: 3, class: "tech", desc: "Gain up to 3 Hazard tokens to count Crew stat that much higher for Attack Step." },
+            // Aggression
+            { name: "Battlehammer", cost: 3, class: "aggression", desc: "+1 Smash Attack Die per Hazard token you have." },
+            { name: "Grinderman", cost: 3, class: "aggression", desc: "May convert Smash collision damage into target Hazard tokens instead of Hull damage." },
+            // Badass
+            { name: "Crowd Pleaser", cost: 1, class: "badass", desc: "Gain 1 Audience Vote whenever you Wipeout." },
+            { name: "Madman", cost: 3, class: "badass", desc: "When having 4+ hazards, move 1 hazard to enemy within Medium range." },
+            // Pursuit
+            { name: "On Your Tail", cost: 2, class: "pursuit", desc: "Enemies that slide/spin in Short range gain 1 Hazard token." },
+            { name: "Pit Maneuver", cost: 3, class: "pursuit", desc: "Smash reaction: force enemy vehicle to resolve forced veer move." },
+            // Reckless
+            { name: "Hog Wild", cost: 2, class: "reckless", desc: "Smash attacks in Wipeout Step gain +2 attack dice." },
+            { name: "Drive Angry", cost: 1, class: "reckless", desc: "Start of activation: gain 1 Hazard token for +1 Smash die." },
+            // Speed
+            { name: "Hell for Leather", cost: 4, class: "speed", desc: "Long Straight template is permitted in any gear without hazard penalty." },
+            { name: "Hot Start", cost: 1, class: "speed", desc: "At the start of the game, roll D6 for starting gear (capped at Max Gear)." },
+            // Stunt
+            { name: "Stunt Driver", cost: 4, class: "stunt", desc: "Spend 1 Focus result to discard 2 Hazard tokens instead of 1." },
+            { name: "Aerialist", cost: 3, class: "stunt", desc: "May launch off obstacles or wrecks without suffering collision damage." }
+        ];
+
+        // Active Ruleset Getters
+        function isV3() {
+            return (appState && appState.ruleset === "v3");
+        }
+
+        function getActiveVehicleTypes() {
+            return isV3() ? VEHICLE_TYPES_V3 : VEHICLE_TYPES;
+        }
+
+        function getActiveWeapons() {
+            return isV3() ? WEAPONS_V3 : WEAPONS;
+        }
+
+        function getActiveUpgrades() {
+            return isV3() ? UPGRADES_V3 : UPGRADES;
+        }
+
+        function getActiveSponsors() {
+            return isV3() ? SPONSORS_V3 : SPONSORS;
+        }
+
+        function getActivePerks() {
+            return isV3() ? PERKS_V3 : PERKS;
+        }
+
+        function setRuleset(edition) {
+            if (edition !== "v2" && edition !== "v3") edition = "v2";
+            appState.ruleset = edition;
+            localStorage.setItem("gaslands_ruleset", edition);
+            
+            // Adapt existing vehicles to new ruleset attributes if needed
+            if (edition === "v3") {
+                if (appState.round === undefined) appState.round = 1;
+                if (!appState.polePosition) appState.polePosition = "me";
+                appState.vehicles.forEach(v => {
+                    const baseV3 = VEHICLE_TYPES_V3.find(t => t.name.toLowerCase() === v.type.toLowerCase()) || VEHICLE_TYPES_V3[0];
+                    if (v.ignitionTokens === undefined) v.ignitionTokens = v.wrecked ? 2 : 0;
+                    if (v.activated === undefined) v.activated = false;
+                    if (!v.driverArchetype) v.driverArchetype = "Road Warrior";
+                });
+            }
+            
+            updateRulesetUI();
+            validateSponsorConstraints();
+            renderHeader();
+            renderVehicles();
+            saveState();
+        }
+
+        function updateRulesetUI() {
+            const current = appState.ruleset || "v2";
+            
+            // Update settings radio/buttons
+            const rV2 = document.getElementById("ruleset-radio-v2");
+            const rV3 = document.getElementById("ruleset-radio-v3");
+            if (rV2) rV2.checked = (current === "v2");
+            if (rV3) rV3.checked = (current === "v3");
+            
+            const cardV2 = document.getElementById("ruleset-card-v2");
+            const cardV3 = document.getElementById("ruleset-card-v3");
+            if (cardV2) {
+                cardV2.style.borderColor = (current === "v2") ? "var(--glow-color)" : "var(--card-border)";
+                cardV2.style.background = (current === "v2") ? "rgba(245, 158, 11, 0.15)" : "rgba(0,0,0,0.25)";
+            }
+            if (cardV3) {
+                cardV3.style.borderColor = (current === "v3") ? "#eab308" : "var(--card-border)";
+                cardV3.style.background = (current === "v3") ? "rgba(234, 179, 8, 0.22)" : "rgba(0,0,0,0.25)";
+            }
+            
+            // Update top bar badge
+            const badge = document.getElementById("header-ruleset-badge");
+            if (badge) {
+                if (current === "v3") {
+                    badge.innerHTML = "⚡ V3 BETA";
+                    badge.className = "ruleset-pill pill-v3";
+                    badge.title = "Ruleset: Gaslands V3 Beta (v5.2). Click to change in Settings.";
+                } else {
+                    badge.innerHTML = "🏎️ V2 REFUELLED";
+                    badge.className = "ruleset-pill pill-v2";
+                    badge.title = "Ruleset: Gaslands: Refuelled (v2). Click to change in Settings.";
+                }
+            }
+
+            // Update Dice Type selector options based on ruleset
+            const diceSelect = document.getElementById("dice-type");
+            if (diceSelect) {
+                const prev = diceSelect.value;
+                if (current === "v3") {
+                    diceSelect.innerHTML = `
+                        <option value="handling">Handling Dice (Focus &amp; Fury)</option>
+                        <option value="wipeout">Wipeout Check</option>
+                        <option value="attack">Attack Dice (Hits &amp; Crits)</option>
+                        <option value="d6">Standard D6</option>
+                        <option value="skid">Skid Dice (v2 Classic)</option>
+                    `;
+                    diceSelect.value = (prev === "skid" || prev === "d6") ? "handling" : (prev || "handling");
+                } else {
+                    diceSelect.innerHTML = `
+                        <option value="skid" selected>Skid Dice</option>
+                        <option value="d6">Standard D6</option>
+                    `;
+                    diceSelect.value = (prev === "d6") ? "d6" : "skid";
+                }
+            }
+        }
+
         const VEHICLE_TYPES = [
             { name: "Buggy", weight: "Lightweight", hull: 6, handling: 4, maxGear: 6, crew: 2, slots: 2, cost: 6, special: "Roll Cage: When this vehicle suffers a flip, this vehicle may choose to ignore the 2 hits received from the flip." },
             { name: "Car", weight: "Middleweight", hull: 10, handling: 3, maxGear: 5, crew: 2, slots: 2, cost: 12, special: "" },
@@ -4499,6 +4997,9 @@ Thanks to Mike for being ace.</p>
     <script>
         // State variables
         let appState = {
+            ruleset: localStorage.getItem("gaslands_ruleset") || "v2",
+            round: 1,
+            polePosition: "me",
             teamName: "",
             sponsor: "Sponsorless",
             budget: 50,
@@ -6282,7 +6783,7 @@ Thanks to Mike for being ace.</p>
 
         // ==========================================
                 // ==========================================
-        // DEVICE & ORIENTATION MANAGER (v1.0.5)
+        // DEVICE & ORIENTATION MANAGER (v1.1.0)
         // Auto-detects device hardware & orientation
         // ==========================================
         const DeviceManager = {
@@ -6500,6 +7001,11 @@ Thanks to Mike for being ace.</p>
         }
 
         function checkFirstLaunchUsername() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("guest") === "1") {
+                if (window.ChatManager) window.ChatManager.setUsername("BetaTester", false);
+                return;
+            }
             const saved = localStorage.getItem("gaslands_chat_username");
             if (!saved) {
                 setTimeout(() => {
@@ -6616,6 +7122,12 @@ Thanks to Mike for being ace.</p>
             },
 
             ensureUsername(callback) {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get("guest") === "1") {
+                    this.setUsername("BetaTester", false);
+                    if (callback) callback();
+                    return;
+                }
                 const saved = localStorage.getItem("gaslands_chat_username");
                 if (!saved) {
                     const defaultNick = this.getUsername();
@@ -7446,6 +7958,7 @@ Thanks to Mike for being ace.</p>
         function openSettingsModal() {
             populateSettingsSponsors();
             initSettingsUI();
+            if (typeof updateRulesetUI === "function") updateRulesetUI();
             const modal = document.getElementById("settings-modal");
             if (modal) modal.classList.add("active");
         }
@@ -7899,14 +8412,28 @@ Thanks to Mike for being ace.</p>
             renderHeader();
             renderSponsorInfo();
             const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("guest") === "1" || !localStorage.getItem("gaslands_chat_username")) {
+                if (urlParams.get("guest") === "1") localStorage.setItem("gaslands_chat_username", "BetaTester");
+            }
+            if (urlParams.get("ruleset")) {
+                setRuleset(urlParams.get("ruleset"));
+            }
             const urlMode = urlParams.get("mode");
             if (urlParams.get("demo") === "1" && appState.vehicles.length === 0) {
                 addVehicle(false);
-                if (appState.vehicles[0]) appState.vehicles[0].name = "War Rig Alpha";
+                if (appState.vehicles[0]) {
+                    appState.vehicles[0].name = "War Rig Alpha";
+
+                }
                 addVehicle(false);
                 if (appState.vehicles[1]) appState.vehicles[1].name = "Rust Bucket";
             }
+
             switchMode(urlMode || "garage");
+            if (urlParams.get("settings") === "1") {
+                setTimeout(openSettingsModal, 200);
+            }
+
         });
 
         let diceToastTimer = null;
@@ -7981,6 +8508,9 @@ Thanks to Mike for being ace.</p>
                 }
             }
             appState.mode = "garage"; // Default page is always Garage mode
+            if (!appState.ruleset) appState.ruleset = localStorage.getItem("gaslands_ruleset") || "v2";
+            if (appState.round === undefined) appState.round = 1;
+            if (!appState.polePosition) appState.polePosition = "me";
             if (appState.turn === undefined) appState.turn = 1;
             if (appState.phase === undefined) appState.phase = 1;
             if (appState.vehicles.length === 0) {
@@ -8036,19 +8566,217 @@ Thanks to Mike for being ace.</p>
             // Adjust visual header theme logo color
             document.getElementById("header-logo").querySelector("span").style.color = "var(--glow-color)";
             
-            // Turn & Phase displays
-            const turnVal = document.getElementById("turn-display-val");
-            if (turnVal) turnVal.textContent = appState.turn;
+            if (typeof updateRulesetUI === "function") updateRulesetUI();
+
+            const v2Panel = document.getElementById("v2-tracker-panel");
+            const v3Panel = document.getElementById("v3-tracker-panel");
             
-            for (let i = 1; i <= 6; i++) {
-                const btn = document.getElementById(`phase-btn-${i}`);
-                if (btn) {
-                    btn.classList.toggle("active", appState.phase === i);
+            if (isV3()) {
+                if (v2Panel) v2Panel.style.display = "none";
+                if (v3Panel) v3Panel.style.display = "flex";
+                
+                const roundVal = document.getElementById("round-display-val");
+                if (roundVal) roundVal.textContent = appState.round || 1;
+                
+                const poleBtn = document.getElementById("pole-position-btn");
+                if (poleBtn) {
+                    const isMe = (appState.polePosition === "me");
+                    poleBtn.innerHTML = `👑 POLE POSITION: ${isMe ? '<span style="color:#facc15;">YOU</span>' : '<span style="color:#94a3b8;">OPPONENT</span>'}`;
+                    poleBtn.style.borderColor = isMe ? "#eab308" : "var(--card-border)";
+                    poleBtn.style.color = isMe ? "#facc15" : "var(--text-muted)";
+                    poleBtn.style.background = isMe ? "rgba(234, 179, 8, 0.25)" : "rgba(0,0,0,0.5)";
+                }
+            } else {
+                if (v2Panel) v2Panel.style.display = "flex";
+                if (v3Panel) v3Panel.style.display = "none";
+                
+                // Turn & Phase displays
+                const turnVal = document.getElementById("turn-display-val");
+                if (turnVal) turnVal.textContent = appState.turn;
+                
+                for (let i = 1; i <= 6; i++) {
+                    const btn = document.getElementById(`phase-btn-${i}`);
+                    if (btn) {
+                        btn.classList.toggle("active", appState.phase === i);
+                    }
                 }
             }
 
             calculateCansSpent();
         }
+
+        // ========================================================
+        // GASLANDS 3E BETA CONTROLLER ACTIONS & HELPERS
+        // ========================================================
+        function adjustRound(delta) {
+            if (!appState.round) appState.round = 1;
+            appState.round = Math.max(1, appState.round + delta);
+            const roundVal = document.getElementById("round-display-val");
+            if (roundVal) roundVal.textContent = appState.round;
+            saveState();
+        }
+
+        function togglePolePosition() {
+            appState.polePosition = (appState.polePosition === "me") ? "other" : "me";
+            renderHeader();
+            saveState();
+            const holder = (appState.polePosition === "me") ? "YOUR TEAM" : "OPPONENT";
+            if (window.showAppToast) window.showAppToast(`👑 Pole Position marker passed to: <strong>${holder}</strong>`);
+        }
+
+        function executeCleanUpPhase() {
+            let wrecksRespawned = 0;
+            let tokensRemoved = 0;
+            
+            appState.vehicles.forEach(v => {
+                // 1. Reset activation tokens
+                v.activated = false;
+                
+                // 2. Decrement ignition tokens on wrecks
+                if (v.wrecked || (v.ignitionTokens && v.ignitionTokens > 0)) {
+                    if (v.ignitionTokens > 0) {
+                        v.ignitionTokens--;
+                        tokensRemoved++;
+                    }
+                    if (v.ignitionTokens <= 0) {
+                        // Respawn
+                        const types = getActiveVehicleTypes();
+                        const base = types.find(t => t.name === v.type) || types[0];
+                        v.wrecked = false;
+                        v.damage = Math.floor(base.hull / 2);
+                        v.hazard = 0;
+                        v.gear = 1;
+                        v.ignitionTokens = 0;
+                        v.onFire = false;
+                        v.distracted = false;
+                        wrecksRespawned++;
+                    }
+                }
+            });
+            
+            if (!appState.round) appState.round = 1;
+            appState.round++;
+            
+            renderHeader();
+            renderVehicles();
+            saveState();
+            
+            let summary = `Round ${appState.round} Clean Up complete: all vehicle activations reset!`;
+            if (tokensRemoved > 0) summary += ` Removed ignition tokens from wrecks.`;
+            if (wrecksRespawned > 0) summary += ` ${wrecksRespawned} vehicle(s) respawned!`;
+            if (window.showAppToast) window.showAppToast(summary);
+            else alert(summary);
+        }
+
+        function toggleVehicleActivation(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            v.activated = !v.activated;
+            renderVehicles();
+            saveState();
+        }
+
+        function vehicleGiveWay(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            const hasCBRadio = v.upgrades && v.upgrades.some(u => u.name === "CB Radio");
+            if (!hasCBRadio) {
+                v.hazard = (v.hazard || 0) + 1;
+                if (v.hazard > 10) {
+                    if (isV3()) v.damage = (v.damage || 0) + (v.hazard - 10);
+                    v.hazard = 10;
+                }
+            }
+            renderVehicles();
+            saveState();
+            const note = hasCBRadio ? 
+                `🏳️ ${v.name} Gives Way for free (CB Radio equipped)! Turn passes clockwise.` :
+                `🏳️ ${v.name} Gives Way and gains 1 Hazard token! Turn passes clockwise.`;
+            if (window.showAppToast) window.showAppToast(note);
+            else alert(note);
+        }
+
+        function vehicleEvade(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            v.hazard = (v.hazard || 0) + 2;
+            if (v.hazard > 10) {
+                if (isV3()) v.damage = (v.damage || 0) + (v.hazard - 10);
+                v.hazard = 10;
+            }
+            renderVehicles();
+            saveState();
+            const note = `🛡️ ${v.name} declares Evade! Gained 2 Hazards. Armour counts as Current Gear (${v.gear}) for this attack!`;
+            if (window.showAppToast) window.showAppToast(note);
+            else alert(note);
+        }
+
+        function decrementIgnitionToken(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            if (v.ignitionTokens === undefined) v.ignitionTokens = 2;
+            v.ignitionTokens = Math.max(0, v.ignitionTokens - 1);
+            if (v.ignitionTokens === 0) {
+                respawnVehicleV3(id);
+                return;
+            }
+            renderVehicles();
+            saveState();
+        }
+
+        function respawnVehicleV3(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            const types = getActiveVehicleTypes();
+            const base = types.find(t => t.name === v.type) || types[0];
+            v.wrecked = false;
+            v.damage = Math.floor(base.hull / 2);
+            v.hazard = 0;
+            v.gear = 1;
+            v.ignitionTokens = 0;
+            v.onFire = false;
+            v.distracted = false;
+            renderVehicles();
+            saveState();
+            if (window.showAppToast) window.showAppToast(`✨ ${v.name} respawned in Gear 1 with ${base.hull - v.damage} HP and 0 Hazards!`);
+        }
+
+        function changeDriverArchetype(id, archetype) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            v.driverArchetype = archetype;
+            renderVehicles();
+            saveState();
+        }
+
+        function updateDriverName(id, name) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (!v) return;
+            v.driverName = name;
+            saveState();
+        }
+
+        function triggerHandlingDiceRoll(gear) {
+            const activeVeh = appState.vehicles.find(car => !car.wrecked && !car.activated) || appState.vehicles[0];
+            const diceCount = activeVeh ? (activeVeh.handling || 3) : 3;
+            const countSel = document.getElementById("throw-dice-count");
+            const typeSel = document.getElementById("dice-type");
+            if (typeSel) typeSel.value = "handling";
+            if (countSel) countSel.value = String(Math.min(10, Math.max(1, diceCount)));
+            if (typeof throwSkidDice3D === "function") throwSkidDice3D();
+        }
+
+        function triggerWipeoutRoll(vehicleId) {
+            const v = appState.vehicles.find(car => car.id === vehicleId);
+            if (!v) return;
+            const hazardCount = Math.max(6, v.hazard || 6);
+            const countSel = document.getElementById("throw-dice-count");
+            const typeSel = document.getElementById("dice-type");
+            if (typeSel) typeSel.value = "wipeout";
+            if (countSel) countSel.value = String(Math.min(10, Math.max(1, hazardCount)));
+            if (typeof throwSkidDice3D === "function") throwSkidDice3D();
+        }
+
 
         function loadSponsorsList() {
             const select = document.getElementById("sponsor-select");
@@ -8174,8 +8902,9 @@ Thanks to Mike for being ace.</p>
 
         // Add Vehicle
         function addVehicle(shouldRender = true) {
-            const defaultType = "Car";
-            const carBase = VEHICLE_TYPES.find(t => t.name === defaultType) || VEHICLE_TYPES[0];
+            const types = getActiveVehicleTypes();
+            const defaultType = isV3() ? "Passenger Car" : "Car";
+            const carBase = types.find(t => t.name === defaultType) || types[0];
             const totalSpent = getTotalCansSpent();
             if (appState.vehicles.length > 0 && totalSpent + carBase.cost > appState.budget) {
                 alert(`Cannot add vehicle: base cost for ${defaultType} (${carBase.cost} Cans) would exceed your Can budget (${totalSpent + carBase.cost} / ${appState.budget} Cans).`);
@@ -8201,6 +8930,12 @@ Thanks to Mike for being ace.</p>
                 distracted: false,
                 wrecked: false,
                 
+                // Gaslands 3E Beta additions
+                activated: false,
+                ignitionTokens: 0,
+                driverArchetype: "Road Warrior",
+                driverName: "",
+
                 isPrisonCar: false
             };
 
@@ -8270,35 +9005,37 @@ Thanks to Mike for being ace.</p>
 
         // Validate sponsor rules and constraints
         function validateSponsorConstraints() {
-            const sp = SPONSORS.find(s => s.name === appState.sponsor);
+            const sponsorsList = getActiveSponsors();
+            const sp = sponsorsList.find(s => s.name === appState.sponsor);
             const allowedPerks = sp ? sp.perks : [];
             const isSponsorless = !sp || sp.name === "Sponsorless" || sp.name === "None (Sponsorless)";
+            const types = getActiveVehicleTypes();
 
             appState.vehicles.forEach(v => {
-                const baseInfo = VEHICLE_TYPES.find(t => t.name === v.type);
+                const baseInfo = types.find(t => t.name === v.type);
                 if (!baseInfo) return;
 
                 // Vehicle restrictions
-                if (appState.sponsor === "Rutherford" && baseInfo.weight === "Lightweight" && baseInfo.name !== "Tank" && baseInfo.name !== "Helicopter") {
-                    v.type = "Car"; 
+                if (appState.sponsor === "Rutherford" && (baseInfo.weight === "Lightweight" || baseInfo.weight === 1) && baseInfo.name !== "Tank" && baseInfo.name !== "Helicopter") {
+                    v.type = isV3() ? "Passenger Car" : "Car"; 
                 }
                 if (appState.sponsor === "Miyazaki" && baseInfo.handling <= 2) {
-                    v.type = "Car"; 
+                    v.type = isV3() ? "Passenger Car" : "Car"; 
                 }
                 if (appState.sponsor === "Idris" && v.type === "Gyrocopter") {
-                    v.type = "Car";
+                    v.type = isV3() ? "Passenger Car" : "Car";
                 }
 
-                // Electrical weapons / upgrades (Mishkin only)
-                if (appState.sponsor !== "Mishkin") {
+                // Electrical weapons / upgrades (Mishkin only or Van in v3)
+                if (appState.sponsor !== "Mishkin" && (!isV3() || v.type !== "Van")) {
                     v.weapons = v.weapons.filter(w => !w.electrical);
+                    const allUpgrades = getActiveUpgrades();
                     v.upgrades = v.upgrades.filter(u => {
-                        const original = UPGRADES.find(orig => orig.name === u.name);
+                        const original = allUpgrades.find(orig => orig.name === u.name);
                         return !original || !original.electrical;
                     });
                 }
 
-                // Sponsor exclusive upgrades
                 if (appState.sponsor !== "Highway Patrol") {
                     v.upgrades = v.upgrades.filter(u => u.name !== "Louder Siren");
                 }
@@ -8313,28 +9050,29 @@ Thanks to Mike for being ace.</p>
                     v.isPrisonCar = false;
                 }
 
-                // Perks allowed by sponsor
-                if (!isSponsorless) {
-                    v.perks = v.perks.filter(p => allowedPerks.includes(p.class));
-                }
-
                 // Build slots integrity
-                const updatedBase = VEHICLE_TYPES.find(t => t.name === v.type) || baseInfo;
+                const updatedBase = types.find(t => t.name === v.type) || baseInfo;
                 let slotsUsed = calculateVehicleSlots(v);
-                while (slotsUsed > updatedBase.slots && v.weapons.length > 0) {
+                let slotsMax = updatedBase.slots;
+                if (isV3()) {
+                    if (v.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
+                    if (v.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
+                    if (v.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
+                }
+                while (slotsUsed > slotsMax && v.weapons.length > 0) {
                     v.weapons.pop();
                     slotsUsed = calculateVehicleSlots(v);
                 }
-                while (slotsUsed > updatedBase.slots && v.upgrades.length > 0) {
+                while (slotsUsed > slotsMax && v.upgrades.length > 0) {
                     v.upgrades.pop();
                     slotsUsed = calculateVehicleSlots(v);
                 }
             });
         }
 
-        // Calculate Cost and Slots used for a vehicle
         function calculateVehicleCans(vehicle) {
-            const baseType = VEHICLE_TYPES.find(t => t.name === vehicle.type);
+            const types = getActiveVehicleTypes();
+            const baseType = types.find(t => t.name === vehicle.type) || types[0];
             if (!baseType) return 0;
 
             let cans = baseType.cost;
@@ -8346,7 +9084,7 @@ Thanks to Mike for being ace.</p>
             vehicle.weapons.forEach(w => {
                 let cost = w.cost;
                 if (w.facing === "Turret") {
-                    cost = w.cost * 3; 
+                    cost = isV3() ? (w.cost + 2) : (w.cost * 3); 
                 }
                 cans += cost;
             });
@@ -8354,10 +9092,10 @@ Thanks to Mike for being ace.</p>
             vehicle.upgrades.forEach(u => {
                 let cost = u.cost;
                 if (appState.sponsor === "Idris" && u.name === "Nitro Booster") {
-                    cost = 3;
+                    cost = isV3() ? 2 : 3;
                 }
                 if (appState.sponsor === "Scarlett" && u.name === "Extra Crewmember") {
-                    cost = 2; 
+                    cost = isV3() ? 1 : 2; 
                 }
                 cans += cost;
             });
@@ -8374,15 +9112,19 @@ Thanks to Mike for being ace.</p>
             vehicle.weapons.forEach(w => {
                 if ((vehicle.type === "Gyrocopter" || vehicle.type === "Helicopter") && w.category === "Dropped") {
                     // 0 slots
+                } else if (isV3() && (w.category === "Hand" || w.category === "Dropped")) {
+                    // In v3, Hand and Dropped weapons require 0 build slots
                 } else {
-                    slots += w.slots;
+                    slots += (w.slots || 0);
                 }
             });
             vehicle.upgrades.forEach(u => {
                 if (appState.sponsor === "Slime" && u.name === "Ram") {
                     // 0 slots
+                } else if (isV3() && u.name && u.name.startsWith("Trailer")) {
+                    // Trailers provide slots instead of consuming
                 } else {
-                    slots += u.slots;
+                    slots += (u.slots || 0);
                 }
             });
             return slots;
@@ -8807,10 +9549,17 @@ Thanks to Mike for being ace.</p>
             }
 
             appState.vehicles.forEach(vehicle => {
-                const baseInfo = VEHICLE_TYPES.find(t => t.name === vehicle.type) || VEHICLE_TYPES[0];
+                const types = getActiveVehicleTypes();
+                const baseInfo = types.find(t => t.name === vehicle.type) || types[0];
                 const cans = calculateVehicleCans(vehicle);
                 const slotsUsed = calculateVehicleSlots(vehicle);
-                const slotsMax = baseInfo.slots;
+                
+                let slotsMax = baseInfo.slots;
+                if (isV3()) {
+                    if (vehicle.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
+                    if (vehicle.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
+                    if (vehicle.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
+                }
 
                 // Calculate sponsor logo class and HTML
                 const sponsorClass = `logo-${appState.sponsor.toLowerCase().replace(/'s/g, 's').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
@@ -8822,11 +9571,23 @@ Thanks to Mike for being ace.</p>
                     currentMaxHull = baseInfo.hull - 2;
                 }
                 
-                let armourCount = vehicle.upgrades.filter(u => u.name === "Armour Plating").length;
+                let armourCount = vehicle.upgrades.filter(u => u.name === "Armour Plating" || u.name === "Ramshackle Hull Plating").length;
                 currentMaxHull += (armourCount * 2);
                 
                 let microPlates = vehicle.upgrades.filter(u => u.name === "MicroPlate Armour").length;
                 currentMaxHull += (microPlates * 2);
+
+                // Armour and Weight (v3)
+                let currentArmour = (baseInfo.armour !== undefined) ? baseInfo.armour : 0;
+                let extraArmourCount = vehicle.upgrades.filter(u => u.name === "Extra Armour").length;
+                currentArmour += extraArmourCount;
+                if (vehicle.upgrades.some(u => u.name === "MicroPlate Armour")) currentArmour += 1;
+
+                let currentWeight = baseInfo.weight;
+                if (typeof currentWeight === 'number') {
+                    let heavyFrames = vehicle.upgrades.filter(u => u.name === "Heavy Frame").length;
+                    currentWeight += heavyFrames;
+                }
 
                 // Max Gear & Handling calculations
                 let currentHandling = baseInfo.handling;
@@ -8844,6 +9605,10 @@ Thanks to Mike for being ace.</p>
                 if (hasNuke) {
                     currentMaxGear = Math.min(6, currentMaxGear + 2);
                 }
+                let hasV10 = vehicle.upgrades.some(u => u.name === "V10 Engine");
+                if (hasV10) {
+                    currentMaxGear = Math.min(6, currentMaxGear + 1);
+                }
 
                 // Warnings check
                 const isSlotsViolated = slotsUsed > slotsMax;
@@ -8852,8 +9617,8 @@ Thanks to Mike for being ace.</p>
                     warnings.push(`Exceeded Build Slots: Using ${slotsUsed}/${slotsMax} Slots.`);
                 }
                 const hasSponsor = appState.sponsor && appState.sponsor !== "Sponsorless" && appState.sponsor !== "None (Sponsorless)";
-                if (hasSponsor && appState.sponsor === "Rutherford" && baseInfo.weight === "Lightweight" && vehicle.type !== "Tank" && vehicle.type !== "Helicopter") {
-                    warnings.push(`Might Is Right: Rutherford cannot buy Lightweight vehicles.`);
+                if (hasSponsor && appState.sponsor === "Rutherford" && (baseInfo.weight === "Lightweight" || baseInfo.weight === 1) && vehicle.type !== "Tank" && vehicle.type !== "Helicopter") {
+                    warnings.push(`Might Is Right: Rutherford cannot buy Lightweight/Weight 1 vehicles.`);
                 }
                 if (hasSponsor && appState.sponsor === "Miyazaki" && baseInfo.handling <= 2) {
                     warnings.push(`Elegance: Miyazaki cannot buy Handling <= 2 vehicles.`);
@@ -8862,15 +9627,43 @@ Thanks to Mike for being ace.</p>
                     warnings.push(`Kiss My Asphalt: Idris cannot buy Gyrocopters.`);
                 }
                 
-                if (appState.sponsor !== "Mishkin") {
+                if (appState.sponsor !== "Mishkin" && (!isV3() || vehicle.type !== "Van")) {
                     const hasElectricalW = vehicle.weapons.some(w => w.electrical);
                     const hasElectricalU = vehicle.upgrades.some(u => {
-                        const original = UPGRADES.find(orig => orig.name === u.name);
+                        const allUpgrades = getActiveUpgrades();
+                        const original = allUpgrades.find(orig => orig.name === u.name);
                         return original && original.electrical;
                     });
                     if (hasElectricalW || hasElectricalU) {
                         warnings.push(`Thumpermonkey: Electrical items are Mishkin exclusive.`);
                     }
+                }
+
+                // Driver Archetype Row in Garage
+                let driverArchetypeHtml = "";
+                if (isV3()) {
+                    const archName = vehicle.driverArchetype || "Standard Driver";
+                    const archObj = DRIVER_ARCHETYPES_V3.find(a => a.name === archName) || DRIVER_ARCHETYPES_V3[0];
+                    driverArchetypeHtml = `
+                        <div class="garage-section" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.6rem; margin-top: 0.5rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+                                <div style="display:flex; align-items:center; gap:0.4rem;">
+                                    <span style="font-family:'Orbitron',sans-serif; font-size:0.75rem; color:#facc15; font-weight:bold;">🏎️ Driver Archetype</span>
+                                    <span style="font-size:0.68rem; padding:0.1rem 0.35rem; background:rgba(34,197,94,0.15); border:1px solid #22c55e; color:#4ade80; border-radius:4px; font-weight:bold;" title="In Gaslands V3 Beta, Driver Archetypes cost 0 Cans (Free to choose; perks cost Cans).">0 Cans (Free)</span>
+                                </div>
+                                <select onchange="changeDriverArchetype('${vehicle.id}', this.value)" style="padding:0.25rem 0.5rem; font-size:0.75rem; background:#000; border:1px solid var(--card-border); color:#fff; border-radius:4px;">
+                                    ${DRIVER_ARCHETYPES_V3.map(a => `<option value="${a.name}" ${a.name === archName ? 'selected' : ''}>${a.name}${a.perkClass !== 'none' ? ` (${a.perkClass.toUpperCase()})` : ' (No Archetype - 0 Cans)'}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.35rem; line-height:1.35;">
+                                <strong>Special Ability:</strong> ${archObj.ability}
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.45rem; padding-top:0.35rem; border-top:1px dashed rgba(255,255,255,0.08);">
+                                <span style="font-size:0.7rem; color:var(--text-muted); white-space:nowrap;">Driver Name:</span>
+                                <input type="text" placeholder="Name Driver (Unlocks 2nd Perk Class)" value="${escapeHtml(vehicle.driverName || '')}" onchange="updateDriverName('${vehicle.id}', this.value)" style="flex:1; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:var(--text-primary); font-size:0.75rem; padding:0.2rem 0.4rem; border-radius:4px;">
+                            </div>
+                        </div>
+                    `;
                 }
 
                 if (appState.mode === "garage") {
@@ -8880,11 +9673,11 @@ Thanks to Mike for being ace.</p>
                         weaponsHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No weapons equipped</div>`;
                     } else {
                         vehicle.weapons.forEach((w, index) => {
-                            const weaponCostDisplay = w.facing === "Turret" ? w.cost * 3 : w.cost;
-                            const slotDisplay = w.slots > 0 ? `${w.slots} Slot${w.slots > 1 ? 's' : ''}` : '0 Slots';
+                            const weaponCostDisplay = w.facing === "Turret" ? (isV3() ? (w.cost + 2) : (w.cost * 3)) : w.cost;
+                            const slotDisplay = (w.slots > 0) ? `${w.slots} Slot${w.slots > 1 ? 's' : ''}` : '0 Slots';
                             
                             // Check if zero slots weapon (no orientation needed)
-                            const isZeroSlots = w.slots === 0;
+                            const isZeroSlots = (w.slots === 0 || (isV3() && (w.category === "Hand" || w.category === "Dropped")));
                             const facingSelectorHtml = isZeroSlots ? 
                                 `<span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal; margin-right: 0.5rem;">[360° Arc]</span>` :
                                 `<select style="padding: 0.2rem; font-size: 0.75rem; width: 85px;" onchange="changeWeaponFacing('${vehicle.id}', ${index}, this.value)">
@@ -8893,7 +9686,7 @@ Thanks to Mike for being ace.</p>
                                     <option value="Left" ${w.facing === 'Left' ? 'selected' : ''}>Left</option>
                                     <option value="Right" ${w.facing === 'Right' ? 'selected' : ''}>Right</option>
                                     <option value="Side" ${w.facing === 'Side' ? 'selected' : ''}>Side</option>
-                                    <option value="Turret" ${w.facing === 'Turret' ? 'selected' : ''}>Turret (x3)</option>
+                                    <option value="Turret" ${w.facing === 'Turret' ? 'selected' : ''}>Turret</option>
                                 </select>`;
 
                             weaponsHtml += `
@@ -8918,8 +9711,8 @@ Thanks to Mike for being ace.</p>
                     } else {
                         vehicle.upgrades.forEach((u, index) => {
                             let cost = u.cost;
-                            if (appState.sponsor === "Idris" && u.name === "Nitro Booster") cost = 3;
-                            if (appState.sponsor === "Scarlett" && u.name === "Extra Crewmember") cost = 2;
+                            if (appState.sponsor === "Idris" && u.name === "Nitro Booster") cost = isV3() ? 2 : 3;
+                            if (appState.sponsor === "Scarlett" && u.name === "Extra Crewmember") cost = isV3() ? 1 : 2;
                             
                             upgradesHtml += `
                                 <div class="equipped-item">
@@ -8988,6 +9781,66 @@ Thanks to Mike for being ace.</p>
                         `;
                     }
 
+                    // Vehicle Type Select Options (Common vs Rare for v3)
+                    let typeOptionsHtml = "";
+                    if (isV3()) {
+                        typeOptionsHtml = `
+                            <optgroup label="Common Vehicles">
+                                ${VEHICLE_TYPES_V3.filter(t => t.tier === 'Common').map(t => {
+                                    return `<option value="${t.name}" ${t.name === vehicle.type ? 'selected' : ''}>${t.name.toUpperCase()} (W${t.weight} • A${t.armour} • ${t.cost} Cans)</option>`;
+                                }).join('')}
+                            </optgroup>
+                            <optgroup label="Rare Vehicles (Max 1 each)">
+                                ${VEHICLE_TYPES_V3.filter(t => t.tier === 'Rare').map(t => {
+                                    return `<option value="${t.name}" ${t.name === vehicle.type ? 'selected' : ''}>${t.name.toUpperCase()} (W${t.weight} • A${t.armour} • ${t.cost} Cans)</option>`;
+                                }).join('')}
+                            </optgroup>
+                        `;
+                    } else {
+                        typeOptionsHtml = VEHICLE_TYPES.map(t => {
+                            let disabled = false;
+                            let note = "";
+                            if (appState.sponsor === "Rutherford" && t.weight === "Lightweight" && t.name !== "Tank" && t.name !== "Helicopter") {
+                                disabled = true; note = " [Rutherford Forbidden]";
+                            }
+                            if (appState.sponsor === "Miyazaki" && t.handling <= 2) {
+                                disabled = true; note = " [Miyazaki Forbidden]";
+                            }
+                            if (appState.sponsor === "Idris" && t.name === "Gyrocopter") {
+                                disabled = true; note = " [Idris Forbidden]";
+                            }
+                            return `<option value="${t.name}" ${t.name === vehicle.type ? 'selected' : ''} ${disabled ? 'disabled style="color:var(--text-muted);"' : ''}>${t.name.toUpperCase()} (${t.cost} Cans)${note}</option>`;
+                        }).join('');
+                    }
+
+                    // Stats Badges
+                    let statsBadgesHtml = "";
+                    if (isV3()) {
+                        statsBadgesHtml = `
+                            <div class="stats-badge-grid" style="grid-template-columns: repeat(6, 1fr);">
+                                <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
+                                <div class="stat-badge"><span class="label">Armour</span><span class="val" style="color:#60a5fa;">🛡️ ${currentArmour}</span></div>
+                                <div class="stat-badge"><span class="label">Weight</span><span class="val" style="color:#f59e0b;">⚖️ ${currentWeight}</span></div>
+                                <div class="stat-badge"><span class="label">Handling</span><span class="val">${currentHandling}</span></div>
+                                <div class="stat-badge"><span class="label">Max Gear</span><span class="val">${currentMaxGear}</span></div>
+                                <div class="stat-badge"><span class="label">Crew</span><span class="val">${currentCrew}</span></div>
+                            </div>
+                        `;
+                    } else {
+                        statsBadgesHtml = `
+                            <div class="stats-badge-grid">
+                                <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
+                                <div class="stat-badge"><span class="label">Handling</span><span class="val">${currentHandling}</span></div>
+                                <div class="stat-badge"><span class="label">Max Gear</span><span class="val">${currentMaxGear}</span></div>
+                                <div class="stat-badge"><span class="label">Crew</span><span class="val">${baseInfo.crew + vehicle.upgrades.filter(u => u.name === "Extra Crewmember").length}</span></div>
+                            </div>
+                        `;
+                    }
+
+                    const cardSubtitle = isV3() ? 
+                        `Weight ${currentWeight} • Armour ${currentArmour} • ${vehicle.type}` :
+                        `${baseInfo.weight} • ${vehicle.type}`;
+
                     const card = document.createElement("div");
                     card.className = "vehicle-card";
                     card.innerHTML = `
@@ -8999,26 +9852,10 @@ Thanks to Mike for being ace.</p>
                                         <button type="button" class="btn btn-secondary btn-sm" onclick="randomizeVehicleName('${vehicle.id}')" title="Generate New ${vehicle.type} Wasteland Name" style="padding: 2px 7px; font-size: 0.85rem; height: 30px; line-height: 1; border-color: var(--card-border); cursor: pointer;">🎲</button>
                                     </div>
                                     <div style="font-size: 0.75rem; font-weight: normal; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px;">
-                                        <span style="font-size: 0.75rem; font-weight: normal;">${baseInfo.weight} • ${vehicle.type}</span>
+                                        <span style="font-size: 0.75rem; font-weight: normal;">${cardSubtitle}</span>
                                     </div>
                                     <select onchange="updateVehicleType('${vehicle.id}', this.value)" style="margin-top:0.2rem; font-size: 0.8rem; padding: 0.2rem; width: 100%;">
-                                        ${VEHICLE_TYPES.map(t => {
-                                            let disabled = false;
-                                            let note = "";
-                                            if (appState.sponsor === "Rutherford" && t.weight === "Lightweight" && t.name !== "Tank" && t.name !== "Helicopter") {
-                                                disabled = true;
-                                                note = " [Rutherford Forbidden]";
-                                            }
-                                            if (appState.sponsor === "Miyazaki" && t.handling <= 2) {
-                                                disabled = true;
-                                                note = " [Miyazaki Forbidden]";
-                                            }
-                                            if (appState.sponsor === "Idris" && t.name === "Gyrocopter") {
-                                                disabled = true;
-                                                note = " [Idris Forbidden]";
-                                            }
-                                            return `<option value="${t.name}" ${t.name === vehicle.type ? 'selected' : ''} ${disabled ? 'disabled style="color:var(--text-muted);"' : ''}>${t.name.toUpperCase()} (${t.cost} Cans)${note}</option>`;
-                                        }).join('')}
+                                        ${typeOptionsHtml}
                                     </select>
                                 </div>
                                 ${sponsorLogoHtml}
@@ -9037,25 +9874,8 @@ Thanks to Mike for being ace.</p>
                         ${imageSlotHtml}
                         <input type="file" id="image-upload-input-${vehicle.id}" style="display: none;" onchange="handleImageUpload(event, '${vehicle.id}')" accept="image/*">
                         
-                        <div class="stats-badge-grid">
-                            <div class="stat-badge">
-                                <span class="label">Hull</span>
-                                <span class="val">${currentMaxHull}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Handling</span>
-                                <span class="val">${currentHandling}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Max Gear</span>
-                                <span class="val">${currentMaxGear}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Crew</span>
-                                <span class="val">${baseInfo.crew + vehicle.upgrades.filter(u => u.name === "Extra Crewmember").length}</span>
-                            </div>
-                        </div>
-
+                        ${statsBadgesHtml}
+                        ${driverArchetypeHtml}
                         ${wardenControlHtml}
 
                         <div class="garage-section">
@@ -9093,7 +9913,9 @@ Thanks to Mike for being ace.</p>
                     garageContainer.appendChild(card);
                     
                 } else {
-                    // Render Play Mode Card (matches Garage Mode Card layout with trackers directly under stats bar)
+                    // ==========================================
+                    // PLAY MODE VEHICLE CARD
+                    // ==========================================
                     let hullBoxesHtml = "";
                     for (let i = 1; i <= currentMaxHull; i++) {
                         let classState = "filled";
@@ -9103,16 +9925,14 @@ Thanks to Mike for being ace.</p>
                         hullBoxesHtml += `<div class="hull-point-box ${classState}" onclick="toggleHullDamage('${vehicle.id}', ${i})"></div>`;
                     }
 
-                    let hazardLimit = 6;
-                    if (appState.sponsor === "Rusty's Bootleggers") {
-                        hazardLimit = 8;
-                    }
+                    let hazardLimit = 10;
+                    let wipeoutThreshold = isV3() ? 6 : (appState.sponsor === "Rusty's Bootleggers" ? 8 : 6);
                     let hazardDotsHtml = "";
                     for (let i = 1; i <= hazardLimit; i++) {
                         let classState = "";
                         if (i <= vehicle.hazard) {
                             classState = "active";
-                            if (vehicle.hazard >= hazardLimit) {
+                            if (i >= wipeoutThreshold) {
                                 classState = "active warning";
                             }
                         }
@@ -9126,9 +9946,9 @@ Thanks to Mike for being ace.</p>
                         gearButtonsHtml += `<button ${active} ${disabled} onclick="setGear('${vehicle.id}', ${i})">${i}</button>`;
                     }
 
-                    let isWipeout = vehicle.hazard >= hazardLimit;
+                    let isWipeout = vehicle.hazard >= wipeoutThreshold;
 
-                    // Play Mode image slot reduced by 20%
+                    // Play Mode image slot
                     let playImageSlotHtml = "";
                     if (vehicle.imageUrl && vehicle.imageUrl !== "db_stored") {
                         playImageSlotHtml = `
@@ -9144,7 +9964,7 @@ Thanks to Mike for being ace.</p>
                         `;
                     }
 
-                    // Weapons list styled like Garage equipped items, with Ammo checkboxes
+                    // Weapons list
                     let playWeaponsHtml = "";
                     if (vehicle.weapons.length === 0) {
                         playWeaponsHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No weapons equipped</div>`;
@@ -9171,7 +9991,7 @@ Thanks to Mike for being ace.</p>
                                 ammoHtml += `</div>`;
                             }
 
-                            const isZeroSlots = w.slots === 0;
+                            const isZeroSlots = (w.slots === 0 || (isV3() && (w.category === "Hand" || w.category === "Dropped")));
                             const facingDisplay = isZeroSlots ? "360°" : w.facing;
 
                             playWeaponsHtml += `
@@ -9191,7 +10011,7 @@ Thanks to Mike for being ace.</p>
                         });
                     }
 
-                    // Upgrades list styled like Garage equipped items, with ammo checkboxes for any that have ammo
+                    // Upgrades list
                     let playUpgradesHtml = "";
                     if (vehicle.upgrades.length === 0) {
                         playUpgradesHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No upgrades equipped</div>`;
@@ -9227,7 +10047,7 @@ Thanks to Mike for being ace.</p>
                         });
                     }
 
-                    // Perks list styled like Garage equipped items
+                    // Perks list
                     let playPerksHtml = "";
                     if (vehicle.perks.length === 0) {
                         playPerksHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No perks selected</div>`;
@@ -9244,7 +10064,7 @@ Thanks to Mike for being ace.</p>
                         });
                     }
 
-                    // Vehicle Special Rules (chassis rules, Roll Cage, Pivot, etc.)
+                    // Vehicle Special Rules
                     let playVehicleRulesHtml = "";
                     if (baseInfo.special) {
                         playVehicleRulesHtml += `
@@ -9252,6 +10072,17 @@ Thanks to Mike for being ace.</p>
                                 <div class="equipped-item-details">
                                     <div class="equipped-item-name">${vehicle.type} Chassis Rules <span style="font-size:0.75rem; color: var(--glow-color); font-weight:normal;">(Special)</span></div>
                                     <div class="equipped-item-desc">${baseInfo.special}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    if (isV3()) {
+                        const arch = DRIVER_ARCHETYPES_V3.find(a => a.name === (vehicle.driverArchetype || "Road Warrior")) || DRIVER_ARCHETYPES_V3[10];
+                        playVehicleRulesHtml += `
+                            <div class="equipped-item">
+                                <div class="equipped-item-details">
+                                    <div class="equipped-item-name">${arch.name} Driver Archetype <span style="font-size:0.75rem; color: #facc15; font-weight:normal;">(Archetype Ability)</span></div>
+                                    <div class="equipped-item-desc">${arch.ability}</div>
                                 </div>
                             </div>
                         `;
@@ -9272,7 +10103,8 @@ Thanks to Mike for being ace.</p>
 
                     // Team / Sponsor Traits
                     let playSponsorTraitsHtml = "";
-                    const sp = SPONSORS.find(s => s.name === appState.sponsor);
+                    const sponsorsList = getActiveSponsors();
+                    const sp = sponsorsList.find(s => s.name === appState.sponsor);
                     const isSponsorActive = sp && sp.name !== "Sponsorless" && sp.name !== "None" && sp.name !== "None (Sponsorless)";
                     if (isSponsorActive && sp.sponsored && sp.sponsored.length > 0) {
                         sp.sponsored.forEach(rule => {
@@ -9293,9 +10125,9 @@ Thanks to Mike for being ace.</p>
                         playSponsorTraitsHtml = `<div class="equipped-item" style="color: var(--text-dark); justify-content: center; font-style: italic;">No sponsor selected (Sponsorless team).</div>`;
                     }
 
-                    // Check if current phase is higher than vehicle gear
+                    // Gear warning (v2 only)
                     let gearWarningHtml = "";
-                    if (appState.phase > vehicle.gear) {
+                    if (!isV3() && appState.phase > vehicle.gear) {
                         gearWarningHtml = `
                             <div class="gear-phase-warning">
                                 ⚠️ OUT OF GEAR RANGE FOR CURRENT PHASE
@@ -9303,14 +10135,83 @@ Thanks to Mike for being ace.</p>
                         `;
                     }
 
+                    // Activation Bar (v3 only)
+                    let activationBarHtml = "";
+                    if (isV3()) {
+                        activationBarHtml = `
+                            <div class="v3-activation-bar" style="display:flex; gap:0.4rem; align-items:center; margin-top:0.4rem; margin-bottom:0.2rem; flex-wrap:wrap;">
+                                <button type="button" class="btn btn-sm" onclick="toggleVehicleActivation('${vehicle.id}')" style="font-family:'Orbitron', sans-serif; font-size:0.75rem; font-weight:700; padding:0.3rem 0.65rem; border-radius:6px; cursor:pointer; ${vehicle.activated ? 'opacity:0.65; background:rgba(255,255,255,0.08); border:1px solid var(--card-border); color:var(--text-muted);' : 'background:linear-gradient(135deg,rgba(34,197,94,0.3),rgba(16,185,129,0.15)); border:1px solid #22c55e; color:#4ade80;'}">
+                                    ${vehicle.activated ? '⚡ ACTIVATED' : '⏳ READY TO ACTIVATE'}
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="vehicleGiveWay('${vehicle.id}')" style="font-size:0.72rem; padding:0.3rem 0.55rem; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text-muted);" title="Give Way: Gain 1 Hazard to pass turn or activate another vehicle (Free with CB Radio)">
+                                    🏳️ Give Way (+1 Haz)
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="vehicleEvade('${vehicle.id}')" style="font-size:0.72rem; padding:0.3rem 0.55rem; background:rgba(59,130,246,0.15); border:1px solid #3b82f6; color:#60a5fa;" title="Evade: Gain 2 Hazards to set Armour = Current Gear for this attack">
+                                    🛡️ Evade (+2 Haz)
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    // Stats Badges for Play Mode
+                    let playStatsBadgesHtml = "";
+                    if (isV3()) {
+                        playStatsBadgesHtml = `
+                            <div class="stats-badge-grid" style="grid-template-columns: repeat(6, 1fr);">
+                                <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
+                                <div class="stat-badge"><span class="label">Armour</span><span class="val" style="color:#60a5fa;">🛡️ ${currentArmour}</span></div>
+                                <div class="stat-badge"><span class="label">Weight</span><span class="val" style="color:#f59e0b;">⚖️ ${currentWeight}</span></div>
+                                <div class="stat-badge"><span class="label">Handling</span><span class="val">${currentHandling}</span></div>
+                                <div class="stat-badge"><span class="label">Max Gear</span><span class="val">${currentMaxGear}</span></div>
+                                <div class="stat-badge"><span class="label">Crew</span><span class="val">${currentCrew}</span></div>
+                            </div>
+                        `;
+                    } else {
+                        playStatsBadgesHtml = `
+                            <div class="stats-badge-grid">
+                                <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
+                                <div class="stat-badge"><span class="label">Handling</span><span class="val">${currentHandling}</span></div>
+                                <div class="stat-badge"><span class="label">Max Gear</span><span class="val">${currentMaxGear}</span></div>
+                                <div class="stat-badge"><span class="label">Crew</span><span class="val">${currentCrew}</span></div>
+                            </div>
+                        `;
+                    }
+
+                    // Wreck Ignition Token Overlay (v3)
+                    const isWreckedState = vehicle.wrecked || vehicle.damage >= currentMaxHull;
+                    let wreckPanelHtml = "";
+                    if (isV3() && isWreckedState) {
+                        const tokens = (vehicle.ignitionTokens !== undefined) ? vehicle.ignitionTokens : 2;
+                        wreckPanelHtml = `
+                            <div class="v3-wreck-container" style="background:rgba(239,68,68,0.15); border:1px solid var(--danger-red); border-radius:8px; padding:0.75rem; margin:0.5rem 0;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-family:'Orbitron',sans-serif; color:var(--danger-red); font-weight:bold; font-size:0.9rem;">💥 WRECKED CHASSIS</span>
+                                    <span style="font-family:'Orbitron',sans-serif; color:#facc15; font-size:0.8rem; font-weight:bold;">🔥 Ignition Tokens: ${tokens} / 2</span>
+                                </div>
+                                <div style="font-size:0.74rem; color:var(--text-muted); margin-top:0.3rem;">
+                                    Remove 1 ignition token during each Clean Up phase. When the last is removed, respawn at half Hull in Gear 1 with 0 Hazards!
+                                </div>
+                                <div style="display:flex; gap:0.4rem; margin-top:0.5rem;">
+                                    <button class="btn btn-sm" onclick="decrementIgnitionToken('${vehicle.id}')" style="font-size:0.72rem; padding:0.25rem 0.6rem;">-1 Ignition Token</button>
+                                    <button class="btn btn-sm btn-primary" onclick="respawnVehicleV3('${vehicle.id}')" style="font-size:0.72rem; padding:0.25rem 0.6rem; ${tokens > 0 ? 'opacity:0.75;' : ''}">✨ Respawn Vehicle</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const playSubtitle = isV3() ? 
+                        `Weight ${currentWeight} • Armour ${currentArmour} • ${vehicle.type}` :
+                        `${baseInfo.weight} • ${vehicle.type}`;
+
                     const card = document.createElement("div");
                     card.id = `play-card-${vehicle.id}`;
                     
                     let cardClasses = ["vehicle-card", "play-dashboard-card"];
-                    if (vehicle.wrecked) cardClasses.push("wrecked");
+                    if (isWreckedState) cardClasses.push("wrecked");
                     if (vehicle.onFire) cardClasses.push("on-fire-card");
                     if (vehicle.distracted) cardClasses.push("distracted-card");
                     if (vehicle.ghostRider) cardClasses.push("ghost-card");
+                    if (isV3() && vehicle.activated) cardClasses.push("activated-card");
                     
                     card.className = cardClasses.join(" ");
                     card.innerHTML = `
@@ -9327,7 +10228,7 @@ Thanks to Mike for being ace.</p>
                                     <div class="vehicle-name-block" style="flex: 1; min-width: 0;">
                                         <span style="font-family:'Orbitron', sans-serif; font-size: 1.25rem; font-weight:800; letter-spacing:0.5px; color: var(--text-primary);">${vehicle.name}</span>
                                         <div style="font-size: 0.75rem; font-weight: normal; line-height: 1.2; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px;">
-                                            <span style="font-size: 0.75rem !important; font-weight: normal !important;">${baseInfo.weight} • ${vehicle.type}</span>
+                                            <span style="font-size: 0.75rem !important; font-weight: normal !important;">${playSubtitle}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -9335,6 +10236,8 @@ Thanks to Mike for being ace.</p>
                                     <span style="font-size: 0.75rem; color: var(--text-muted);">${slotsUsed} / ${slotsMax} Slots</span>
                                 </div>
                             </div>
+
+                            ${activationBarHtml}
 
                             <!-- Status Buttons (Fire, Ghost, Distracted - Guaranteed All on One Line) -->
                             <div class="play-status-bar">
@@ -9344,28 +10247,13 @@ Thanks to Mike for being ace.</p>
                             </div>
                         </div>
 
+                        ${wreckPanelHtml}
+
                         <!-- Chassis Image Slot -->
                         ${playImageSlotHtml}
 
-                        <!-- Stats Bar (Hull, Handling, Max Gear, Crew) -->
-                        <div class="stats-badge-grid">
-                            <div class="stat-badge">
-                                <span class="label">Hull</span>
-                                <span class="val">${currentMaxHull}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Handling</span>
-                                <span class="val">${currentHandling}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Max Gear</span>
-                                <span class="val">${currentMaxGear}</span>
-                            </div>
-                            <div class="stat-badge">
-                                <span class="label">Crew</span>
-                                <span class="val">${currentCrew}</span>
-                            </div>
-                        </div>
+                        <!-- Stats Bar -->
+                        ${playStatsBadgesHtml}
 
                         ${gearWarningHtml}
 
@@ -9391,14 +10279,22 @@ Thanks to Mike for being ace.</p>
                                 </div>
                                 <div class="hazard-dots-row">
                                     <div class="hazard-dots">${hazardDotsHtml}</div>
-                                    ${isWipeout ? `<div class="wipeout-alert">WIPEOUT!</div>` : ''}
+                                    ${isWipeout ? `
+                                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                                            <div class="wipeout-alert">${isV3() ? 'WIPEOUT RISK!' : 'WIPEOUT!'}</div>
+                                            <button class="btn btn-sm" onclick="triggerWipeoutRoll('${vehicle.id}')" style="font-size:0.7rem; padding:0.15rem 0.45rem; background:rgba(239,68,68,0.25); border:1px solid #ef4444; color:#fca5a5; cursor:pointer;" title="Roll Wipeout Check (${vehicle.hazard} dice)">💥 Roll Check</button>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             </div>
 
                             <!-- Gearbox -->
                             <div class="gearbox">
-                                <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
-                                <div class="gear-selector">${gearButtonsHtml}</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
+                                    ${isV3() ? `<button class="btn btn-sm" onclick="triggerHandlingDiceRoll(${vehicle.gear})" style="font-size:0.7rem; padding:0.15rem 0.45rem; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; cursor:pointer;">🎯 Roll Handling</button>` : ''}
+                                </div>
+                                <div class="gear-selector" style="margin-top:0.35rem;">${gearButtonsHtml}</div>
                             </div>
                         </div>
 
@@ -9469,8 +10365,6 @@ Thanks to Mike for being ace.</p>
                 startGlitchShader(canvas, id, imgUrl);
             });
         }
-
-        // Custom Event Handlers
         function updateVehicleName(id, val) {
             const v = appState.vehicles.find(car => car.id === id);
             if (v) {
@@ -9483,17 +10377,28 @@ Thanks to Mike for being ace.</p>
             const v = appState.vehicles.find(car => car.id === id);
             if (!v) return;
             const oldType = v.type;
-            const newBase = VEHICLE_TYPES.find(t => t.name === val);
+            const types = getActiveVehicleTypes();
+            const newBase = types.find(t => t.name === val);
             if (!newBase) return;
 
-            // 1. Sponsor Vehicle Restrictions
-            if (appState.sponsor === "Rutherford" && newBase.weight === "Lightweight" && val !== "Tank" && val !== "Helicopter") {
-                alert("Rutherford teams may not purchase Lightweight vehicles.");
+            // Rare vehicle restriction in v3
+            if (isV3() && newBase.tier === "Rare") {
+                const countOfRare = appState.vehicles.filter(otherCar => otherCar.id !== id && otherCar.type === val).length;
+                if (countOfRare >= 1 && val !== "Bike") {
+                    alert(`Cannot select ${val}: in Gaslands V3 Beta, you cannot have two vehicles of the same Rare Vehicle Type in your team.`);
+                    renderVehicles();
+                    return;
+                }
+            }
+
+            // Sponsor Vehicle Restrictions
+            if (appState.sponsor === "Rutherford" && (newBase.weight === "Lightweight" || newBase.weight === 1) && val !== "Tank" && val !== "Helicopter") {
+                alert("Rutherford teams may not purchase Lightweight / Weight 1 vehicles.");
                 renderVehicles();
                 return;
             }
             if (appState.sponsor === "Miyazaki" && newBase.handling <= 2) {
-                alert("Miyazaki teams may not purchase vehicles with Handling 2 or lower.");
+                alert("Miyazaki teams may not purchase vehicles with base Handling <= 2.");
                 renderVehicles();
                 return;
             }
@@ -9503,31 +10408,25 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
-            // 2. Build Slots limit
-            const currentSlots = calculateVehicleSlots(v);
-            if (currentSlots > newBase.slots) {
-                alert(`Cannot switch to ${val}: equipped items use ${currentSlots} slots, but ${val} only has ${newBase.slots} build slots. Remove some weapons/upgrades first.`);
-                renderVehicles();
-                return;
-            }
-
-            // 3. Can Budget limit
             v.type = val;
-            const totalSpent = getTotalCansSpent();
-            if (totalSpent > appState.budget) {
-                v.type = oldType; // revert
-                alert(`Cannot switch to ${val}: total team cost would be ${totalSpent} Cans, which exceeds your Can budget of ${appState.budget} Cans.`);
-                renderVehicles();
-                return;
+            
+            // Adjust build slots integrity
+            let slotsUsed = calculateVehicleSlots(v);
+            let slotsMax = newBase.slots;
+            if (isV3()) {
+                if (v.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
+                if (v.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
+                if (v.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
+            }
+            while (slotsUsed > slotsMax && v.weapons.length > 0) {
+                v.weapons.pop();
+                slotsUsed = calculateVehicleSlots(v);
+            }
+            while (slotsUsed > slotsMax && v.upgrades.length > 0) {
+                v.upgrades.pop();
+                slotsUsed = calculateVehicleSlots(v);
             }
 
-            if (v.gear > newBase.maxGear) v.gear = newBase.maxGear;
-            let maxHull = newBase.hull;
-            let armourCount = v.upgrades.filter(u => u.name === "Armour Plating").length;
-            maxHull += (armourCount * 2);
-            if (v.damage > maxHull) v.damage = maxHull;
-
-            validateSponsorConstraints();
             renderVehicles();
             saveState();
         }
@@ -9659,24 +10558,50 @@ Thanks to Mike for being ace.</p>
             
             const vehicle = appState.vehicles.find(v => v.id === activeModalTargetVehicleId);
             if (!vehicle) return;
-            const vBase = VEHICLE_TYPES.find(t => t.name === vehicle.type) || VEHICLE_TYPES[0];
+            const vBase = isV3() ? 
+                (VEHICLE_TYPES_V3.find(t => t.name === vehicle.type) || VEHICLE_TYPES_V3[0]) :
+                (VEHICLE_TYPES.find(t => t.name === vehicle.type) || VEHICLE_TYPES[0]);
+            
             const currentSlots = calculateVehicleSlots(vehicle);
-            const maxSlots = vBase.slots;
+            let maxSlots = vBase.slots;
+            if (isV3()) {
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Lightweight)")) maxSlots += 1;
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Middleweight)")) maxSlots += 2;
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Heavyweight)")) maxSlots += 3;
+            }
             const totalSpent = getTotalCansSpent();
 
             if (activeModalItemType === "weapon") {
-                WEAPONS.forEach(w => {
-                    if (w.name.toLowerCase().includes(query) || w.special.toLowerCase().includes(query)) {
+                const weaponsList = getActiveWeapons();
+                weaponsList.forEach(w => {
+                    if (w.name.toLowerCase().includes(query) || (w.special && w.special.toLowerCase().includes(query))) {
                         const isElectrical = w.electrical === true;
-                        let isSponsorAllowed = !isElectrical || appState.sponsor === "Mishkin";
-                        let sponsorReason = isElectrical ? "Mishkin only (Electrical)" : "";
+                        let isSponsorAllowed = !isElectrical || appState.sponsor === "Mishkin" || (isV3() && vehicle.type === "Van");
+                        let sponsorReason = isElectrical ? "Mishkin or Van only (Electrical)" : "";
 
-                        const weaponSlots = ((vehicle.type === "Gyrocopter" || vehicle.type === "Helicopter") && w.category === "Dropped") ? 0 : w.slots;
+                        let weaponSlots = w.slots || 0;
+                        if ((vehicle.type === "Gyrocopter" || vehicle.type === "Helicopter") && w.category === "Dropped") {
+                            weaponSlots = 0;
+                        } else if (isV3() && (w.category === "Hand" || w.category === "Dropped")) {
+                            weaponSlots = 0;
+                        }
+
+                        // Rare weapon limit in v3
+                        let isRareLimitViolated = false;
+                        if (isV3() && w.category === "Rare") {
+                            let countInTeam = 0;
+                            appState.vehicles.forEach(otherV => {
+                                countInTeam += otherV.weapons.filter(ow => ow.name === w.name).length;
+                            });
+                            if (countInTeam >= 1) isRareLimitViolated = true;
+                        }
+
                         const hasSlots = (currentSlots + weaponSlots <= maxSlots);
                         const hasBudget = (totalSpent + w.cost <= appState.budget);
 
                         let lockReasons = [];
                         if (!isSponsorAllowed) lockReasons.push(sponsorReason);
+                        if (isRareLimitViolated) lockReasons.push("Rare limit: Max 1 per team");
                         if (!hasSlots) lockReasons.push(`No slots (${weaponSlots} needed, ${maxSlots - currentSlots} left)`);
                         if (!hasBudget) lockReasons.push(`Over budget (${w.cost} Cans, ${appState.budget - totalSpent} left)`);
 
@@ -9687,9 +10612,9 @@ Thanks to Mike for being ace.</p>
                         
                         item.innerHTML = `
                             <div class="selection-item-details">
-                                <div class="selection-item-title">${w.name} ${isElectrical ? '⚡' : ''}</div>
-                                <div class="selection-item-meta">${w.range} range • ${w.dice} • ${w.slots > 0 ? `${w.slots} Slots` : '0 Slots'}</div>
-                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${w.special}</div>
+                                <div class="selection-item-title">${w.name} ${isElectrical ? '⚡' : ''} ${w.category === 'Rare' ? '<span style="color:#facc15; font-size:0.7rem; font-weight:bold;">[RARE]</span>' : ''}</div>
+                                <div class="selection-item-meta">${w.range} range • ${w.dice} • ${weaponSlots > 0 ? `${weaponSlots} Slots` : '0 Slots'}</div>
+                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${w.special || ''}</div>
                                 ${!isAllowed ? `<div style="color: var(--danger-red); font-size: 0.72rem; font-weight: bold; margin-top: 3px;">🔒 ${lockReasons.join(" • ")}</div>` : ''}
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -9711,19 +10636,30 @@ Thanks to Mike for being ace.</p>
                     }
                 });
             } else if (activeModalItemType === "upgrade") {
-                UPGRADES.forEach(u => {
-                    if (u.name.toLowerCase().includes(query) || u.special.toLowerCase().includes(query)) {
+                const upgradesList = getActiveUpgrades();
+                upgradesList.forEach(u => {
+                    if (u.name.toLowerCase().includes(query) || (u.special && u.special.toLowerCase().includes(query))) {
                         
                         const isElectrical = u.electrical === true;
-                        let isSponsorAllowed = !isElectrical || appState.sponsor === "Mishkin";
-                        let sponsorReason = isElectrical ? "Mishkin only (Electrical)" : "";
+                        let isSponsorAllowed = !isElectrical || appState.sponsor === "Mishkin" || (isV3() && vehicle.type === "Van");
+                        let sponsorReason = isElectrical ? "Mishkin or Van only (Electrical)" : "";
                         
                         if (u.name === "Louder Siren" && appState.sponsor !== "Highway Patrol") {
                             isSponsorAllowed = false;
                             sponsorReason = "Highway Patrol only";
                         }
                         
-                        let isWeightAllowed = !((u.name === "Exploding Ram" || u.name === "Experimental Nuclear Engine") && vBase.weight === "Lightweight");
+                        let isWeightAllowed = true;
+                        if (!isV3() && (u.name === "Exploding Ram" || u.name === "Experimental Nuclear Engine") && vBase.weight === "Lightweight") {
+                            isWeightAllowed = false;
+                        }
+                        if (isV3() && u.name === "Trailer (Middleweight)" && (typeof vBase.weight === 'number' && vBase.weight < 2)) {
+                            isWeightAllowed = false;
+                        }
+                        if (isV3() && u.name === "Trailer (Heavyweight)" && (typeof vBase.weight === 'number' && vBase.weight < 4)) {
+                            isWeightAllowed = false;
+                        }
+
                         let isTracksAllowed = !(u.name === "Tank Tracks" && (vehicle.type === "Tank" || vehicle.type === "Helicopter" || vehicle.type === "Gyrocopter"));
                         
                         let isCrewAllowed = true;
@@ -9732,32 +10668,45 @@ Thanks to Mike for being ace.</p>
                             if (extraCount >= vBase.crew) isCrewAllowed = false;
                         }
 
-                        let cost = u.cost;
-                        if (appState.sponsor === "Idris" && u.name === "Nitro Booster") cost = 3;
-                        if (appState.sponsor === "Scarlett" && u.name === "Extra Crewmember") cost = 2;
+                        // Rare upgrade limit in v3
+                        let isRareLimitViolated = false;
+                        if (isV3() && u.category === "Rare") {
+                            let countInTeam = 0;
+                            appState.vehicles.forEach(otherV => {
+                                countInTeam += otherV.upgrades.filter(ou => ou.name === u.name).length;
+                            });
+                            if (countInTeam >= 1) isRareLimitViolated = true;
+                        }
 
-                        const upgradeSlots = (appState.sponsor === "Slime" && u.name === "Ram") ? 0 : u.slots;
+                        let cost = u.cost;
+                        if (appState.sponsor === "Idris" && u.name === "Nitro Booster") cost = isV3() ? 2 : 3;
+                        if (appState.sponsor === "Scarlett" && u.name === "Extra Crewmember") cost = isV3() ? 1 : 2;
+
+                        let upgradeSlots = (appState.sponsor === "Slime" && u.name === "Ram") ? 0 : (u.slots || 0);
+                        if (isV3() && u.name.startsWith("Trailer")) upgradeSlots = 0;
+
                         const hasSlots = (currentSlots + upgradeSlots <= maxSlots);
                         const hasBudget = (totalSpent + cost <= appState.budget);
 
                         let lockReasons = [];
                         if (!isSponsorAllowed) lockReasons.push(sponsorReason);
-                        if (!isWeightAllowed) lockReasons.push("Non-Lightweight only");
+                        if (!isWeightAllowed) lockReasons.push("Weight requirement not met");
                         if (!isTracksAllowed) lockReasons.push("Forbidden on Tank/Heli/Gyro");
                         if (!isCrewAllowed) lockReasons.push("Max crew limit reached");
+                        if (isRareLimitViolated) lockReasons.push("Rare limit: Max 1 per team");
                         if (!hasSlots) lockReasons.push(`No slots (${upgradeSlots} needed, ${maxSlots - currentSlots} left)`);
                         if (!hasBudget) lockReasons.push(`Over budget (${cost} Cans, ${appState.budget - totalSpent} left)`);
 
                         const isAllowed = lockReasons.length === 0;
-                        
+
                         const item = document.createElement("div");
                         item.className = "selection-item" + (!isAllowed ? " locked-item" : "");
-
+                        
                         item.innerHTML = `
                             <div class="selection-item-details">
-                                <div class="selection-item-title">${u.name} ${isElectrical ? '⚡' : ''}</div>
+                                <div class="selection-item-title">${u.name} ${isElectrical ? '⚡' : ''} ${u.category === 'Rare' ? '<span style="color:#facc15; font-size:0.7rem; font-weight:bold;">[RARE]</span>' : ''}</div>
                                 <div class="selection-item-meta">${upgradeSlots > 0 ? `${upgradeSlots} Slots` : '0 Slots'}</div>
-                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${u.special}</div>
+                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${u.special || ''}</div>
                                 ${!isAllowed ? `<div style="color: var(--danger-red); font-size: 0.72rem; font-weight: bold; margin-top: 3px;">🔒 ${lockReasons.join(" • ")}</div>` : ''}
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -9778,143 +10727,49 @@ Thanks to Mike for being ace.</p>
                         container.appendChild(item);
                     }
                 });
-
-                // Verney custom upgrade
-                if (appState.sponsor === "Verney" && "microplate armour".includes(query)) {
-                    const cost = 6;
-                    const hasBudget = (totalSpent + cost <= appState.budget);
-                    const item = document.createElement("div");
-                    item.className = "selection-item" + (!hasBudget ? " locked-item" : "");
-                    item.innerHTML = `
-                        <div class="selection-item-details">
-                            <div class="selection-item-title">MicroPlate Armour 🛡️</div>
-                            <div class="selection-item-meta">0 Slots • Verney Sponsored</div>
-                            <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">Increases the vehicle's Hull Value by 2.</div>
-                            ${!hasBudget ? `<div style="color: var(--danger-red); font-size: 0.72rem; font-weight: bold; margin-top: 3px;">🔒 Over budget (${cost} Cans, ${appState.budget - totalSpent} left)</div>` : ''}
-                        </div>
-                        <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                            <span class="selection-item-cost" style="${!hasBudget ? 'color: var(--danger-red);' : ''}">6 Cans</span>
-                        </div>
-                    `;
-                    if (hasBudget) {
-                        item.onclick = () => {
-                            selectUpgrade({ name: "MicroPlate Armour", slots: 0, cost: 6, special: "+2 Hull Points. (Verney Sponsored)" });
-                            closeModal();
-                        };
-                    } else {
-                        item.onclick = () => {
-                            alert("Cannot add MicroPlate Armour: would exceed Can budget.");
-                        };
-                    }
-                    container.appendChild(item);
-                }
-
-                // Rusty custom upgrade - Trailers
-                if (appState.sponsor === "Rusty's Bootleggers") {
-                    const trailers = [
-                        { name: "Trailer (Lightweight)", slots: 0, cost: 4, special: "Articulated. Piledriver. Stowage: cab weapon mount." },
-                        { name: "Trailer (Middleweight)", slots: 1, cost: 8, special: "Middleweight/Heavyweight only. Articulated. Stowage: cab/trailer mount." },
-                        { name: "Trailer (Heavyweight)", slots: 3, cost: 12, special: "Heavyweight only. Articulated. Stowage: cab/trailer mount." }
-                    ];
-                    trailers.forEach(t => {
-                        if (t.name.toLowerCase().includes(query)) {
-                            let allowed = true;
-                            let reason = "";
-                            if (t.name.includes("Middleweight") && vBase.weight === "Lightweight") { allowed = false; reason = "Middle/Heavy only"; }
-                            if (t.name.includes("Heavyweight") && vBase.weight !== "Heavyweight") { allowed = false; reason = "Heavyweight only"; }
-                            if (currentSlots + t.slots > maxSlots) { allowed = false; reason = `Needs ${t.slots} slots (${maxSlots - currentSlots} left)`; }
-                            if (totalSpent + t.cost > appState.budget) { allowed = false; reason = `Over budget (${t.cost} Cans, ${appState.budget - totalSpent} left)`; }
-
-                            const item = document.createElement("div");
-                            item.className = "selection-item" + (!allowed ? " locked-item" : "");
-                            item.innerHTML = `
-                                <div class="selection-item-details">
-                                    <div class="selection-item-title">${t.name}</div>
-                                    <div class="selection-item-meta">${t.slots} Slots • Rusty Cargo</div>
-                                    <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${t.special}</div>
-                                    ${!allowed ? `<div style="color: var(--danger-red); font-size: 0.72rem; font-weight: bold; margin-top: 3px;">🔒 ${reason}</div>` : ''}
-                                </div>
-                                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                                    <span class="selection-item-cost">${t.cost} Cans</span>
-                                </div>
-                            `;
-                            if (allowed) {
-                                item.onclick = () => {
-                                    selectUpgrade(t);
-                                    closeModal();
-                                };
-                            } else {
-                                item.onclick = () => {
-                                    alert("Cannot add " + t.name + ": " + reason);
-                                };
-                            }
-                            container.appendChild(item);
-                        }
-                    });
-
-                    const cargo = [
-                        { name: "Peach Moonshine", slots: 0, cost: 0, special: "Free trailer cargo. Molotov Cocktails have infinite Ammo tokens." },
-                        { name: "Sourmash Jet Booster", slots: 0, cost: 0, special: "Free trailer cargo. End of movement: if 5+ hazards, make forced Long Straight move forward." },
-                        { name: "Siphon Pump", slots: 0, cost: 0, special: "Free trailer cargo. Start of Attack Step: steal up to 1 hazard from each vehicle in Short range." },
-                        { name: "Old Fashioned Corn Liquor", slots: 0, cost: 0, special: "Free trailer cargo. Enemies in Medium range gain 1 additional hazard whenever they gain hazard tokens." },
-                        { name: "Cattle-Hammer", slots: 0, cost: 0, special: "Free trailer cargo. Adjust gear to any gear up to max during Wipeout step or collisions." }
-                    ];
-                    cargo.forEach(c => {
-                        if (c.name.toLowerCase().includes(query)) {
-                            const item = document.createElement("div");
-                            item.className = "selection-item";
-                            item.innerHTML = `
-                                <div class="selection-item-details">
-                                    <div class="selection-item-title">${c.name} (Cargo)</div>
-                                    <div class="selection-item-meta">0 Slots • Trailer Cargo</div>
-                                    <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${c.special}</div>
-                                </div>
-                                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                                    <span class="selection-item-cost">FREE</span>
-                                </div>
-                            `;
-                            item.onclick = () => {
-                                selectUpgrade(c);
-                                closeModal();
-                            };
-                            container.appendChild(item);
-                        }
-                    });
-                }
             } else if (activeModalItemType === "perk") {
-                const isSponsorless = !appState.sponsor || appState.sponsor === "Sponsorless";
-                const sponsorInfo = SPONSORS.find(s => s.name === appState.sponsor);
-                const allowedClasses = sponsorInfo ? sponsorInfo.perks : [];
+                const perksList = getActivePerks();
+                const sp = getActiveSponsors().find(s => s.name === appState.sponsor);
+                const allowedClasses = sp ? sp.perks : [];
+                const isSponsorless = !sp || sp.name === "Sponsorless" || sp.name === "None (Sponsorless)";
 
-                PERKS.forEach(p => {
-                    // If a sponsor is added, only allow perks that are permitted by that sponsor!
-                    if (!isSponsorless && !allowedClasses.includes(p.class)) {
-                        return; // Exclude entirely from list
-                    }
+                let archPerkClass = null;
+                if (isV3()) {
+                    const arch = DRIVER_ARCHETYPES_V3.find(a => a.name === (vehicle.driverArchetype || "Road Warrior"));
+                    if (arch) archPerkClass = arch.perkClass.toLowerCase();
+                }
 
-                    if (p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query)) {
+                perksList.forEach(p => {
+                    if (p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query))) {
+                        
+                        let isClassAllowed = isSponsorless || allowedClasses.includes(p.class);
+                        if (isV3() && archPerkClass && p.class.toLowerCase() === archPerkClass) {
+                            isClassAllowed = true;
+                        }
+
                         const hasBudget = (totalSpent + p.cost <= appState.budget);
-                        const isDuplicate = vehicle.perks.some(ex => ex.name === p.name);
 
                         let lockReasons = [];
+                        if (!isClassAllowed) lockReasons.push("Not in sponsor or driver perk class");
                         if (!hasBudget) lockReasons.push(`Over budget (${p.cost} Cans, ${appState.budget - totalSpent} left)`);
-                        if (isDuplicate) lockReasons.push("Already equipped");
 
                         const isAllowed = lockReasons.length === 0;
 
                         const item = document.createElement("div");
                         item.className = "selection-item" + (!isAllowed ? " locked-item" : "");
+                        
                         item.innerHTML = `
                             <div class="selection-item-details">
                                 <div class="selection-item-title">${p.name}</div>
-                                <div class="selection-item-meta">${p.class.toUpperCase()}</div>
-                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${p.desc}</div>
+                                <div class="selection-item-meta">${p.class.toUpperCase()} Class</div>
+                                <div class="selection-item-meta" style="color:var(--text-muted); font-size:0.75rem;">${p.desc || ''}</div>
                                 ${!isAllowed ? `<div style="color: var(--danger-red); font-size: 0.72rem; font-weight: bold; margin-top: 3px;">🔒 ${lockReasons.join(" • ")}</div>` : ''}
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end;">
                                 <span class="selection-item-cost" style="${!hasBudget ? 'color: var(--danger-red);' : ''}">${p.cost} Cans</span>
                             </div>
                         `;
+                        
                         if (isAllowed) {
                             item.onclick = () => {
                                 selectPerk(p);
@@ -9930,8 +10785,7 @@ Thanks to Mike for being ace.</p>
                 });
             }
         }
-
-        // Handle item selection and pushing to state
+        
         function selectWeapon(w) {
             const v = appState.vehicles.find(car => car.id === activeModalTargetVehicleId);
             if (!v) return;
@@ -10170,12 +11024,15 @@ Thanks to Mike for being ace.</p>
                     v.hazard = val;
                 }
                 
-                let hazardLimit = 6;
-                if (appState.sponsor === "Rusty's Bootleggers") {
-                    hazardLimit = 8;
-                }
-                
-                if (v.hazard >= hazardLimit) {
+                let hazardLimit = 10;
+                if (v.hazard > hazardLimit) {
+                    if (isV3()) {
+                        const excess = v.hazard - hazardLimit;
+                        v.damage = (v.damage || 0) + excess;
+                        if (typeof showNetworkToast === 'function') {
+                            showNetworkToast(`⚠️ Max 10 Hazards reached on ${escapeHtml(v.name)}! ${excess} excess converted to Hull damage.`);
+                        }
+                    }
                     v.hazard = hazardLimit;
                 }
                 if (v.hazard < 0) {
@@ -10249,13 +11106,77 @@ Thanks to Mike for being ace.</p>
             saveState();
         }
 
+        // Team Perks Modal
+        function openTeamPerksModal() {
+            const container = document.getElementById("team-perks-content-list");
+            if (container) {
+                if (!appState.vehicles || appState.vehicles.length === 0) {
+                    container.innerHTML = `<div style="font-style:italic; color:var(--text-muted); font-size:0.8rem; padding:0.5rem;">No vehicles on your team yet. Add vehicles in the Garage.</div>`;
+                } else {
+                    let html = "";
+                    appState.vehicles.forEach(v => {
+                        const archName = isV3() ? (v.driverArchetype || "Standard Driver") : "Driver";
+                        const archObj = (typeof DRIVER_ARCHETYPES_V3 !== 'undefined') ? 
+                            (DRIVER_ARCHETYPES_V3.find(a => a.name === archName) || DRIVER_ARCHETYPES_V3[0]) : null;
+                        
+                        let perksHtml = "";
+                        if (v.perks && v.perks.length > 0) {
+                            perksHtml = v.perks.map(p => `
+                                <div style="background:rgba(255,255,255,0.04); border-left:3px solid var(--glow-color); padding:0.35rem 0.55rem; border-radius:4px; margin-top:0.3rem;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-weight:bold; color:var(--text-primary); font-size:0.75rem;">⭐ ${escapeHtml(p.name)}</span>
+                                        <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">${escapeHtml(p.class || '')} • ${p.cost || 0} Cans</span>
+                                    </div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px; line-height:1.3;">${escapeHtml(p.desc || '')}</div>
+                                </div>
+                            `).join('');
+                        } else {
+                            perksHtml = `<div style="font-size:0.72rem; color:var(--text-muted); font-style:italic; margin-top:0.3rem;">No perks equipped on this vehicle.</div>`;
+                        }
+
+                        html += `
+                            <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:0.65rem;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.35rem;">
+                                    <div>
+                                        <span style="font-family:'Orbitron',sans-serif; font-weight:bold; color:#fff; font-size:0.85rem;">${escapeHtml(v.name)}</span>
+                                        <span style="font-size:0.72rem; color:var(--text-muted); margin-left:0.4rem; text-transform:uppercase;">(${escapeHtml(v.type)})</span>
+                                    </div>
+                                    ${isV3() ? `<span style="font-size:0.72rem; color:#facc15; font-weight:bold; font-family:'Orbitron',sans-serif;">${escapeHtml(archName)}</span>` : ''}
+                                </div>
+                                ${isV3() && archObj && archObj.ability ? `
+                                    <div style="font-size:0.72rem; color:#a3e635; margin-top:0.35rem; line-height:1.35; background:rgba(163,230,53,0.07); padding:0.3rem 0.5rem; border-radius:4px; border:1px solid rgba(163,230,53,0.18);">
+                                        <strong>Special Ability:</strong> ${escapeHtml(archObj.ability)}
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top:0.4rem;">
+                                    <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); font-weight:bold;">Equipped Perks:</span>
+                                    ${perksHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+            }
+            const modal = document.getElementById("team-perks-modal");
+            if (modal) modal.classList.add("active");
+        }
+
+        function closeTeamPerksModal(event) {
+            if (event && event.target && event.target.id !== "team-perks-modal" && !event.target.classList.contains("close-modal-btn")) {
+                return;
+            }
+            const modal = document.getElementById("team-perks-modal");
+            if (modal) modal.classList.remove("active");
+        }
+
         // Votes
         function toggleVotesAccordion() {
             const hub = document.querySelector('.votes-hub');
             const btn = document.getElementById('votes-toggle-btn');
             if (!hub) return;
             const isExp = hub.classList.toggle('perks-expanded');
-            if (btn) btn.innerHTML = isExp ? '🎟️ Perks ▴' : '🎟️ Perks ▾';
+            if (btn) btn.innerHTML = isExp ? '⚡ Spends ▴' : '⚡ Spends ▾';
         }
 
         function adjustVotes(val) {
@@ -10398,11 +11319,21 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
-            const baseInfo = VEHICLE_TYPES.find(t => t.name === v.type) || { weight: "Middleweight", crew: 1 };
+            const allTypes = (typeof getActiveVehicleTypes === "function") ? getActiveVehicleTypes() : (isV3() ? VEHICLE_TYPES_V3 : VEHICLE_TYPES);
+            const baseInfo = allTypes.find(t => t.name.toLowerCase() === v.type.toLowerCase()) || 
+                             (typeof VEHICLE_TYPES_V3 !== "undefined" ? VEHICLE_TYPES_V3.find(t => t.name.toLowerCase() === v.type.toLowerCase()) : null) || 
+                             VEHICLE_TYPES.find(t => t.name.toLowerCase() === v.type.toLowerCase()) || 
+                             { weight: "Middleweight", crew: 1 };
             
             const typeDescriptions = {
-                "Buggy": "lightweight off-road buggy with exposed roll cage frame and four medium-sized knobby off-road wheels",
-                "Car": "midsize armored sedan car with four standard-sized wheels",
+                "Buggy": "lightweight off-road buggy with exposed roll cage frame and four knobby all-terrain wheels",
+                "Car": "midsize armored sedan combat car with reinforced steel plates and four standard-sized wheels",
+                "Passenger Car": "armored four-door passenger combat car with reinforced steel window grilles, heavy steel plate armor, and studded wasteland tires",
+                "Pickup": "rugged combat pickup truck with lifted suspension, reinforced flatbed roll-bar cage, external bull bars, and aggressive knobby off-road tires",
+                "Sports Car": "sleek aerodynamic combat sports car with low-slung widebody armor, aggressive twin hood air scoops, rear downforce wing, and wide racing slicks",
+                "Muscle Car": "heavy American muscle car with exposed supercharged V8 engine blower protruding through the hood, aggressive side exhaust pipes, reinforced crash bumper, and wide rear tires",
+                "Hot Rod": "chopped and channeled post-apocalyptic hot rod with exposed roaring chrome engine, flame-throwing zoomie exhaust headers, stripped-back steel chassis, and deep-dish rear drag wheels",
+                "Van": "heavily fortified combat transport van with riveted steel armored plating over side panels, slotted firing ports in the rear doors, roof turret hatch, and heavy-duty wheels",
                 "Performance Car": "low-profile aerodynamic high-speed performance sports car with four low-profile racing wheels",
                 "Truck": "midsize rugged pickup truck with four large heavy-duty off-road wheels",
                 "Heavy Truck": "heavy-duty six-wheeled industrial haul truck with massive reinforced steel cab and dual rear axles",
@@ -10418,7 +11349,7 @@ Thanks to Mike for being ace.</p>
                 "Tank": "heavy tracked armored combat tank with steel treads and low slung armored chassis",
                 "War Rig": "massive multi-wheeled articulated war rig semi-trailer truck with eighteen large commercial wheels"
             };
-            const typeDesc = typeDescriptions[v.type] || `${baseInfo.weight.toLowerCase()} ${v.type.toLowerCase()}`;
+            const typeDesc = typeDescriptions[v.type] || `${(typeof baseInfo.weight === 'string' ? baseInfo.weight.toLowerCase() : 'combat')} ${v.type.toLowerCase()}`;
             
             // Radio select for purpose
             const radios = document.getElementsByName("prompt-purpose");
@@ -10500,7 +11431,8 @@ Thanks to Mike for being ace.</p>
 
             // Crew calculations & Action-Movie seated posture description
             const extraCrew = (v.upgrades || []).filter(u => u.name === "Extra Crewmember").length;
-            const totalCrew = Math.max(1, (baseInfo.crew || 1) + extraCrew);
+            const nominalCrew = (baseInfo.crew !== undefined) ? baseInfo.crew : (v.crew !== undefined ? v.crew : 1);
+            const totalCrew = Math.max(1, nominalCrew + extraCrew);
 
             let crewArmText = "";
             if (crewWeapons.length > 0) {
@@ -10524,20 +11456,20 @@ Thanks to Mike for being ace.</p>
                 const steering = isBike ? "handlebars" : "steering wheel";
                 const driverTitle = isBike ? "rider" : "driver";
                 if (crewWeapons.length > 0) {
-                    crewText = `Vehicle crew of 1 seated ${driverTitle} inside actively steering behind the ${steering} even while armed with ${crewArmText} ready at hand`;
+                    crewText = `Vehicle crew of exactly 1 seated ${driverTitle} inside actively steering behind the ${steering} even while armed with ${crewArmText} ready at hand`;
                 } else {
-                    crewText = `Vehicle crew of 1 seated ${driverTitle} inside actively steering behind the ${steering} with grim focus even if armed`;
+                    crewText = `Vehicle crew of exactly 1 seated ${driverTitle} inside actively steering behind the ${steering} with grim focus even if armed`;
                 }
             } else if (totalCrew === 2) {
                 if (v.type === "Bike with Sidecar") {
-                    crewText = `Vehicle crew of 2 riders: 1 driver actively steering behind the handlebars even if armed, while 1 passenger is seated in the sidecar actively leaning out and firing out like an intense action movie scene, armed with ${crewArmText}`;
+                    crewText = `Vehicle crew of exactly 2 riders in seated positions: 1 driver actively steering behind the handlebars even if armed, while 1 passenger is seated in the sidecar actively leaning out and firing out like an intense action movie scene, armed with ${crewArmText}`;
                 } else if (v.type === "Buggy") {
-                    crewText = `Vehicle crew consisting of 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the roll cage frame firing out like an intense action movie scene, armed with ${crewArmText}`;
+                    crewText = `Vehicle crew consisting of exactly 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the roll cage frame firing out like an intense action movie scene, armed with ${crewArmText}`;
                 } else {
-                    crewText = `Vehicle crew consisting of 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the side window firing out of the vehicle like an intense action movie scene, armed with ${crewArmText}`;
+                    crewText = `Vehicle crew consisting of exactly 2 crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other 1 crew member is in a seated position actively leaning out of the side window firing out of the vehicle like an intense action movie scene, armed with ${crewArmText}`;
                 }
             } else {
-                crewText = `Vehicle crew consisting of ${totalCrew} crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other ${totalCrew - 1} crew members are in seated positions actively leaning out and firing out of the open side and rear windows like an explosive action movie scene, armed with ${crewArmText}`;
+                crewText = `Vehicle crew consisting of exactly ${totalCrew} crew members in seated positions: 1 crew member is actively driving the vehicle behind the steering wheel even if armed, while the other ${totalCrew - 1} crew members are in seated positions actively leaning out and firing out of the open side and rear windows like an explosive action movie scene, armed with ${crewArmText}`;
             }
 
             let teamSponsorDesc = "";
@@ -10545,7 +11477,7 @@ Thanks to Mike for being ace.</p>
             if (appState.sponsor && appState.sponsor !== "Sponsorless") teamSponsorDesc += `, sponsored by ${appState.sponsor}`;
 
             const fdmPromptSnippet = hasFdmLimit 
-                ? " Strict 4-colour limit optimization for multi-material FDM 3D printing (multi-color / Bambu AMS): designed with a maximum palette of exactly 4 distinct solid filament colours, clean sharp color-separated boundaries, flat solid color zones with zero color blending or gradients, and solid layer transitions optimized for multi-color FDM color-swapping with minimal purge waste."
+                ? " Multi-material FDM 3D printing optimization (Bambu AMS / multi-color palette): The vehicle model is intricately detailed with aggressive high-relief post-apocalyptic sculpting: heavy welded steel plates, individual bolts and rivets, pronounced engine blowers, rugged suspension coils, deep panel recesses, and functional weapon assemblies. All geometry is designed for tabletop gaming miniatures (28mm-32mm heroic scale). The color scheme is strictly grouped into an ultra-clean, high-contrast palette of exactly 4 distinct solid filament colors: (1) Main Armor/Chassis Body Color, (2) Gunmetal/Dark Steel for weapons, bull bars, and roll-cage framing, (3) Deep Matte Black for chunky treaded rubber tires and chassis undercarriage, and (4) High-visibility Accent Color (such as Hazard Orange, Warning Yellow, or Crimson Red) for rims, weapon sights, and painted war-markings. Features crisp, defined boundaries between separate physical components for flawless multi-color FDM slicing without color bleed, while maintaining an intricate, menacing, heavily detailed battle wagon sculpt."
                 : "";
 
             let description = "";
@@ -10734,6 +11666,23 @@ Thanks to Mike for being ace.</p>
         }, 400);
 
         // Global bridge — called by the Throw Dice button (in turn-phase-tracker)
+        
+        function triggerHandlingPushIt() {
+            const activeVeh = (typeof appState !== 'undefined' && appState.vehicles) ? 
+                (appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0]) : null;
+            if (activeVeh) {
+                activeVeh.hazard = (activeVeh.hazard || 0) + 1;
+                if (activeVeh.hazard > 10) {
+                    if (isV3()) activeVeh.damage = (activeVeh.damage || 0) + (activeVeh.hazard - 10);
+                    activeVeh.hazard = 10;
+                }
+                renderVehicles();
+                saveState();
+                if (window.showAppToast) window.showAppToast(`⚡ ${activeVeh.name} Pushed It! Gained 1 Hazard token.`);
+            }
+            if (typeof throwSkidDice3D === 'function') throwSkidDice3D();
+        }
+    
         function throwSkidDice3D() {
             const n = parseInt(document.getElementById('throw-dice-count').value, 10);
             if (window._dice3dReady) {
@@ -10878,7 +11827,7 @@ Thanks to Mike for being ace.</p>
         ctx.fillStyle = '#f2ede0';
         ctx.fillRect(0, 0, S, S);
 
-        if (diceType === 'd6') {
+        if (diceType === 'd6' || diceType === 'handling' || diceType === 'wipeout' || diceType === 'attack') {
             // Draw classic D6 pips (dots)
             ctx.fillStyle = '#111';
             const r = 45;
@@ -11272,30 +12221,86 @@ Thanks to Mike for being ace.</p>
         const diceType = document.getElementById('dice-type') ? document.getElementById('dice-type').value : 'skid';
         let rollResultStrings = [];
 
-        // Sort dice visually left-to-right (by X, then Z) so the history log and remote broadcast match the screen order
+        // Sort dice visually left-to-right (by X, then Z)
         const sortedDice = [...diceObjs].sort((a, b) => {
             const dx = a.mesh.position.x - b.mesh.position.x;
             return Math.abs(dx) > 0.25 ? dx : (a.mesh.position.z - b.mesh.position.z);
         });
 
-        sortedDice.forEach(d => {
-            counts[d.outcome]++;
-            if (diceType === 'd6') {
-                rollResultStrings.push(d.value);
-            } else {
-                rollResultStrings.push(`<span style="color:${OUTCOME_COLORS[d.outcome]}">${d.outcome.toUpperCase()}</span>`);
-            }
-        });
-
         let parts = [];
-        if (diceType === 'd6') {
+        const activeVeh = (typeof appState !== 'undefined' && appState.vehicles) ? 
+            (appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0]) : null;
+        const currentGear = activeVeh ? (activeVeh.gear || 1) : 1;
+
+        if (diceType === 'handling') {
+            let focus = 0;
+            let fury = 0;
+            sortedDice.forEach(d => {
+                const val = d.value;
+                if (val === 1 || val < currentGear) {
+                    fury++;
+                    rollResultStrings.push(`<span style="color:#ef4444; font-weight:bold;">${val} (🔥 Fury)</span>`);
+                } else {
+                    focus++;
+                    rollResultStrings.push(`<span style="color:#22c55e; font-weight:bold;">${val} (🎯 Focus)</span>`);
+                }
+            });
+            parts.push(`<span style="color:#facc15; font-weight:bold; font-family:'Orbitron',sans-serif;">Gear ${currentGear} Check:</span>`);
+            parts.push(`<span style="color:#22c55e; font-weight:bold;">🎯 ${focus} Focus</span>`);
+            parts.push(`<span style="color:#ef4444; font-weight:bold;">🔥 ${fury} Fury</span>`);
+            parts.push(`<button class="btn btn-sm" onclick="triggerHandlingPushIt()" style="font-size:0.7rem; padding:0.15rem 0.5rem; background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#fca5a5; cursor:pointer;" title="Gain 1 Hazard to re-roll any number of dice once">Push It (+1 Haz)</button>`);
+        } else if (diceType === 'wipeout') {
+            let fury = 0;
+            sortedDice.forEach(d => {
+                const val = d.value;
+                if (val === 1 || val < currentGear) {
+                    fury++;
+                    rollResultStrings.push(`<span style="color:#ef4444; font-weight:bold;">${val} (🔥 Fury)</span>`);
+                } else {
+                    rollResultStrings.push(`<span style="color:#94a3b8;">${val}</span>`);
+                }
+            });
+            if (fury < 3) {
+                parts.push(`<span style="color:#4ade80; font-weight:bold; font-family:'Orbitron',sans-serif;">🛡️ HOLD IT TOGETHER! (${fury} Fury &lt; 3. Discard 1 Hazard token, no wipeout!)</span>`);
+            } else {
+                const moveDist = currentGear <= 2 ? 'Short' : (currentGear <= 4 ? 'Medium' : 'Long');
+                const crunchDmg = currentGear <= 2 ? 1 : (currentGear <= 4 ? 2 : 3);
+                parts.push(`<span style="color:#ef4444; font-weight:bold; font-family:'Orbitron',sans-serif;">💥 WIPEOUT! (${fury} Fury &ge; 3. Forced Move: ${moveDist} Straight. Crunch: ${crunchDmg} Dmg. Reset Gear 1 &amp; Clear Hazards!)</span>`);
+            }
+        } else if (diceType === 'attack') {
+            let normalHits = 0;
+            let crits = 0;
+            sortedDice.forEach(d => {
+                const val = d.value;
+                if (val === 6) {
+                    crits++;
+                    rollResultStrings.push(`<span style="color:#eab308; font-weight:bold;">${val} (⚡ CRIT)</span>`);
+                } else if (val >= 4) {
+                    normalHits++;
+                    rollResultStrings.push(`<span style="color:#4ade80; font-weight:bold;">${val} (🎯 Hit)</span>`);
+                } else {
+                    rollResultStrings.push(`<span style="color:#64748b;">${val}</span>`);
+                }
+            });
+            parts.push(`<span style="color:#facc15; font-weight:bold; font-family:'Orbitron',sans-serif;">⚔️ Hits: ${normalHits + crits}</span>`);
+            if (crits > 0) parts.push(`<span style="color:#eab308; font-weight:bold;">⚡ ${crits} Critical (IGNORES ARMOUR)</span>`);
+            if (normalHits > 0) parts.push(`<span style="color:#4ade80;">🎯 ${normalHits} Normal (Cancelled by Armour)</span>`);
+        } else if (diceType === 'd6') {
+            sortedDice.forEach(d => {
+                counts[d.outcome]++;
+                rollResultStrings.push(d.value);
+            });
             const sum = sortedDice.reduce((s, d) => s + d.value, 0);
             parts.push(`<span style="color:#f2ede0">D6: ${sortedDice.map(d => d.value).join(', ')}${sortedDice.length > 1 ? ` (Total: ${sum})` : ''}</span>`);
         } else {
-            if (counts.shift)  parts.push(`<span class="rs-shift">${counts.shift}\u00d7 Shift</span>`);
-            if (counts.slide)  parts.push(`<span class="rs-slide">${counts.slide}\u00d7 Slide</span>`);
-            if (counts.spin)   parts.push(`<span class="rs-spin">${counts.spin}\u00d7 Spin</span>`);
-            if (counts.hazard) parts.push(`<span class="rs-hazard">${counts.hazard}\u00d7 Hazard</span>`);
+            sortedDice.forEach(d => {
+                counts[d.outcome]++;
+                rollResultStrings.push(`<span style="color:${OUTCOME_COLORS[d.outcome]}">${d.outcome.toUpperCase()}</span>`);
+            });
+            if (counts.shift)  parts.push(`<span class="rs-shift">${counts.shift}&times; Shift</span>`);
+            if (counts.slide)  parts.push(`<span class="rs-slide">${counts.slide}&times; Slide</span>`);
+            if (counts.spin)   parts.push(`<span class="rs-spin">${counts.spin}&times; Spin</span>`);
+            if (counts.hazard) parts.push(`<span class="rs-hazard">${counts.hazard}&times; Hazard</span>`);
         }
 
         const resultJoined = rollResultStrings.join(' • ');
