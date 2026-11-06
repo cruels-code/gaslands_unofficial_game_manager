@@ -921,20 +921,40 @@
             background: rgba(27, 34, 22, 0.85);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 0.5rem 1rem;
-            margin-bottom: 1.5rem;
+            padding: 0.45rem 0.85rem;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+            gap: 0.75rem;
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
             backdrop-filter: blur(12px);
         }
         
-        .tracker-group {
+        .turn-phase-tracker .tracker-group {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.45rem;
+            flex-shrink: 0;
+        }
+
+        .turn-phase-tracker #v3-tracker-panel,
+        .turn-phase-tracker #v2-tracker-panel {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: nowrap !important;
+            flex-shrink: 0;
+        }
+
+        .turn-phase-tracker .play-dice-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: auto;
+            flex-shrink: 0;
+            flex-wrap: nowrap !important;
         }
         
         .tracker-label {
@@ -3173,7 +3193,12 @@
                 </button>
                 <div class="input-group">
                     <label for="team-name-input">Team Name</label>
-                    <input type="text" id="team-name-input" placeholder="Enter Team Name..." onchange="updateTeamName()" value="">
+                    <div style="display: flex; gap: 0.35rem; align-items: center;">
+                        <input type="text" id="team-name-input" placeholder="Enter Team Name..." onchange="updateTeamName()" value="">
+                        <button type="button" class="btn btn-sm" onclick="openTeamManagerModal()" title="Manage &amp; Switch Teams" style="padding: 0.35rem 0.6rem; font-family: 'Orbitron', monospace, sans-serif; white-space: nowrap; font-size: 0.75rem; border: 1px solid var(--glow-color); color: var(--glow-color); background: rgba(245, 158, 11, 0.12); border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+                            📂 Teams
+                        </button>
+                    </div>
                 </div>
                 <div class="input-group" id="sponsor-input-group">
                     <label for="sponsor-select">Team Sponsor</label>
@@ -3216,13 +3241,17 @@
         <!-- GARAGE VIEW -->
         <div id="garage-view" class="view-section active">
             <div class="garage-top-controls">
-                <div class="left">
-                    <button class="btn" onclick="addVehicle()">➕ Add Vehicle</button>
-                    <button class="btn btn-danger" onclick="confirmReset()">🧹 Clear Team</button>
+                <div class="left" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary" onclick="openTeamManagerModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Orbitron', sans-serif; font-weight: 700; background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(245, 158, 11, 0.15)); border-color: var(--glow-color); color: var(--glow-color);">
+                        <span>📂</span> Team Manager
+                    </button>
+                    <button type="button" class="btn" onclick="addVehicle()">➕ Add Vehicle</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmReset()">🧹 Clear Team</button>
                 </div>
-                <div class="right" style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button class="btn" onclick="exportTeam()">📤 Export Team</button>
-                    <button class="btn" onclick="triggerImport()">📥 Import Team</button>
+                <div class="right" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn" onclick="openTeamManagerModal()">📂 Switch Team</button>
+                    <button type="button" class="btn" onclick="exportTeam()">📤 Export</button>
+                    <button type="button" class="btn" onclick="triggerImport()">📥 Import</button>
                     <input type="file" id="import-file-input" style="display: none;" onchange="importTeamFile(event)">
                 </div>
             </div>
@@ -3238,9 +3267,9 @@
             <!-- Game Turn & Phase Tracker (v2) or Round & Pole Position Tracker (v3) -->
             <div class="turn-phase-tracker" id="play-turn-tracker-container">
                 <!-- v2 Refuelled Tracker Panel -->
-                <div id="v2-tracker-panel" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <div id="v2-tracker-panel" style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
                     <div class="tracker-group">
-                        <span class="tracker-label">Game Turn</span>
+                        <span class="tracker-label">Turn</span>
                         <div class="turn-controls">
                             <button class="turn-btn" onclick="adjustTurn(-1)">-</button>
                             <span class="turn-value" id="turn-display-val">1</span>
@@ -3261,9 +3290,9 @@
                 </div>
 
                 <!-- v3 3E Beta Tracker Panel -->
-                <div id="v3-tracker-panel" style="display: none; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <div id="v3-tracker-panel" style="display: none; gap: 0.65rem; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
                     <div class="tracker-group">
-                        <span class="tracker-label">Game Round</span>
+                        <span class="tracker-label">Round</span>
                         <div class="turn-controls">
                             <button class="turn-btn" onclick="adjustRound(-1)">-</button>
                             <span class="turn-value" id="round-display-val">1</span>
@@ -3271,25 +3300,25 @@
                         </div>
                     </div>
                     <div class="tracker-group">
-                        <span class="tracker-label">Pole Position</span>
-                        <button id="pole-position-btn" class="pole-position-badge" onclick="togglePolePosition()" title="Click to pass pole position clockwise" style="background: rgba(0,0,0,0.5); border: 1px solid #eab308; color: #facc15; padding: 0.35rem 0.75rem; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; font-weight: bold; cursor: pointer; transition: all 0.2s;">
+                        <button id="pole-position-btn" class="pole-position-badge" onclick="togglePolePosition()" title="Click to pass pole position clockwise" style="background: rgba(0,0,0,0.5); border: 1px solid #eab308; color: #facc15; padding: 0.35rem 0.65rem; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; font-weight: bold; cursor: pointer; transition: all 0.2s; white-space: nowrap;">
                             👑 POLE POSITION: YOU
                         </button>
                     </div>
                     <div class="tracker-group round-action-group">
-                        <button class="btn btn-primary" onclick="executeCleanUpPhase()" style="font-family:'Orbitron', sans-serif; font-size:0.75rem; font-weight:bold; padding: 0.38rem 0.85rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.15)); border: 1px solid #eab308; color: #facc15; cursor:pointer;" title="Clean Up Phase: reset activation tokens, remove 1 ignition token from wrecks, advance round">
+                        <button class="btn btn-primary" onclick="executeCleanUpPhase()" style="font-family:'Orbitron', sans-serif; font-size:0.75rem; font-weight:bold; padding: 0.35rem 0.75rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.15)); border: 1px solid #eab308; color: #facc15; cursor:pointer; white-space: nowrap;" title="Clean Up Phase: reset activation tokens, remove 1 ignition token from wrecks, advance round">
                             🧹 Clean Up &amp; Next Round
                         </button>
                     </div>
                 </div>
+
                 <!-- Throw Dice controls -->
-                <div style="display:flex; align-items:center; gap:0.5rem; margin-left:auto;">
+                <div class="play-dice-controls" id="play-dice-controls" style="display:flex; align-items:center; gap:0.35rem; margin-left:auto; flex-shrink:0; flex-wrap:nowrap;">
                     <div id="dice-toast-notification" class="dice-toast"></div>
-                    <select id="dice-type" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.5rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer;">
+                    <select id="dice-type" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer; max-width: 140px;">
                         <option value="skid" selected>Skid Dice</option>
                         <option value="d6">Standard D6</option>
                     </select>
-                    <select id="throw-dice-count" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.5rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer;">
+                    <select id="throw-dice-count" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer;">
                         <option value="1">1 Die</option>
                         <option value="2">2 Dice</option>
                         <option value="3" selected>3 Dice</option>
@@ -3301,13 +3330,13 @@
                         <option value="9">9 Dice</option>
                         <option value="10">10 Dice</option>
                     </select>
-                    <button id="api-key-btn" onclick="setRandomOrgApiKey()" style="font-family:'Orbitron',sans-serif; font-size:1.0rem; padding:0.25rem 0.6rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:var(--text-primary); cursor:pointer; transition:all 0.2s;" title="Set Random.org API Key">
+                    <button id="api-key-btn" onclick="setRandomOrgApiKey()" style="font-family:'Orbitron',sans-serif; font-size:0.95rem; padding:0.25rem 0.5rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:var(--text-primary); cursor:pointer; transition:all 0.2s;" title="Set Random.org API Key">
                         🔑
                     </button>
-                    <button id="dice-log-toggle-btn" onclick="toggleDiceLog()" style="font-family:'Orbitron',sans-serif; font-size:1.0rem; padding:0.25rem 0.6rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:var(--text-primary); cursor:pointer; transition:all 0.2s;" title="Toggle Dice History">
+                    <button id="dice-log-toggle-btn" onclick="toggleDiceLog()" style="font-family:'Orbitron',sans-serif; font-size:0.95rem; padding:0.25rem 0.5rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:var(--text-primary); cursor:pointer; transition:all 0.2s;" title="Toggle Dice History">
                         🕒
                     </button>
-                    <button id="throw-dice-btn" onclick="throwSkidDice3D()" style="font-family:'Orbitron',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:1px; padding:0.38rem 0.9rem; border-radius:8px; border:2px solid var(--glow-color); background:linear-gradient(135deg,rgba(100,200,50,0.18),rgba(60,140,20,0.08)); color:var(--glow-color); cursor:pointer; transition:all 0.2s; text-transform:uppercase;">
+                    <button id="throw-dice-btn" onclick="throwSkidDice3D()" style="font-family:'Orbitron',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.5px; padding:0.35rem 0.75rem; border-radius:6px; border:2px solid var(--glow-color); background:linear-gradient(135deg,rgba(100,200,50,0.18),rgba(60,140,20,0.08)); color:var(--glow-color); cursor:pointer; transition:all 0.2s; text-transform:uppercase; white-space:nowrap;">
                         🎲 Roll
                     </button>
                 </div>
@@ -3824,6 +3853,109 @@
         </div>
     </div>
 
+        <!-- Team Manager Modal -->
+    <div class="modal-overlay" id="team-manager-modal" onclick="closeTeamManagerModal(event)" style="z-index: 1060;">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 780px; width: 95%; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 0 35px var(--glow-shadow); border-color: var(--glow-color); padding: 1.25rem;">
+            <div class="modal-header" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
+                <div>
+                    <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem;">
+                        <span>📂</span> Gaslands Team Manager
+                    </h3>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">
+                        Store multiple rosters, switch teams on the fly, and manage your wasteland fleet.
+                    </div>
+                </div>
+                <button class="close-modal-btn" onclick="closeTeamManagerModal()">&times;</button>
+            </div>
+
+            <!-- Top Actions Toolbar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 0.8rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="toggleNewTeamDrawer()" style="display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'Orbitron', sans-serif; font-weight: 700;">
+                        <span>➕</span> Create New Team
+                    </button>
+                    <button type="button" class="btn btn-sm" onclick="triggerImportToLibrary()" style="display: inline-flex; align-items: center; gap: 0.35rem;" title="Import a JSON team file into your library">
+                        <span>📥</span> Import Team File
+                    </button>
+                    <input type="file" id="team-library-import-input" style="display:none;" onchange="importTeamToLibrary(event)" accept=".json">
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button type="button" class="btn btn-sm" onclick="exportAllTeamsBackup()" title="Download a single backup JSON file containing all your stored teams" style="font-size: 0.75rem;">
+                        <span>💾</span> Backup All Teams
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inline New Team Creator Drawer (Hidden by default) -->
+            <div id="new-team-drawer" style="display: none; background: rgba(0,0,0,0.45); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; margin-bottom: 0.8rem; box-shadow: inset 0 0 15px rgba(0,0,0,0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.4rem;">
+                    <span style="font-family: 'Orbitron', sans-serif; color: var(--glow-color); font-weight: 700; font-size: 0.9rem;">
+                        🏎️ CREATE NEW WASTELAND TEAM
+                    </span>
+                    <button type="button" class="btn btn-sm" onclick="toggleNewTeamDrawer(false)" style="padding: 2px 8px; font-size: 0.75rem;">✖ Cancel</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px;">Team Name</label>
+                        <div style="display: flex; gap: 0.3rem;">
+                            <input type="text" id="new-team-name-input" placeholder="e.g. Rust Bucket Brigade" style="flex: 1; padding: 0.4rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: var(--text-primary); font-family: 'Orbitron', sans-serif; font-size: 0.82rem;">
+                            <button type="button" class="btn btn-sm" onclick="randomizeNewTeamName()" title="Generate Random Wasteland Team Name">🎲</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px;">Sponsor</label>
+                        <select id="new-team-sponsor-select" style="width: 100%; padding: 0.4rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: var(--text-primary); font-size: 0.82rem;">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px;">Can Budget</label>
+                        <input type="number" id="new-team-budget-input" value="50" min="10" max="1000" style="width: 100%; padding: 0.4rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: var(--text-primary); font-size: 0.82rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px;">Ruleset Edition</label>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <label style="flex: 1; display: flex; align-items: center; gap: 0.35rem; background: rgba(0,0,0,0.4); padding: 0.4rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.78rem;">
+                                <input type="radio" name="new-team-ruleset" id="new-team-ruleset-v3" value="v3" checked onchange="populateNewTeamSponsorsDropdown()">
+                                <span style="color: #facc15; font-weight: bold;">⚡ V3 Beta</span>
+                            </label>
+                            <label style="flex: 1; display: flex; align-items: center; gap: 0.35rem; background: rgba(0,0,0,0.4); padding: 0.4rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.78rem;">
+                                <input type="radio" name="new-team-ruleset" id="new-team-ruleset-v2" value="v2" onchange="populateNewTeamSponsorsDropdown()">
+                                <span style="color: #38bdf8; font-weight: bold;">🏎️ Refuelled</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn btn-primary" onclick="createNewTeamFromDrawer()" style="padding: 0.45rem 1.2rem; font-family: 'Orbitron', sans-serif;">
+                        ✨ Create &amp; Switch to Team
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div style="flex: 1; overflow-y: auto; padding-right: 0.3rem; display: flex; flex-direction: column; gap: 1rem; max-height: calc(88vh - 160px);">
+                <!-- Active Team Overview Banner -->
+                <div id="team-manager-active-banner">
+                    <!-- Populated by renderTeamManagerModal -->
+                </div>
+
+                <!-- Stored Teams Grid / List -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.35rem;">
+                        <span style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: #facc15; letter-spacing: 0.5px; font-weight: 700;" id="team-manager-count-label">
+                            💾 STORED TEAMS ROSTER
+                        </span>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">Auto-saves changes as you build</span>
+                    </div>
+                    <div id="team-manager-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Team Cards dynamically injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Team Perks & Audience Votes Reference Modal -->
     <div class="modal-overlay" id="team-perks-modal" onclick="closeTeamPerksModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 650px; box-shadow: 0 0 35px var(--glow-shadow); border-color: var(--glow-color);">
@@ -3968,6 +4100,19 @@
                             <input type="checkbox" id="setting-show-ai-prompt" onchange="toggleAiPromptVisibility(this.checked)">
                             <span class="toggle-slider"></span>
                         </label>
+                    </div>
+                </div>
+
+                <!-- Team Manager Option -->
+                <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: bold; color: var(--text-primary);">Wasteland Team Manager</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Store multiple team rosters, switch between teams, or backup your collection.</div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="closeSettingsModal(); openTeamManagerModal();" style="display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'Orbitron', sans-serif; font-weight: 700;">
+                            <span>📂</span> Manage Teams
+                        </button>
                     </div>
                 </div>
 
@@ -4674,11 +4819,11 @@ Thanks to Mike for being ace.</p>
                 const prev = diceSelect.value;
                 if (current === "v3") {
                     diceSelect.innerHTML = `
-                        <option value="handling">Handling Dice (Focus &amp; Fury)</option>
+                        <option value="handling" title="Handling Dice (Focus &amp; Fury)">Handling Dice</option>
                         <option value="wipeout">Wipeout Check</option>
-                        <option value="attack">Attack Dice (Hits &amp; Crits)</option>
+                        <option value="attack" title="Attack Dice (Hits &amp; Crits)">Attack Dice</option>
                         <option value="d6">Standard D6</option>
-                        <option value="skid">Skid Dice (v2 Classic)</option>
+                        <option value="skid">Skid Dice (v2)</option>
                     `;
                     diceSelect.value = (prev === "skid" || prev === "d6") ? "handling" : (prev || "handling");
                 } else {
@@ -4995,11 +5140,13 @@ Thanks to Mike for being ace.</p>
 
     <!-- App State and Controller Logic -->
     <script>
+        var SAVED_TEAMS_KEY = "gaslands_saved_teams";
         // State variables
         let appState = {
             ruleset: localStorage.getItem("gaslands_ruleset") || "v2",
             round: 1,
             polePosition: "me",
+            teamId: null,
             teamName: "",
             sponsor: "Sponsorless",
             budget: 50,
@@ -8433,6 +8580,12 @@ Thanks to Mike for being ace.</p>
             if (urlParams.get("settings") === "1") {
                 setTimeout(openSettingsModal, 200);
             }
+            if (urlParams.get("tm") === "1") {
+                setTimeout(openTeamManagerModal, 250);
+                if (urlParams.get("newteam") === "1") {
+                    setTimeout(() => toggleNewTeamDrawer(true), 350);
+                }
+            }
 
         });
 
@@ -8494,6 +8647,7 @@ Thanks to Mike for being ace.</p>
             localStorage.setItem("gaslands_manager_state", JSON.stringify(stateToSave));
             if (syncVehicles && typeof debouncedSyncVehicles === "function") debouncedSyncVehicles();
             calculateCansSpent();
+            if (typeof syncActiveTeamToStorage === "function") syncActiveTeamToStorage();
         }
 
         // Load State
@@ -8515,6 +8669,9 @@ Thanks to Mike for being ace.</p>
             if (appState.phase === undefined) appState.phase = 1;
             if (appState.vehicles.length === 0) {
                 addVehicle(false);
+            }
+            if (typeof initTeamManagerStorage === "function") {
+                initTeamManagerStorage();
             }
 
             // Retrieve stored images from IndexedDB asynchronously
@@ -11241,6 +11398,670 @@ Thanks to Mike for being ace.</p>
             reader.readAsText(file);
             event.target.value = ""; // Clear file selector state
         }
+
+        // ========================================================
+        // GASLANDS TEAM MANAGER CONTROLLER & PERSISTENCE
+        // ========================================================
+        var SAVED_TEAMS_KEY = "gaslands_saved_teams";
+
+        function getSavedTeams() {
+            try {
+                const raw = localStorage.getItem(SAVED_TEAMS_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (e) {
+                console.error("Error reading saved teams:", e);
+            }
+            return [];
+        }
+
+        function saveTeamsList(teams) {
+            try {
+                localStorage.setItem(SAVED_TEAMS_KEY, JSON.stringify(teams));
+            } catch (e) {
+                console.error("Error saving teams list:", e);
+            }
+        }
+
+        function initTeamManagerStorage() {
+            let teams = getSavedTeams();
+            if (teams.length === 0) {
+                if (!appState.teamId) {
+                    appState.teamId = "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+                }
+                const defaultTeam = {
+                    id: appState.teamId,
+                    name: appState.teamName || "My Wasteland Team",
+                    sponsor: appState.sponsor || "None (Sponsorless)",
+                    budget: appState.budget || 50,
+                    ruleset: appState.ruleset || (isV3() ? "v3" : "v2"),
+                    votes: appState.votes || 0,
+                    round: appState.round || 1,
+                    turn: appState.turn || 1,
+                    phase: appState.phase || 1,
+                    polePosition: appState.polePosition || "me",
+                    vehicles: JSON.parse(JSON.stringify(appState.vehicles || [])),
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                defaultTeam.vehicles.forEach(v => {
+                    if (v.imageUrl) v.imageUrl = "db_stored";
+                });
+                teams = [defaultTeam];
+                saveTeamsList(teams);
+            } else {
+                if (!appState.teamId || !teams.some(t => t.id === appState.teamId)) {
+                    const matched = teams.find(t => t.name === appState.teamName && t.sponsor === appState.sponsor);
+                    if (matched) {
+                        appState.teamId = matched.id;
+                    } else {
+                        appState.teamId = teams[0].id;
+                    }
+                }
+            }
+        }
+
+        function syncActiveTeamToStorage(showToastFeedback = false) {
+            let teams = getSavedTeams();
+            if (!appState.teamId) {
+                appState.teamId = "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+            }
+            const activeSnapshot = {
+                id: appState.teamId,
+                name: appState.teamName || "Unnamed Team",
+                sponsor: appState.sponsor || "None (Sponsorless)",
+                budget: appState.budget || 50,
+                ruleset: appState.ruleset || (isV3() ? "v3" : "v2"),
+                votes: appState.votes || 0,
+                round: appState.round || 1,
+                turn: appState.turn || 1,
+                phase: appState.phase || 1,
+                polePosition: appState.polePosition || "me",
+                vehicles: JSON.parse(JSON.stringify(appState.vehicles || [])),
+                updatedAt: Date.now()
+            };
+            activeSnapshot.vehicles.forEach(v => {
+                if (v.imageUrl) v.imageUrl = "db_stored";
+            });
+
+            const idx = teams.findIndex(t => t.id === appState.teamId);
+            if (idx >= 0) {
+                activeSnapshot.createdAt = teams[idx].createdAt || Date.now();
+                teams[idx] = activeSnapshot;
+            } else {
+                activeSnapshot.createdAt = Date.now();
+                teams.unshift(activeSnapshot);
+            }
+            saveTeamsList(teams);
+            if (showToastFeedback && window.showAppToast) {
+                window.showAppToast(`💾 Team <strong>"${escapeHtml(activeSnapshot.name)}"</strong> synced to library.`);
+            }
+        }
+
+        function openTeamManagerModal() {
+            syncActiveTeamToStorage(false);
+            populateNewTeamSponsorsDropdown();
+            renderTeamManagerModal();
+            const modal = document.getElementById("team-manager-modal");
+            if (modal) modal.classList.add("active");
+        }
+
+        function closeTeamManagerModal(event) {
+            if (event && event.target && event.target.id !== "team-manager-modal" && !event.target.classList.contains("close-modal-btn")) {
+                return;
+            }
+            const modal = document.getElementById("team-manager-modal");
+            if (modal) modal.classList.remove("active");
+            toggleNewTeamDrawer(false);
+        }
+
+        function populateNewTeamSponsorsDropdown() {
+            const select = document.getElementById("new-team-sponsor-select");
+            if (!select) return;
+            const isNewV3 = document.getElementById("new-team-ruleset-v3") ? document.getElementById("new-team-ruleset-v3").checked : isV3();
+            const sponsors = (isNewV3 && typeof SPONSORS_V3 !== 'undefined') ? SPONSORS_V3 : (typeof SPONSORS !== 'undefined' ? SPONSORS : []);
+            
+            let html = `<option value="None (Sponsorless)">None (Sponsorless)</option>`;
+            sponsors.forEach(s => {
+                html += `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function toggleNewTeamDrawer(forceState) {
+            const drawer = document.getElementById("new-team-drawer");
+            if (!drawer) return;
+            const willShow = (forceState !== undefined) ? forceState : (drawer.style.display === "none");
+            drawer.style.display = willShow ? "block" : "none";
+            if (willShow) {
+                const nameInput = document.getElementById("new-team-name-input");
+                if (nameInput && !nameInput.value) {
+                    nameInput.value = generateTeamName();
+                }
+                populateNewTeamSponsorsDropdown();
+                setTimeout(() => { if (nameInput) nameInput.focus(); }, 50);
+            }
+        }
+
+        function generateTeamName() {
+            const adjs = [
+                "Rusty", "Atomic", "Hellish", "Screaming", "Vicious", "Toxic", "Psychotic", 
+                "Iron", "Scorched", "Rabid", "Grim", "Savage", "Bleeding", "Chrome", 
+                "Midnight", "Desert", "Wasteland", "Thunder", "Vengeful", "Doomsday",
+                "Ashen", "Bloodied", "Cursed", "Deranged", "Feral", "Mangled", "Radioactive"
+            ];
+            const nouns = [
+                "Warband", "Reapers", "Marauders", "Raiders", "Convoy", "Brigade", "Syndicate", 
+                "Scorpions", "Bastards", "Vultures", "Legion", "Horde", "Junkers", "Corsairs", 
+                "Outlaws", "Gladiators", "Drifters", "Hellions", "Overlords", "Rustbuckets"
+            ];
+            const a = adjs[Math.floor(Math.random() * adjs.length)];
+            const n = nouns[Math.floor(Math.random() * nouns.length)];
+            const formats = [
+                `The ${a} ${n}`,
+                `${a} ${n}`,
+                `${a} Road ${n}`,
+                `${n} of ${a} Doom`
+            ];
+            return formats[Math.floor(Math.random() * formats.length)];
+        }
+
+        function randomizeNewTeamName() {
+            const nameInput = document.getElementById("new-team-name-input");
+            if (nameInput) nameInput.value = generateTeamName();
+        }
+
+        function createStarterVehicle(ruleset) {
+            const isV3Rule = (ruleset === "v3");
+            return {
+                id: "veh_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+                name: isV3Rule ? "Interceptor" : "War Machine",
+                type: "Car",
+                driverArchetype: isV3Rule ? "Standard Driver" : undefined,
+                driverName: "",
+                weapons: [],
+                upgrades: [],
+                perks: [],
+                damage: 0,
+                hazard: 0,
+                gear: 1,
+                ammoStates: {},
+                onFire: false,
+                ghostRider: false,
+                distracted: false,
+                wrecked: false,
+                wreckTokens: 0,
+                readyToRespawn: false,
+                activatedThisRound: false,
+                hasPushedThisRound: false,
+                imageUrl: null
+            };
+        }
+
+        function createNewTeamFromDrawer() {
+            const nameInput = document.getElementById("new-team-name-input");
+            const sponsorSelect = document.getElementById("new-team-sponsor-select");
+            const budgetInput = document.getElementById("new-team-budget-input");
+            const rulesetV3 = document.getElementById("new-team-ruleset-v3");
+            
+            const teamName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : generateTeamName();
+            const sponsor = sponsorSelect ? sponsorSelect.value : "None (Sponsorless)";
+            const budget = budgetInput ? parseInt(budgetInput.value, 10) || 50 : 50;
+            const ruleset = (rulesetV3 && rulesetV3.checked) ? "v3" : "v2";
+            
+            // Save active team first
+            syncActiveTeamToStorage(false);
+            
+            const newTeam = {
+                id: "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+                name: teamName,
+                sponsor: sponsor,
+                budget: budget,
+                ruleset: ruleset,
+                votes: 0,
+                round: 1,
+                turn: 1,
+                phase: 1,
+                polePosition: "me",
+                vehicles: [ createStarterVehicle(ruleset) ],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            
+            let teams = getSavedTeams();
+            teams.unshift(newTeam);
+            saveTeamsList(teams);
+            
+            toggleNewTeamDrawer(false);
+            loadTeam(newTeam.id);
+            closeTeamManagerModal();
+            if (window.showAppToast) window.showAppToast(`🏎️ Created and loaded team: <strong>${escapeHtml(newTeam.name)}</strong>`);
+        }
+
+        function loadTeam(teamId) {
+            // Save current team before switching
+            syncActiveTeamToStorage(false);
+            
+            const teams = getSavedTeams();
+            const target = teams.find(t => t.id === teamId);
+            if (!target) {
+                alert("Could not find the selected team.");
+                return;
+            }
+            
+            appState.teamId = target.id;
+            appState.teamName = target.name || "Unnamed Team";
+            appState.sponsor = target.sponsor || "None (Sponsorless)";
+            appState.budget = target.budget || 50;
+            appState.votes = target.votes || 0;
+            appState.round = target.round || 1;
+            appState.turn = target.turn || 1;
+            appState.phase = target.phase || 1;
+            appState.polePosition = target.polePosition || "me";
+            
+            // Handle ruleset differences
+            const teamRuleset = target.ruleset || "v2";
+            if (teamRuleset !== appState.ruleset) {
+                setRuleset(teamRuleset);
+            }
+            
+            appState.vehicles = JSON.parse(JSON.stringify(target.vehicles || []));
+            if (appState.vehicles.length === 0) {
+                appState.vehicles.push(createStarterVehicle(teamRuleset));
+            }
+            
+            validateSponsorConstraints();
+            applySponsorTheme();
+            renderHeader();
+            renderSponsorInfo();
+            renderVehicles();
+            saveState(true);
+            
+            // Load vehicle images from IndexedDB asynchronously
+            let checkCount = 0;
+            let imagesLoadedCount = 0;
+            appState.vehicles.forEach(v => {
+                if (v.imageUrl === "db_stored") {
+                    checkCount++;
+                    getImageFromDB(v.id, function(base64Data) {
+                        if (base64Data) {
+                            v.imageUrl = base64Data;
+                        } else {
+                            v.imageUrl = null;
+                        }
+                        imagesLoadedCount++;
+                        if (imagesLoadedCount === checkCount) {
+                            renderVehicles();
+                            if (window.NetworkManager && window.NetworkManager.isConnected()) {
+                                window.NetworkManager.syncVehicles();
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (window.NetworkManager && window.NetworkManager.isConnected()) {
+                window.NetworkManager.syncVehicles();
+                if (typeof window.NetworkManager.updatePresenceMetadata === 'function') {
+                    window.NetworkManager.updatePresenceMetadata();
+                }
+            }
+            
+            renderTeamManagerModal();
+            closeTeamManagerModal();
+            if (window.showAppToast) window.showAppToast(`🏎️ Switched to team: <strong>${escapeHtml(target.name)}</strong>`);
+        }
+
+        function duplicateTeam(teamId) {
+            const teams = getSavedTeams();
+            const source = teams.find(t => t.id === teamId) || (teamId === appState.teamId ? {
+                id: appState.teamId,
+                name: appState.teamName,
+                sponsor: appState.sponsor,
+                budget: appState.budget,
+                ruleset: appState.ruleset,
+                vehicles: appState.vehicles
+            } : null);
+            
+            if (!source) return;
+            
+            const copy = JSON.parse(JSON.stringify(source));
+            copy.id = "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+            copy.name = (copy.name || "Team") + " (Copy)";
+            copy.createdAt = Date.now();
+            copy.updatedAt = Date.now();
+            
+            // Duplicate vehicles with new IDs and duplicate IndexedDB images
+            if (Array.isArray(copy.vehicles)) {
+                copy.vehicles.forEach(v => {
+                    const oldId = v.id;
+                    v.id = "veh_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+                    if (v.imageUrl === "db_stored" && typeof getImageFromDB === 'function' && typeof saveImageToDB === 'function') {
+                        getImageFromDB(oldId, function(base64Data) {
+                            if (base64Data) saveImageToDB(v.id, base64Data);
+                        });
+                    }
+                });
+            }
+            
+            teams.unshift(copy);
+            saveTeamsList(teams);
+            renderTeamManagerModal();
+            if (window.showAppToast) window.showAppToast(`📋 Duplicated team: <strong>${escapeHtml(copy.name)}</strong>`);
+        }
+
+        function promptRenameTeam(teamId) {
+            const teams = getSavedTeams();
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            if (typeof showAppPrompt === 'function') {
+                showAppPrompt("Enter new team name:", team.name, (newName) => {
+                    if (newName && newName.trim()) {
+                        team.name = newName.trim();
+                        team.updatedAt = Date.now();
+                        saveTeamsList(teams);
+                        if (appState.teamId === teamId) {
+                            appState.teamName = team.name;
+                            const input = document.getElementById("team-name-input");
+                            if (input) input.value = team.name;
+                            saveState();
+                        }
+                        renderTeamManagerModal();
+                        if (window.showAppToast) window.showAppToast(`✏️ Renamed team to <strong>"${escapeHtml(team.name)}"</strong>`);
+                    }
+                });
+            }
+        }
+
+        function confirmDeleteTeam(teamId) {
+            const teams = getSavedTeams();
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            const warningMsg = `Are you sure you want to delete the team "${team.name}"?\n\nThis will permanently remove this team from your storage.`;
+            showAppConfirm(warningMsg, () => {
+                let updated = teams.filter(t => t.id !== teamId);
+                if (updated.length === 0) {
+                    const freshTeam = {
+                        id: "team_" + Date.now(),
+                        name: "My Wasteland Team",
+                        sponsor: "None (Sponsorless)",
+                        budget: 50,
+                        ruleset: isV3() ? "v3" : "v2",
+                        votes: 0,
+                        round: 1,
+                        turn: 1,
+                        phase: 1,
+                        polePosition: "me",
+                        vehicles: [ createStarterVehicle(isV3() ? "v3" : "v2") ],
+                        createdAt: Date.now(),
+                        updatedAt: Date.now()
+                    };
+                    updated = [freshTeam];
+                    saveTeamsList(updated);
+                    loadTeam(freshTeam.id);
+                } else {
+                    saveTeamsList(updated);
+                    if (appState.teamId === teamId) {
+                        loadTeam(updated[0].id);
+                    }
+                }
+                renderTeamManagerModal();
+                if (window.showAppToast) window.showAppToast(`🗑️ Deleted team <strong>"${escapeHtml(team.name)}"</strong>.`);
+            });
+        }
+
+        function exportSingleTeam(teamId) {
+            const teams = getSavedTeams();
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            const exportData = {
+                ...team,
+                format: "gaslands_team_single",
+                version: "1.0",
+                exportedAt: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `${(team.name || 'gaslands_team').replace(/[^a-z0-9_-]/gi, '_')}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function exportAllTeamsBackup() {
+            const teams = getSavedTeams();
+            const exportData = {
+                format: "gaslands_teams_backup",
+                version: "1.0",
+                exportedAt: new Date().toISOString(),
+                teamCount: teams.length,
+                teams: teams
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `gaslands_all_teams_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            if (window.showAppToast) window.showAppToast(`💾 Backed up ${teams.length} teams to JSON file!`);
+        }
+
+        function triggerImportToLibrary() {
+            const input = document.getElementById("team-library-import-input");
+            if (input) input.click();
+        }
+
+        function importTeamToLibrary(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let teams = getSavedTeams();
+                    let countAdded = 0;
+                    
+                    if (parsed.format === "gaslands_teams_backup" && Array.isArray(parsed.teams)) {
+                        parsed.teams.forEach(t => {
+                            if (t && Array.isArray(t.vehicles)) {
+                                t.id = "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+                                t.name = (t.name || "Imported Team");
+                                t.updatedAt = Date.now();
+                                teams.unshift(t);
+                                countAdded++;
+                            }
+                        });
+                        saveTeamsList(teams);
+                        renderTeamManagerModal();
+                        if (window.showAppToast) window.showAppToast(`📥 Successfully imported ${countAdded} teams to library!`);
+                    } else if (parsed && Array.isArray(parsed.vehicles)) {
+                        const newTeam = {
+                            ...parsed,
+                            id: "team_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+                            name: parsed.teamName || parsed.name || "Imported Team",
+                            createdAt: Date.now(),
+                            updatedAt: Date.now()
+                        };
+                        teams.unshift(newTeam);
+                        saveTeamsList(teams);
+                        loadTeam(newTeam.id);
+                        renderTeamManagerModal();
+                        if (window.showAppToast) window.showAppToast(`📥 Successfully imported and loaded <strong>"${escapeHtml(newTeam.name)}"</strong>!`);
+                    } else {
+                        alert("Diagnostics Error: Invalid JSON file. Could not find vehicle roster.");
+                    }
+                } catch (err) {
+                    alert("Diagnostics Parse Failure: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = "";
+        }
+
+        function renderTeamManagerModal() {
+            const teams = getSavedTeams();
+            const countLabel = document.getElementById("team-manager-count-label");
+            if (countLabel) countLabel.textContent = `💾 STORED TEAMS ROSTER (${teams.length})`;
+            
+            // 1. Render Active Team Overview Banner
+            const activeBanner = document.getElementById("team-manager-active-banner");
+            if (activeBanner) {
+                const totalCans = getTotalCansSpent();
+                const isOverBudget = totalCans > appState.budget;
+                
+                let vehiclePillsHtml = "";
+                if (appState.vehicles && appState.vehicles.length > 0) {
+                    vehiclePillsHtml = appState.vehicles.map(v => {
+                        const cans = calculateVehicleCans(v);
+                        return `<span style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 2px 7px; font-size: 0.72rem; color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.3rem;">
+                            🚗 <strong>${escapeHtml(v.name || v.type)}</strong> <span style="color:var(--text-muted); font-size:0.68rem;">(${escapeHtml(v.type)} · ${cans} Cans)</span>
+                        </span>`;
+                    }).join("");
+                } else {
+                    vehiclePillsHtml = `<span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">No vehicles currently in team.</span>`;
+                }
+
+                activeBanner.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(0,0,0,0.5)); border: 1px solid #eab308; border-radius: 8px; padding: 0.9rem 1rem; box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                    <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 7px; border-radius: 4px; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80;">
+                                        🟢 ACTIVE IN GAME
+                                    </span>
+                                    <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 7px; border-radius: 4px; ${isV3() ? 'background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; color: #facc15;' : 'background: rgba(6, 182, 212, 0.2); border: 1px solid var(--accent-cyan); color: #38bdf8;'}">
+                                        ${isV3() ? '⚡ V3 BETA' : '🏎️ V2 REFUELLED'}
+                                    </span>
+                                </div>
+                                <h4 style="margin: 0.4rem 0 0.2rem 0; font-family: 'Orbitron', sans-serif; font-size: 1.15rem; color: var(--text-primary); letter-spacing: 0.5px;">
+                                    ${escapeHtml(appState.teamName || "Unnamed Team")}
+                                </h4>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 3px;">
+                                    <span>🛡️ Sponsor: <strong style="color:var(--text-primary);">${escapeHtml(appState.sponsor)}</strong></span>
+                                    <span>⛽ Cans: <strong style="color:${isOverBudget ? 'var(--danger-red)' : 'var(--glow-color)'};">${totalCans} / ${appState.budget}</strong></span>
+                                    <span>🚗 Vehicles: <strong style="color:var(--text-primary);">${appState.vehicles.length}</strong></span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-sm" onclick="syncActiveTeamToStorage(true)" title="Forces immediate sync of active team changes to storage" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    💾 Sync
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="duplicateTeam('${appState.teamId}')" title="Duplicate active team" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    📋 Duplicate
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="exportTeam()" title="Download active team JSON" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    📤 Export
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.65rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                            ${vehiclePillsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 2. Render Stored Teams List
+            const listContainer = document.getElementById("team-manager-list");
+            if (!listContainer) return;
+            
+            if (teams.length === 0) {
+                listContainer.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">No stored teams found. Click "➕ Create New Team" to get started!</div>`;
+                return;
+            }
+            
+            let listHtml = "";
+            teams.forEach(team => {
+                const isActive = (team.id === appState.teamId);
+                const isTeamV3 = (team.ruleset === "v3");
+                
+                let teamCans = 0;
+                if (Array.isArray(team.vehicles)) {
+                    team.vehicles.forEach(v => {
+                        teamCans += calculateVehicleCans(v);
+                    });
+                }
+                const isOverBudget = teamCans > (team.budget || 50);
+                
+                let vehiclePills = "";
+                if (team.vehicles && team.vehicles.length > 0) {
+                    vehiclePills = team.vehicles.map(v => {
+                        const cans = calculateVehicleCans(v);
+                        return `<span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.25rem;">
+                            🚗 ${escapeHtml(v.name || v.type)} <span style="opacity:0.75; font-size: 0.65rem;">(${escapeHtml(v.type)} · ${cans}c)</span>
+                        </span>`;
+                    }).join("");
+                } else {
+                    vehiclePills = `<span style="font-size: 0.7rem; color: var(--text-muted); font-style: italic;">No vehicles</span>`;
+                }
+                
+                const updatedDateStr = team.updatedAt ? new Date(team.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                
+                listHtml += `
+                    <div style="background: ${isActive ? 'linear-gradient(135deg, rgba(234, 179, 8, 0.08), rgba(0,0,0,0.5))' : 'rgba(0,0,0,0.35)'}; border: 1px solid ${isActive ? 'var(--glow-color)' : 'rgba(255,255,255,0.08)'}; border-radius: 8px; padding: 0.85rem 1rem; box-shadow: ${isActive ? '0 0 12px rgba(245, 158, 11, 0.2)' : 'none'}; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                                    <span style="font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.5px;">
+                                        ${escapeHtml(team.name || "Unnamed Team")}
+                                    </span>
+                                    ${isActive ? `
+                                        <span style="font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80;">
+                                            🟢 ACTIVE
+                                        </span>
+                                    ` : ''}
+                                    <span style="font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; ${isTeamV3 ? 'background: rgba(234, 179, 8, 0.15); border: 1px solid #eab308; color: #facc15;' : 'background: rgba(6, 182, 212, 0.15); border: 1px solid var(--accent-cyan); color: #38bdf8;'}">
+                                        ${isTeamV3 ? '⚡ V3' : '🏎️ V2'}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.76rem; color: var(--text-muted); display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 3px;">
+                                    <span>🛡️ ${escapeHtml(team.sponsor || 'Sponsorless')}</span>
+                                    <span>⛽ <strong style="color: ${isOverBudget ? 'var(--danger-red)' : 'var(--text-primary)'};">${teamCans} / ${team.budget || 50} Cans</strong></span>
+                                    <span>🚗 ${team.vehicles ? team.vehicles.length : 0} Cars</span>
+                                    ${updatedDateStr ? `<span style="opacity: 0.7; font-size: 0.7rem;">🕒 ${updatedDateStr}</span>` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                                ${isActive ? `
+                                    <button type="button" class="btn btn-sm" disabled style="opacity: 0.7; cursor: default; background: rgba(34, 197, 94, 0.18); border-color: #22c55e; color: #4ade80; font-weight: bold; font-size: 0.75rem;">
+                                        ✅ Active
+                                    </button>
+                                ` : `
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="loadTeam('${team.id}')" style="display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700;">
+                                        ▶️ Switch Team
+                                    </button>
+                                `}
+                                <button type="button" class="btn btn-sm" onclick="duplicateTeam('${team.id}')" title="Duplicate Team" style="font-size: 0.75rem;">
+                                    📋 Copy
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="promptRenameTeam('${team.id}')" title="Rename Team" style="font-size: 0.75rem;">
+                                    ✏️ Rename
+                                </button>
+                                <button type="button" class="btn btn-sm" onclick="exportSingleTeam('${team.id}')" title="Export Team JSON" style="font-size: 0.75rem;">
+                                    📤
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteTeam('${team.id}')" title="Delete Team" style="padding: 0.25rem 0.55rem; font-size: 0.75rem;">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 2px;">
+                            ${vehiclePills}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = listHtml;
+        }
+
 
         function spendVote(action) {
             let cost = 1;
