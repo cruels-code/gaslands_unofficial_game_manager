@@ -8,7 +8,11 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 
 ## 🚀 Key Features
 
-### 1. Gaslands V3 Beta & Refuelled Dual-Edition Support (v1.1.0)
+### 1. Gaslands V3 Beta & Refuelled Dual-Edition Support (v1.1.1)
+- **Full-Width 3-Column Layout:** Vehicle cards dynamically use 100% of the desktop display width in an optimized 3-column layout, designed to fit completely on-screen on 1080p, 1440p, 3000x2000, and 4K displays without vertical scrolling.
+- **Collapsible Upgrades & Perks Dropdown:** Keep primary combat stats, hull HP, hazards, gear, and weapons immediately accessible; expand upgrades and perks with a single click.
+- **Accurate Build Slot Validation:** Fixed build slot calculation ensuring 3-slot vehicles (Muscle Car, Passenger Car, Van) and vehicles with trailer upgrades correctly support adding items when 2 slots are used.
+- **Single-Line Play Tracker:** Game Round, Pole Position marker, Clean Up phase button, and Skid/D6 dice controls are unified on a single continuous horizontal line.
 - **Instant Edition Switcher:** Toggle between classic **Gaslands: Refuelled (v2)** and **Gaslands V3 Beta (v5.2)** anytime via Settings or the header pill.
 - **V3 Vehicle Catalog & Stats:** Full support for Common and Rare vehicles with Hull, Armour (0–5), Weight (1–6), Handling, Max Gear, Crew, Build Slots, and Can costs.
 - **17 Specialist Driver Archetypes:** Full roster of archetypes (Arsonist, Blackfinger, Brawler, Daredevil, Fixer, Gunner, Heavy, Leadfoot, Mechanic, Mystic, Professional, Psycho, Raider, Road Warrior, Rough Rider, Spark, Speed Freak) plus Standard Driver (Free / 0 Cans). Driver naming unlocks secondary perk classes.

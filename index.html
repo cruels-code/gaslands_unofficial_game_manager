@@ -319,11 +319,13 @@
             box-shadow: 0 0 10px var(--glow-shadow);
         }
 
-        /* Container & Grid layouts */
+        /* Container & Grid layouts - Full-width 3-cards desktop layout */
         main {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0.5rem auto 1.5rem auto !important;
+            padding: 0 1.1rem !important;
+            box-sizing: border-box !important;
         }
 
         .view-section {
@@ -335,11 +337,30 @@
             display: block;
         }
 
-        .vehicles-grid {
+        .vehicles-grid,
+        #garage-vehicles-container,
+        #play-vehicles-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.85rem;
+            margin-top: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (min-width: 1025px) {
+            .vehicles-grid,
+            #garage-vehicles-container,
+            #play-vehicles-container,
+            body.play-mode-active #play-vehicles-container {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 0.85rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-top: 0.75rem !important;
+                box-sizing: border-box !important;
+            }
         }
 
         @media (max-width: 600px) {
@@ -404,14 +425,100 @@
         .vehicle-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 10px;
+            padding: 0.75rem 0.85rem;
             position: relative;
             backdrop-filter: blur(16px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
-            gap: 1.2rem;
+            gap: 0.45rem;
+            box-sizing: border-box;
+        }
+
+        .play-trackers-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .play-trackers-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.45rem;
+            align-items: start;
+        }
+
+        /* Wasteland Dropdown Bar for Upgrades & Perks */
+        .card-dropdown-bar {
+            background: rgba(0, 0, 0, 0.42);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.3rem 0.55rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            margin-top: 0.2rem;
+            box-sizing: border-box;
+        }
+
+        .card-dropdown-bar:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--glow-color);
+        }
+
+        .dropdown-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-width: 0;
+        }
+
+        .dropdown-icon {
+            font-size: 0.68rem;
+            color: var(--glow-color);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .dropdown-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .dropdown-badge {
+            font-size: 0.64rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.05rem 0.35rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .dropdown-toggle-text {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
+            margin-left: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .card-dropdown-content {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .card-dropdown-content.open {
+            display: block;
         }
 
         .vehicle-card:hover {
@@ -463,10 +570,10 @@
         .stats-badge-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
+            gap: 0.25rem;
             background: rgba(0,0,0,0.15);
-            padding: 0.6rem;
-            border-radius: 8px;
+            padding: 0.3rem 0.4rem;
+            border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.02);
         }
 
@@ -478,34 +585,34 @@
         }
 
         .stat-badge .label {
-            font-size: 0.6rem;
+            font-size: 0.56rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .stat-badge .val {
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             color: var(--text-primary);
-            margin-top: 0.1rem;
+            margin-top: 0.05rem;
         }
 
         /* Garage Customizer Panels */
         .garage-section {
             border-top: 1px solid rgba(255,255,255,0.03);
-            padding-top: 0.8rem;
+            padding-top: 0.35rem;
         }
 
         .section-title {
             font-family: 'Special Elite', monospace;
-            font-size: 0.8rem;
+            font-size: 0.74rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -514,20 +621,20 @@
         .item-list {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
-            margin-bottom: 0.6rem;
+            gap: 0.22rem;
+            margin-bottom: 0.3rem;
         }
 
         .equipped-item {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255,255,255,0.04);
-            border-radius: 6px;
-            padding: 0.4rem 0.6rem;
+            border-radius: 5px;
+            padding: 0.22rem 0.45rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
-            gap: 0.5rem;
+            font-size: 0.78rem;
+            gap: 0.4rem;
         }
 
         .equipped-item-details {
@@ -627,9 +734,9 @@
             white-space: nowrap !important;
             background: rgba(0, 0, 0, 0.55);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            padding: 0.35rem 0.35rem !important;
-            font-size: 0.72rem;
+            border-radius: 5px;
+            padding: 0.22rem 0.3rem !important;
+            font-size: 0.68rem;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
@@ -920,9 +1027,9 @@
         .turn-phase-tracker {
             background: rgba(27, 34, 22, 0.85);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 0.45rem 0.85rem;
-            margin-bottom: 1.25rem;
+            border-radius: 10px;
+            padding: 0.35rem 0.75rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -2573,124 +2680,138 @@
                 gap: 0.4rem !important;
             }
 
-            /* --- PLAY MODE: TURN & GEAR PHASE TRACKER --- */
+            /* --- PLAY MODE: TURN & GEAR PHASE TRACKER (ALWAYS 1 LINE) --- */
             .turn-phase-tracker {
-                display: grid !important;
-                grid-template-columns: auto 1fr !important;
+                display: flex !important;
+                flex-direction: row !important;
                 align-items: center !important;
-                gap: 0.35rem !important;
-                padding: 0.5rem 0.55rem !important;
+                justify-content: space-between !important;
+                gap: 0.45rem !important;
+                padding: 0.35rem 0.6rem !important;
                 margin-bottom: 0.75rem !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
             }
 
-            .turn-phase-tracker .tracker-group:first-child {
-                grid-column: 1 !important;
+            .turn-phase-tracker #v2-tracker-panel,
+            .turn-phase-tracker #v3-tracker-panel {
                 display: flex !important;
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 2px !important;
+                align-items: center !important;
+                gap: 0.45rem !important;
+                flex-wrap: nowrap !important;
+                flex-shrink: 0 !important;
             }
 
-            .turn-phase-tracker .tracker-group:first-child .tracker-label {
-                font-size: 0.62rem !important;
+            .turn-phase-tracker .tracker-group {
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.3rem !important;
+                flex-shrink: 0 !important;
+            }
+
+            .turn-phase-tracker .tracker-label {
+                font-size: 0.68rem !important;
                 letter-spacing: 0.5px !important;
+                white-space: nowrap !important;
             }
 
             .turn-phase-tracker .turn-controls {
                 display: flex !important;
                 align-items: center !important;
-                gap: 0.25rem !important;
+                gap: 0.2rem !important;
+                flex-shrink: 0 !important;
             }
 
             .turn-phase-tracker .turn-btn {
-                width: 28px !important;
-                min-width: 28px !important;
-                height: 28px !important;
-                min-height: 28px !important;
+                width: 24px !important;
+                min-width: 24px !important;
+                height: 24px !important;
+                min-height: 24px !important;
                 padding: 0 !important;
-                font-size: 0.85rem !important;
+                font-size: 0.8rem !important;
             }
 
             .turn-phase-tracker .turn-value {
-                font-size: 1.1rem !important;
-                min-width: 20px !important;
+                font-size: 1rem !important;
+                min-width: 18px !important;
                 text-align: center !important;
-            }
-
-            .turn-phase-tracker .tracker-group:nth-child(2) {
-                grid-column: 2 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: flex-end !important;
-                gap: 2px !important;
-            }
-
-            .turn-phase-tracker .tracker-group:nth-child(2) .tracker-label {
-                font-size: 0.62rem !important;
-                letter-spacing: 0.5px !important;
             }
 
             .turn-phase-tracker .phase-selector {
                 display: flex !important;
                 gap: 2px !important;
-                justify-content: flex-end !important;
+                flex-shrink: 0 !important;
             }
 
             .turn-phase-tracker .phase-btn {
-                width: 27px !important;
-                min-width: 26px !important;
-                height: 28px !important;
-                font-size: 0.75rem !important;
+                width: 24px !important;
+                min-width: 24px !important;
+                height: 24px !important;
+                font-size: 0.72rem !important;
                 padding: 0 !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
             }
 
-            /* Row 2: Dice Controls */
-            .turn-phase-tracker > div:last-child {
-                grid-column: 1 / -1 !important;
+            .turn-phase-tracker .pole-position-badge {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.72rem !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+            }
+
+            .turn-phase-tracker .round-action-group .btn {
+                padding: 0.25rem 0.55rem !important;
+                font-size: 0.72rem !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Single-row inline dice controls */
+            .turn-phase-tracker > div:last-child,
+            .turn-phase-tracker .play-dice-controls {
                 display: flex !important;
-                width: 100% !important;
-                max-width: 100% !important;
                 align-items: center !important;
-                gap: 3px !important;
-                justify-content: space-between !important;
-                margin-left: 0 !important;
-                padding-top: 0.4rem !important;
-                border-top: 1px dashed rgba(255,255,255,0.08) !important;
-                box-sizing: border-box !important;
+                gap: 0.25rem !important;
+                margin-left: auto !important;
+                padding: 0 !important;
+                border: none !important;
                 flex-wrap: nowrap !important;
+                flex-shrink: 0 !important;
             }
 
             .turn-phase-tracker #dice-type {
-                flex: 1.2 1 0 !important;
-                min-width: 0 !important;
-                height: 32px !important;
-                font-size: 0.72rem !important;
+                width: auto !important;
+                max-width: 125px !important;
+                height: 28px !important;
+                font-size: 0.7rem !important;
                 padding: 0 4px !important;
                 box-sizing: border-box !important;
+                flex-shrink: 0 !important;
             }
 
             .turn-phase-tracker #throw-dice-count {
-                flex: 0.9 1 0 !important;
-                min-width: 0 !important;
-                height: 32px !important;
-                font-size: 0.72rem !important;
+                width: auto !important;
+                max-width: 70px !important;
+                height: 28px !important;
+                font-size: 0.7rem !important;
                 padding: 0 4px !important;
                 box-sizing: border-box !important;
+                flex-shrink: 0 !important;
             }
 
             .turn-phase-tracker #api-key-btn,
             .turn-phase-tracker #dice-log-toggle-btn {
-                width: 30px !important;
-                min-width: 28px !important;
-                height: 32px !important;
+                width: 26px !important;
+                min-width: 26px !important;
+                height: 28px !important;
                 padding: 0 !important;
-                font-size: 0.95rem !important;
+                font-size: 0.85rem !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -2698,15 +2819,14 @@
             }
 
             .turn-phase-tracker #throw-dice-btn {
-                flex: 1.3 1 0 !important;
-                min-width: 0 !important;
-                height: 32px !important;
-                font-size: 0.75rem !important;
+                height: 28px !important;
+                font-size: 0.72rem !important;
                 font-weight: 700 !important;
                 text-align: center !important;
                 justify-content: center !important;
-                padding: 0 4px !important;
+                padding: 0 0.55rem !important;
                 white-space: nowrap !important;
+                flex-shrink: 0 !important;
             }
 
             /* --- PLAY MODE: AUDIENCE VOTES HUB --- */
@@ -4241,7 +4361,7 @@ Thanks to Mike for being ace.</p>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 0.8rem; gap: 0.8rem; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm" onclick="openVersionModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Orbitron', monospace, sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--glow-color); background: rgba(245, 158, 11, 0.12); border: 1px solid var(--glow-color); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to view applied updates & version history">
-                    <span>🏷️</span> v1.1.0 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
+                    <span>🏷️</span> v1.1.1 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
                 </button>
                 <button class="btn btn-primary" onclick="closeAboutModal()" style="padding: 0.45rem 1.4rem;">Close</button>
             </div>
@@ -4258,11 +4378,27 @@ Thanks to Mike for being ace.</p>
                 <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
             </div>
             <div style="padding: 1.2rem 0.5rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-primary); overflow-y: auto; max-height: calc(85vh - 130px);">
-                                <!-- v1.1.0 -->
+                                                <!-- v1.1.1 -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
+                            v1.1.1 - Current Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">07.11.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Full-Width 3-Column Screen Optimization:</strong> Vehicle cards now use 100% of the screen width in a balanced 3-column layout on PC resolutions (1080p, 1440p, 3000x2000, 4K).</li>
+                        <li><strong>Collapsible Upgrades &amp; Perks Dropdown:</strong> Compact cards fit on screen without vertical scrolling; click the dropdown bar anytime to view or edit upgrades and perks.</li>
+                        <li><strong>Build Slot Limit Fix:</strong> Resolved issue where 3-slot vehicles (Muscle Car, Passenger Car, Van, etc.) falsely indicated no build slots remaining when only 2 were used.</li>
+                        <li><strong>Single-Line Play Tracker:</strong> Unified Round, Pole Position, Clean Up, and Dice Controls into a clean single continuous line across all displays.</li>
+                    </ul>
+                </div>
+
+                <!-- v1.1.0 -->
                 <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
                         <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
-                            v1.1.0 - Current Release
+                            v1.1.0
                         </span>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">06.11.26</span>
                     </div>
@@ -4735,8 +4871,64 @@ Thanks to Mike for being ace.</p>
             return (appState && appState.ruleset === "v3");
         }
 
+                        function toggleVehicleExtras(vehicleId, mode) {
+            if (!appState.expandedCardExtras) appState.expandedCardExtras = {};
+            const key = `${mode}_${vehicleId}`;
+            appState.expandedCardExtras[key] = !appState.expandedCardExtras[key];
+            const isOpen = appState.expandedCardExtras[key];
+
+            const content = document.getElementById(`dropdown-content-${mode}-${vehicleId}`);
+            const bar = document.getElementById(`dropdown-bar-${mode}-${vehicleId}`);
+            if (content && bar) {
+                content.style.display = isOpen ? 'block' : 'none';
+                content.classList.toggle('open', isOpen);
+                const icon = bar.querySelector('.dropdown-icon');
+                if (icon) icon.textContent = isOpen ? '▼' : '▶';
+                const txt = bar.querySelector('.dropdown-toggle-text');
+                if (txt) txt.textContent = isOpen ? 'Hide ▲' : 'Show ▼';
+            }
+            saveState();
+        }
+
         function getActiveVehicleTypes() {
             return isV3() ? VEHICLE_TYPES_V3 : VEHICLE_TYPES;
+        }
+
+        function getVehicleBaseType(vehicleType) {
+            const list = getActiveVehicleTypes();
+            if (!vehicleType) return list[0];
+
+            let found = list.find(t => t.name.toLowerCase() === vehicleType.toLowerCase());
+            if (found) return found;
+
+            if (isV3()) {
+                const lower = vehicleType.toLowerCase();
+                if (lower === "car") return list.find(t => t.name === "Passenger Car") || list[0];
+                if (lower === "truck") return list.find(t => t.name === "Van") || list.find(t => t.name === "Truck") || list[0];
+            } else {
+                const lower = vehicleType.toLowerCase();
+                if (lower === "passenger car" || lower === "muscle car") return list.find(t => t.name === "Car") || list[0];
+                if (lower === "van") return list.find(t => t.name === "Truck") || list[0];
+            }
+
+            found = VEHICLE_TYPES_V3.find(t => t.name.toLowerCase() === vehicleType.toLowerCase()) ||
+                    VEHICLE_TYPES.find(t => t.name.toLowerCase() === vehicleType.toLowerCase());
+            return found || list[0];
+        }
+
+        function getVehicleMaxSlots(vehicle) {
+            if (!vehicle) return 0;
+            const base = getVehicleBaseType(vehicle.type);
+            let maxSlots = base ? (base.slots || 0) : 0;
+            if (vehicle.upgrades && Array.isArray(vehicle.upgrades)) {
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Lightweight)")) maxSlots += 1;
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Middleweight)")) maxSlots += 2;
+                if (vehicle.upgrades.some(u => u.name === "Trailer (Heavyweight)")) maxSlots += 3;
+                if (!isV3() && vehicle.upgrades.some(u => u.name === "Trailer" || (u.name.startsWith("Trailer") && !u.name.includes("(")))) {
+                    maxSlots += 2;
+                }
+            }
+            return maxSlots;
         }
 
         function getActiveWeapons() {
@@ -4765,7 +4957,8 @@ Thanks to Mike for being ace.</p>
                 if (appState.round === undefined) appState.round = 1;
                 if (!appState.polePosition) appState.polePosition = "me";
                 appState.vehicles.forEach(v => {
-                    const baseV3 = VEHICLE_TYPES_V3.find(t => t.name.toLowerCase() === v.type.toLowerCase()) || VEHICLE_TYPES_V3[0];
+                    if (v.type.toLowerCase() === "car") v.type = "Passenger Car";
+                    const baseV3 = getVehicleBaseType(v.type);
                     if (v.ignitionTokens === undefined) v.ignitionTokens = v.wrecked ? 2 : 0;
                     if (v.activated === undefined) v.activated = false;
                     if (!v.driverArchetype) v.driverArchetype = "Road Warrior";
@@ -6930,7 +7123,7 @@ Thanks to Mike for being ace.</p>
 
         // ==========================================
                 // ==========================================
-        // DEVICE & ORIENTATION MANAGER (v1.1.0)
+        // DEVICE & ORIENTATION MANAGER (v1.1.1)
         // Auto-detects device hardware & orientation
         // ==========================================
         const DeviceManager = {
@@ -9208,14 +9401,9 @@ Thanks to Mike for being ace.</p>
                 }
 
                 // Build slots integrity
-                const updatedBase = types.find(t => t.name === v.type) || baseInfo;
+                const updatedBase = getVehicleBaseType(v.type);
                 let slotsUsed = calculateVehicleSlots(v);
-                let slotsMax = updatedBase.slots;
-                if (isV3()) {
-                    if (v.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
-                    if (v.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
-                    if (v.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
-                }
+                let slotsMax = getVehicleMaxSlots(v);
                 while (slotsUsed > slotsMax && v.weapons.length > 0) {
                     v.weapons.pop();
                     slotsUsed = calculateVehicleSlots(v);
@@ -9706,17 +9894,10 @@ Thanks to Mike for being ace.</p>
             }
 
             appState.vehicles.forEach(vehicle => {
-                const types = getActiveVehicleTypes();
-                const baseInfo = types.find(t => t.name === vehicle.type) || types[0];
+                const baseInfo = getVehicleBaseType(vehicle.type);
                 const cans = calculateVehicleCans(vehicle);
                 const slotsUsed = calculateVehicleSlots(vehicle);
-                
-                let slotsMax = baseInfo.slots;
-                if (isV3()) {
-                    if (vehicle.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
-                    if (vehicle.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
-                    if (vehicle.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
-                }
+                const slotsMax = getVehicleMaxSlots(vehicle);
 
                 // Calculate sponsor logo class and HTML
                 const sponsorClass = `logo-${appState.sponsor.toLowerCase().replace(/'s/g, 's').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
@@ -10043,21 +10224,31 @@ Thanks to Mike for being ace.</p>
                             <div class="item-list">${weaponsHtml}</div>
                         </div>
 
-                        <div class="garage-2col-grid">
-                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                                <div class="section-title">
-                                    <span>Upgrades</span>
-                                    <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="openSelectionModal('${vehicle.id}', 'upgrade')">+ Add</button>
-                                </div>
-                                <div class="item-list">${upgradesHtml}</div>
+                        <!-- Upgrades & Perks Dropdown Bar in Garage -->
+                        <div class="card-dropdown-bar" onclick="toggleVehicleExtras('${vehicle.id}', 'garage')" id="dropdown-bar-garage-${vehicle.id}">
+                            <div class="dropdown-bar-left">
+                                <span class="dropdown-icon" id="dropdown-icon-garage-${vehicle.id}">${(appState.expandedCardExtras && appState.expandedCardExtras['garage_' + vehicle.id]) ? '▼' : '▶'}</span>
+                                <span class="dropdown-title">UPGRADES &amp; PERKS</span>
+                                <span class="dropdown-badge">${vehicle.upgrades.length} Upgrades • ${vehicle.perks.length} Perks</span>
                             </div>
-
-                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                                <div class="section-title">
-                                    <span>Perks</span>
-                                    <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="openSelectionModal('${vehicle.id}', 'perk')">+ Add</button>
+                            <span class="dropdown-toggle-text">${(appState.expandedCardExtras && appState.expandedCardExtras['garage_' + vehicle.id]) ? 'Hide ▲' : 'Show ▼'}</span>
+                        </div>
+                        <div class="card-dropdown-content ${(appState.expandedCardExtras && appState.expandedCardExtras['garage_' + vehicle.id]) ? 'open' : ''}" id="dropdown-content-garage-${vehicle.id}" style="display: ${(appState.expandedCardExtras && appState.expandedCardExtras['garage_' + vehicle.id]) ? 'block' : 'none'};">
+                            <div class="garage-2col-grid" style="margin-top: 0.35rem;">
+                                <div class="garage-section" style="border-top: none; margin-top: 0; padding-top: 0;">
+                                    <div class="section-title">
+                                        <span>Upgrades</span>
+                                        <button class="btn" style="padding: 0.15rem 0.45rem; font-size: 0.68rem;" onclick="openSelectionModal('${vehicle.id}', 'upgrade')">+ Add</button>
+                                    </div>
+                                    <div class="item-list">${upgradesHtml}</div>
                                 </div>
-                                <div class="item-list">${perksHtml}</div>
+                                <div class="garage-section" style="border-top: none; margin-top: 0; padding-top: 0;">
+                                    <div class="section-title">
+                                        <span>Perks</span>
+                                        <button class="btn" style="padding: 0.15rem 0.45rem; font-size: 0.68rem;" onclick="openSelectionModal('${vehicle.id}', 'perk')">+ Add</button>
+                                    </div>
+                                    <div class="item-list">${perksHtml}</div>
+                                </div>
                             </div>
                         </div>
 
@@ -10414,44 +10605,46 @@ Thanks to Mike for being ace.</p>
 
                         ${gearWarningHtml}
 
-                        <!-- Trackers directly under the Stats Bar (Hull & Hazards & Gearbox) -->
+                        <!-- Trackers directly under the Stats Bar (Hull & Hazards side-by-side, Gearbox beneath) -->
                         <div class="play-trackers-panel">
-                            <!-- Hull Integrity Tracker -->
-                            <div class="hull-tracker">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight:bold;">
-                                    <span style="font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HULL INTEGRITY</span>
-                                    <span style="color: ${vehicle.damage >= currentMaxHull ? 'var(--danger-red)' : 'var(--accent-cyan)'}; font-family:'Orbitron', sans-serif;">${currentMaxHull - vehicle.damage} / ${currentMaxHull} HP</span>
-                                </div>
-                                <div class="hull-points-grid">${hullBoxesHtml}</div>
-                            </div>
-
-                            <!-- Hazard Tokens Tracker -->
-                            <div class="hazard-tracker">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HAZARD TOKENS</span>
-                                    <div style="display:flex; align-items:center; gap:0.4rem;">
-                                        <button style="background: transparent; border:none; color: var(--text-muted); cursor:pointer; font-size:0.8rem;" onclick="toggleHazard('${vehicle.id}', 0)">[Clear]</button>
-                                        <span style="font-family:'Orbitron', sans-serif; font-size:0.9rem; font-weight:bold; color: var(--glow-color);">${vehicle.hazard} / ${hazardLimit}</span>
+                            <div class="play-trackers-row">
+                                <!-- Hull Integrity Tracker -->
+                                <div class="hull-tracker">
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight:bold;">
+                                        <span style="font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HULL INTEGRITY</span>
+                                        <span style="color: ${vehicle.damage >= currentMaxHull ? 'var(--danger-red)' : 'var(--accent-cyan)'}; font-family:'Orbitron', sans-serif;">${currentMaxHull - vehicle.damage}/${currentMaxHull} HP</span>
                                     </div>
+                                    <div class="hull-points-grid">${hullBoxesHtml}</div>
                                 </div>
-                                <div class="hazard-dots-row">
-                                    <div class="hazard-dots">${hazardDotsHtml}</div>
-                                    ${isWipeout ? `
-                                        <div style="display:flex; align-items:center; gap:0.4rem;">
-                                            <div class="wipeout-alert">${isV3() ? 'WIPEOUT RISK!' : 'WIPEOUT!'}</div>
-                                            <button class="btn btn-sm" onclick="triggerWipeoutRoll('${vehicle.id}')" style="font-size:0.7rem; padding:0.15rem 0.45rem; background:rgba(239,68,68,0.25); border:1px solid #ef4444; color:#fca5a5; cursor:pointer;" title="Roll Wipeout Check (${vehicle.hazard} dice)">💥 Roll Check</button>
+
+                                <!-- Hazard Tokens Tracker -->
+                                <div class="hazard-tracker">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem;">
+                                        <span style="font-size: 0.72rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">HAZARDS</span>
+                                        <div style="display:flex; align-items:center; gap:0.3rem;">
+                                            <button style="background: transparent; border:none; color: var(--text-muted); cursor:pointer; font-size:0.75rem;" onclick="toggleHazard('${vehicle.id}', 0)">[Clear]</button>
+                                            <span style="font-family:'Orbitron', sans-serif; font-size:0.85rem; font-weight:bold; color: var(--glow-color);">${vehicle.hazard}/${hazardLimit}</span>
                                         </div>
-                                    ` : ''}
+                                    </div>
+                                    <div class="hazard-dots-row" style="padding: 0.25rem 0.35rem;">
+                                        <div class="hazard-dots">${hazardDotsHtml}</div>
+                                        ${isWipeout ? `
+                                            <div style="display:flex; align-items:center; gap:0.25rem;">
+                                                <div class="wipeout-alert" style="font-size:0.65rem; padding:0.1rem 0.25rem;">${isV3() ? 'RISK' : 'WIPEOUT'}</div>
+                                                <button class="btn btn-sm" onclick="triggerWipeoutRoll('${vehicle.id}')" style="font-size:0.65rem; padding:0.1rem 0.35rem; background:rgba(239,68,68,0.25); border:1px solid #ef4444; color:#fca5a5; cursor:pointer;" title="Roll Wipeout Check (${vehicle.hazard} dice)">💥</button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Gearbox -->
                             <div class="gearbox">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-size: 0.75rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
-                                    ${isV3() ? `<button class="btn btn-sm" onclick="triggerHandlingDiceRoll(${vehicle.gear})" style="font-size:0.7rem; padding:0.15rem 0.45rem; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; cursor:pointer;">🎯 Roll Handling</button>` : ''}
+                                    <span style="font-size: 0.72rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
+                                    ${isV3() ? `<button class="btn btn-sm" onclick="triggerHandlingDiceRoll(${vehicle.gear})" style="font-size:0.68rem; padding:0.1rem 0.4rem; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; cursor:pointer;">🎯 Roll Handling</button>` : ''}
                                 </div>
-                                <div class="gear-selector" style="margin-top:0.35rem;">${gearButtonsHtml}</div>
+                                <div class="gear-selector" style="margin-top:0.2rem; padding: 0.2rem;">${gearButtonsHtml}</div>
                             </div>
                         </div>
 
@@ -10463,37 +10656,34 @@ Thanks to Mike for being ace.</p>
                             <div class="item-list">${playWeaponsHtml}</div>
                         </div>
 
-                        <!-- Vehicle Special Rules -->
-                        <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                            <div class="section-title">
-                                <span>Vehicle Special Rules</span>
+                        <!-- Upgrades, Perks & Rules Dropdown Bar in Play Mode -->
+                        <div class="card-dropdown-bar" onclick="toggleVehicleExtras('${vehicle.id}', 'play')" id="dropdown-bar-play-${vehicle.id}">
+                            <div class="dropdown-bar-left">
+                                <span class="dropdown-icon" id="dropdown-icon-play-${vehicle.id}">${(appState.expandedCardExtras && appState.expandedCardExtras['play_' + vehicle.id]) ? '▼' : '▶'}</span>
+                                <span class="dropdown-title">UPGRADES, PERKS &amp; RULES</span>
+                                <span class="dropdown-badge">${vehicle.upgrades.length} Upgrades • ${vehicle.perks.length} Perks</span>
                             </div>
-                            <div class="item-list">${playVehicleRulesHtml}</div>
+                            <span class="dropdown-toggle-text">${(appState.expandedCardExtras && appState.expandedCardExtras['play_' + vehicle.id]) ? 'Hide ▲' : 'Show ▼'}</span>
                         </div>
-
-                        <!-- Upgrades & Perks in 2-Column Grid -->
-                        <div class="garage-2col-grid">
-                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                                <div class="section-title">
-                                    <span>Upgrades</span>
+                        <div class="card-dropdown-content ${(appState.expandedCardExtras && appState.expandedCardExtras['play_' + vehicle.id]) ? 'open' : ''}" id="dropdown-content-play-${vehicle.id}" style="display: ${(appState.expandedCardExtras && appState.expandedCardExtras['play_' + vehicle.id]) ? 'block' : 'none'};">
+                            <div class="garage-section" style="border-top: none; margin-top: 0.2rem; padding-top: 0.1rem;">
+                                <div class="section-title"><span>Vehicle Special Rules</span></div>
+                                <div class="item-list">${playVehicleRulesHtml}</div>
+                            </div>
+                            <div class="garage-2col-grid" style="margin-top: 0.3rem;">
+                                <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.3rem; padding-top: 0.3rem;">
+                                    <div class="section-title"><span>Upgrades</span></div>
+                                    <div class="item-list">${playUpgradesHtml}</div>
                                 </div>
-                                <div class="item-list">${playUpgradesHtml}</div>
-                            </div>
-
-                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                                <div class="section-title">
-                                    <span>Perks</span>
+                                <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.3rem; padding-top: 0.3rem;">
+                                    <div class="section-title"><span>Perks</span></div>
+                                    <div class="item-list">${playPerksHtml}</div>
                                 </div>
-                                <div class="item-list">${playPerksHtml}</div>
                             </div>
-                        </div>
-
-                        <!-- Team / Sponsor Traits -->
-                        <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.5rem;">
-                            <div class="section-title">
-                                <span>Team / Sponsor Traits</span>
+                            <div class="garage-section" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 0.3rem; padding-top: 0.3rem;">
+                                <div class="section-title"><span>Team / Sponsor Traits</span></div>
+                                <div class="item-list">${playSponsorTraitsHtml}</div>
                             </div>
-                            <div class="item-list">${playSponsorTraitsHtml}</div>
                         </div>
 
                         <!-- WebGL Fire shader overlay when on fire -->
@@ -10569,12 +10759,7 @@ Thanks to Mike for being ace.</p>
             
             // Adjust build slots integrity
             let slotsUsed = calculateVehicleSlots(v);
-            let slotsMax = newBase.slots;
-            if (isV3()) {
-                if (v.upgrades.some(u => u.name === "Trailer (Lightweight)")) slotsMax += 1;
-                if (v.upgrades.some(u => u.name === "Trailer (Middleweight)")) slotsMax += 2;
-                if (v.upgrades.some(u => u.name === "Trailer (Heavyweight)")) slotsMax += 3;
-            }
+            let slotsMax = getVehicleMaxSlots(v);
             while (slotsUsed > slotsMax && v.weapons.length > 0) {
                 v.weapons.pop();
                 slotsUsed = calculateVehicleSlots(v);
@@ -10715,17 +10900,9 @@ Thanks to Mike for being ace.</p>
             
             const vehicle = appState.vehicles.find(v => v.id === activeModalTargetVehicleId);
             if (!vehicle) return;
-            const vBase = isV3() ? 
-                (VEHICLE_TYPES_V3.find(t => t.name === vehicle.type) || VEHICLE_TYPES_V3[0]) :
-                (VEHICLE_TYPES.find(t => t.name === vehicle.type) || VEHICLE_TYPES[0]);
-            
+            const vBase = getVehicleBaseType(vehicle.type);
             const currentSlots = calculateVehicleSlots(vehicle);
-            let maxSlots = vBase.slots;
-            if (isV3()) {
-                if (vehicle.upgrades.some(u => u.name === "Trailer (Lightweight)")) maxSlots += 1;
-                if (vehicle.upgrades.some(u => u.name === "Trailer (Middleweight)")) maxSlots += 2;
-                if (vehicle.upgrades.some(u => u.name === "Trailer (Heavyweight)")) maxSlots += 3;
-            }
+            const maxSlots = getVehicleMaxSlots(vehicle);
             const totalSpent = getTotalCansSpent();
 
             if (activeModalItemType === "weapon") {
@@ -10954,11 +11131,13 @@ Thanks to Mike for being ace.</p>
             }
 
             // 2. Build slots limit
-            const vBase = VEHICLE_TYPES.find(t => t.name === v.type) || VEHICLE_TYPES[0];
+            const vBase = getVehicleBaseType(v.type);
+            const maxSlots = getVehicleMaxSlots(v);
             const currentSlots = calculateVehicleSlots(v);
-            const weaponSlots = ((v.type === "Gyrocopter" || v.type === "Helicopter") && w.category === "Dropped") ? 0 : w.slots;
-            if (currentSlots + weaponSlots > vBase.slots) {
-                alert(`Cannot add ${w.name}: would exceed build slots (${currentSlots + weaponSlots} / ${vBase.slots} Slots).`);
+            const weaponSlots = ((v.type === "Gyrocopter" || v.type === "Helicopter") && w.category === "Dropped") ? 0 : 
+                                (isV3() && (w.category === "Hand" || w.category === "Dropped") ? 0 : (w.slots || 0));
+            if (currentSlots + weaponSlots > maxSlots) {
+                alert(`Cannot add ${w.name}: would exceed build slots (${currentSlots + weaponSlots} / ${maxSlots} Slots).`);
                 return;
             }
 
@@ -11030,7 +11209,7 @@ Thanks to Mike for being ace.</p>
             }
 
             // 2. Chassis weight/type restrictions
-            const vBase = VEHICLE_TYPES.find(t => t.name === v.type) || VEHICLE_TYPES[0];
+            const vBase = getVehicleBaseType(v.type);
             if ((u.name === "Exploding Ram" || u.name === "Experimental Nuclear Engine") && vBase.weight === "Lightweight") {
                 alert("Cannot add " + u.name + ": forbidden on Lightweight vehicles.");
                 return;
@@ -11048,10 +11227,12 @@ Thanks to Mike for being ace.</p>
             }
 
             // 3. Build slots limit
+            const maxSlots = getVehicleMaxSlots(v);
             const currentSlots = calculateVehicleSlots(v);
-            const upgradeSlots = (appState.sponsor === "Slime" && u.name === "Ram") ? 0 : u.slots;
-            if (currentSlots + upgradeSlots > vBase.slots) {
-                alert(`Cannot add ${u.name}: would exceed build slots (${currentSlots + upgradeSlots} / ${vBase.slots} Slots).`);
+            const upgradeSlots = (appState.sponsor === "Slime" && u.name === "Ram") ? 0 : 
+                                 (isV3() && u.name && u.name.startsWith("Trailer") ? 0 : (u.slots || 0));
+            if (currentSlots + upgradeSlots > maxSlots) {
+                alert(`Cannot add ${u.name}: would exceed build slots (${currentSlots + upgradeSlots} / ${maxSlots} Slots).`);
                 return;
             }
 
@@ -11065,6 +11246,8 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
+            if (!appState.expandedCardExtras) appState.expandedCardExtras = {};
+            appState.expandedCardExtras[`garage_${v.id}`] = true;
             v.upgrades.push({
                 name: u.name,
                 slots: u.slots,
@@ -11102,6 +11285,8 @@ Thanks to Mike for being ace.</p>
                 return;
             }
 
+            if (!appState.expandedCardExtras) appState.expandedCardExtras = {};
+            appState.expandedCardExtras[`garage_${v.id}`] = true;
             v.perks.push({
                 name: p.name,
                 cost: p.cost,
@@ -11578,7 +11763,7 @@ Thanks to Mike for being ace.</p>
             return {
                 id: "veh_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
                 name: isV3Rule ? "Interceptor" : "War Machine",
-                type: "Car",
+                type: isV3Rule ? "Passenger Car" : "Car",
                 driverArchetype: isV3Rule ? "Standard Driver" : undefined,
                 driverName: "",
                 weapons: [],
