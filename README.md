@@ -8,7 +8,8 @@ Designed for tabletop miniature players to manage vehicle dashboards, hull damag
 
 ## 🚀 Key Features
 
-### 1. Gaslands V3 Beta & Refuelled Dual-Edition Support (v1.1.1)
+### 1. Gaslands V3 Beta & Refuelled Dual-Edition Support (v1.1.2)
+- **Compact Side-by-Side Play Card Action Column:** Replaced the wide full-width image frame with an integrated side-by-side row. The 6 action/status buttons (`Activate`, `Give Way`, `Evade`, `Fire`, `Ghost`, `Distracted`) sit in a dedicated vertical column with guaranteed equal dimensions alongside the vehicle chassis image, saving vertical space while keeping actions immediately reachable.
 - **Full-Width 3-Column Layout:** Vehicle cards dynamically use 100% of the desktop display width in an optimized 3-column layout, designed to fit completely on-screen on 1080p, 1440p, 3000x2000, and 4K displays without vertical scrolling.
 - **Collapsible Upgrades & Perks Dropdown:** Keep primary combat stats, hull HP, hazards, gear, and weapons immediately accessible; expand upgrades and perks with a single click.
 - **Accurate Build Slot Validation:** Fixed build slot calculation ensuring 3-slot vehicles (Muscle Car, Passenger Car, Van) and vehicles with trailer upgrades correctly support adding items when 2 slots are used.

@@ -791,6 +791,150 @@
             text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
         }
 
+
+        /* Play Mode Actions & Chassis Image Side-by-Side Row */
+        .play-actions-image-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.35rem;
+            margin-bottom: 0.35rem;
+            box-sizing: border-box;
+        }
+
+        .play-action-buttons-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-auto-rows: 25px;
+            gap: 4px;
+            width: 132px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .play-action-btn {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.67rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.4);
+            outline: none;
+            white-space: nowrap !important;
+            box-sizing: border-box !important;
+            padding: 0 4px !important;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .play-action-btn:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Activate button */
+        .play-action-btn.btn-activate {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.15));
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+        .play-action-btn.btn-activate.active,
+        .play-action-btn.btn-activate.activated {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border);
+            color: var(--text-muted);
+            opacity: 0.65;
+        }
+
+        /* Give Way button */
+        .play-action-btn.btn-giveway {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-muted);
+        }
+
+        /* Evade button */
+        .play-action-btn.btn-evade {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        /* Fire button */
+        .play-action-btn.btn-fire {
+            border-color: rgba(249, 115, 22, 0.4);
+            color: #fb923c;
+        }
+        .play-action-btn.btn-fire.active {
+            background: rgba(249, 115, 22, 0.25);
+            border-color: #f97316;
+            color: #ff9800;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.5), inset 0 0 8px rgba(249, 115, 22, 0.25);
+            text-shadow: 0 0 8px rgba(249, 115, 22, 0.7);
+            animation: fire-pulse 1s infinite alternate;
+        }
+
+        /* Ghost button */
+        .play-action-btn.btn-ghost {
+            border-color: rgba(6, 182, 212, 0.4);
+            color: #38bdf8;
+        }
+        .play-action-btn.btn-ghost.active {
+            background: rgba(6, 182, 212, 0.25);
+            border-color: var(--accent-cyan);
+            color: #38bdf8;
+            box-shadow: 0 0 12px var(--accent-cyan-glow), inset 0 0 8px rgba(6, 182, 212, 0.25);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+        }
+
+        /* Distracted button */
+        .play-action-btn.btn-distracted {
+            border-color: rgba(234, 179, 8, 0.4);
+            color: #facc15;
+        }
+        .play-action-btn.btn-distracted.active {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: var(--danger-red);
+            color: #fca5a5;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), inset 0 0 8px rgba(239, 68, 68, 0.25);
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+        }
+
+        /* Vehicle Chassis Image Container */
+        .play-chassis-image-box {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-sizing: border-box;
+            min-height: 170px;
+        }
+
+        .play-chassis-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
         /* Dashboard Gearbox */
         .gearbox {
             display: flex;
@@ -2944,6 +3088,16 @@
 
             .play-dashboard-card .status-toggles .btn,
             .play-dashboard-card .status-chip,
+                        .play-action-buttons-col {
+                width: 120px !important;
+                grid-auto-rows: 24px !important;
+                gap: 3px !important;
+            }
+            .play-action-btn {
+                font-size: 0.62rem !important;
+                padding: 0 2px !important;
+            }
+
             .play-dashboard-card .play-status-chip {
                 flex: 1 1 0 !important;
                 min-width: 0 !important;
@@ -4361,7 +4515,7 @@ Thanks to Mike for being ace.</p>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 0.8rem; gap: 0.8rem; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm" onclick="openVersionModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Orbitron', monospace, sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--glow-color); background: rgba(245, 158, 11, 0.12); border: 1px solid var(--glow-color); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to view applied updates & version history">
-                    <span>🏷️</span> v1.1.1 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
+                    <span>🏷️</span> v1.1.2 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 500; font-family: sans-serif;">(View Applied Updates)</span>
                 </button>
                 <button class="btn btn-primary" onclick="closeAboutModal()" style="padding: 0.45rem 1.4rem;">Close</button>
             </div>
@@ -4378,11 +4532,25 @@ Thanks to Mike for being ace.</p>
                 <button class="close-modal-btn" onclick="closeVersionModal()">&times;</button>
             </div>
             <div style="padding: 1.2rem 0.5rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-primary); overflow-y: auto; max-height: calc(85vh - 130px);">
-                                                <!-- v1.1.1 -->
+                                                <!-- v1.1.2 -->
                 <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3); margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
                         <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
-                            v1.1.1 - Current Release
+                            v1.1.2 - Current Release
+                        </span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">07.11.26</span>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>Side-by-Side Play Card Action Column:</strong> Replaced the wide full-width image banner with an integrated side-by-side action row. All 6 action and status buttons (Activate, Give Way, Evade, Fire, Ghost, Distracted) are organized in a clean vertical column with guaranteed identical dimensions next to the vehicle chassis image.</li>
+                        <li><strong>Zero-Scroll Space Optimization:</strong> Eliminated stacked button bars, saving ~25px per vehicle card for an optimal fit on 1080p, 1440p, 3000x2000, and 4K screens.</li>
+                    </ul>
+                </div>
+
+                <!-- v1.1.1 -->
+                <div style="background: rgba(0,0,0,0.35); border: 1px solid var(--glow-color); border-radius: 8px; padding: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.3); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-family: 'Orbitron', monospace, sans-serif; font-size: 1rem; color: var(--glow-color); font-weight: 700; letter-spacing: 0.5px;">
+                            v1.1.1
                         </span>
                         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Orbitron', sans-serif;">07.11.26</span>
                     </div>
@@ -7123,7 +7291,7 @@ Thanks to Mike for being ace.</p>
 
         // ==========================================
                 // ==========================================
-        // DEVICE & ORIENTATION MANAGER (v1.1.1)
+        // DEVICE & ORIENTATION MANAGER (v1.1.2)
         // Auto-detects device hardware & orientation
         // ==========================================
         const DeviceManager = {
@@ -10296,18 +10464,59 @@ Thanks to Mike for being ace.</p>
 
                     let isWipeout = vehicle.hazard >= wipeoutThreshold;
 
-                    // Play Mode image slot
-                    let playImageSlotHtml = "";
-                    if (vehicle.imageUrl && vehicle.imageUrl !== "db_stored") {
-                        playImageSlotHtml = `
-                            <div style="position: relative; width: 100%; height: 128px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15);">
-                                <img src="${vehicle.imageUrl}" style="width: 80%; height: 100%; object-fit: contain;">
+                    // Play Mode: Combined Action Buttons Column & Chassis Image Row
+                    let playActionsAndImageHtml = "";
+                    if (isV3()) {
+                        playActionsAndImageHtml = `
+                            <div class="play-actions-image-row">
+                                <div class="play-action-buttons-col">
+                                    <button type="button" class="play-action-btn btn-activate ${vehicle.activated ? 'active' : ''}" onclick="toggleVehicleActivation('${vehicle.id}')" title="${vehicle.activated ? 'Vehicle activated for this round' : 'Click to activate vehicle'}">
+                                        ${vehicle.activated ? '⚡ Activated' : '⏳ Activate'}
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-giveway" onclick="vehicleGiveWay('${vehicle.id}')" title="Give Way: Gain 1 Hazard to pass turn or activate another vehicle (Free with CB Radio)">
+                                        🏳️ Give Way
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-evade" onclick="vehicleEvade('${vehicle.id}')" title="Evade: Gain 2 Hazards to set Armour = Current Gear for this attack">
+                                        🛡️ Evade
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')" title="Toggle On Fire status">
+                                        🔥 Fire
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-ghost ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')" title="Toggle Ghost Rider status">
+                                        👻 Ghost
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')" title="Toggle Distracted status">
+                                        ⚠️ Distracted
+                                    </button>
+                                </div>
+                                <div class="play-chassis-image-box">
+                                    ${vehicle.imageUrl && vehicle.imageUrl !== "db_stored" ? 
+                                        `<img src="${vehicle.imageUrl}" alt="${vehicle.name}">` : 
+                                        `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Image</span>`
+                                    }
+                                </div>
                             </div>
                         `;
                     } else {
-                        playImageSlotHtml = `
-                            <div style="width: 100%; height: 80px; border: 1px dashed var(--card-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem; background: rgba(0,0,0,0.15);">
-                                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Image</span>
+                        playActionsAndImageHtml = `
+                            <div class="play-actions-image-row">
+                                <div class="play-action-buttons-col v2-col" style="grid-auto-rows: 25px;">
+                                    <button type="button" class="play-action-btn btn-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')" title="Toggle On Fire status">
+                                        🔥 Fire
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-ghost ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')" title="Toggle Ghost Rider status">
+                                        👻 Ghost
+                                    </button>
+                                    <button type="button" class="play-action-btn btn-distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')" title="Toggle Distracted status">
+                                        ⚠️ Distracted
+                                    </button>
+                                </div>
+                                <div class="play-chassis-image-box" style="min-height: 83px;">
+                                    ${vehicle.imageUrl && vehicle.imageUrl !== "db_stored" ? 
+                                        `<img src="${vehicle.imageUrl}" alt="${vehicle.name}">` : 
+                                        `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Image</span>`
+                                    }
+                                </div>
                             </div>
                         `;
                     }
@@ -10483,23 +10692,7 @@ Thanks to Mike for being ace.</p>
                         `;
                     }
 
-                    // Activation Bar (v3 only)
-                    let activationBarHtml = "";
-                    if (isV3()) {
-                        activationBarHtml = `
-                            <div class="v3-activation-bar" style="display:flex; gap:0.4rem; align-items:center; margin-top:0.4rem; margin-bottom:0.2rem; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-sm" onclick="toggleVehicleActivation('${vehicle.id}')" style="font-family:'Orbitron', sans-serif; font-size:0.75rem; font-weight:700; padding:0.3rem 0.65rem; border-radius:6px; cursor:pointer; ${vehicle.activated ? 'opacity:0.65; background:rgba(255,255,255,0.08); border:1px solid var(--card-border); color:var(--text-muted);' : 'background:linear-gradient(135deg,rgba(34,197,94,0.3),rgba(16,185,129,0.15)); border:1px solid #22c55e; color:#4ade80;'}">
-                                    ${vehicle.activated ? '⚡ ACTIVATED' : '⏳ READY TO ACTIVATE'}
-                                </button>
-                                <button type="button" class="btn btn-sm" onclick="vehicleGiveWay('${vehicle.id}')" style="font-size:0.72rem; padding:0.3rem 0.55rem; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:var(--text-muted);" title="Give Way: Gain 1 Hazard to pass turn or activate another vehicle (Free with CB Radio)">
-                                    🏳️ Give Way (+1 Haz)
-                                </button>
-                                <button type="button" class="btn btn-sm" onclick="vehicleEvade('${vehicle.id}')" style="font-size:0.72rem; padding:0.3rem 0.55rem; background:rgba(59,130,246,0.15); border:1px solid #3b82f6; color:#60a5fa;" title="Evade: Gain 2 Hazards to set Armour = Current Gear for this attack">
-                                    🛡️ Evade (+2 Haz)
-                                </button>
-                            </div>
-                        `;
-                    }
+                    // (Activation bar integrated into playActionsAndImageHtml)
 
                     // Stats Badges for Play Mode
                     let playStatsBadgesHtml = "";
@@ -10585,20 +10778,12 @@ Thanks to Mike for being ace.</p>
                                 </div>
                             </div>
 
-                            ${activationBarHtml}
-
-                            <!-- Status Buttons (Fire, Ghost, Distracted - Guaranteed All on One Line) -->
-                            <div class="play-status-bar">
-                                <button type="button" class="play-status-chip on-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')">🔥 Fire</button>
-                                <button type="button" class="play-status-chip ghost-rider ${vehicle.ghostRider ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'ghostRider')">👻 Ghost</button>
-                                <button type="button" class="play-status-chip distracted ${vehicle.distracted ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'distracted')">⚠️ Distracted</button>
-                            </div>
                         </div>
 
                         ${wreckPanelHtml}
 
-                        <!-- Chassis Image Slot -->
-                        ${playImageSlotHtml}
+                        <!-- Actions & Chassis Image Side-by-Side Row -->
+                        ${playActionsAndImageHtml}
 
                         <!-- Stats Bar -->
                         ${playStatsBadgesHtml}
