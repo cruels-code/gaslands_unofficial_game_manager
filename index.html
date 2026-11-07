@@ -798,19 +798,29 @@
             align-items: stretch;
             gap: 0.5rem;
             width: 100%;
+            height: 170px; /* Locked height matching the 6-button action column */
             margin-top: 0.35rem;
             margin-bottom: 0.35rem;
             box-sizing: border-box;
         }
 
+        .play-actions-image-row.v2-row {
+            height: 86px; /* Locked height matching the 3-button column in v2 */
+        }
+
         .play-action-buttons-col {
             display: grid;
             grid-template-columns: 1fr;
-            grid-auto-rows: 25px;
+            grid-template-rows: repeat(6, 1fr);
             gap: 4px;
             width: 132px;
+            height: 100%;
             flex-shrink: 0;
             box-sizing: border-box;
+        }
+
+        .play-action-buttons-col.v2-col {
+            grid-template-rows: repeat(3, 1fr);
         }
 
         .play-action-btn {
@@ -917,6 +927,8 @@
         .play-chassis-image-box {
             flex: 1;
             min-width: 0;
+            height: 100%;
+            max-height: 100%;
             border: 1px solid var(--card-border);
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.25);
@@ -926,13 +938,15 @@
             overflow: hidden;
             position: relative;
             box-sizing: border-box;
-            min-height: 170px;
         }
 
-        .play-chassis-image-box img {
+        .play-chassis-image-box img,
+        .play-chassis-image-box video {
             width: 100%;
             height: 100%;
+            max-height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         /* Dashboard Gearbox */
@@ -9003,7 +9017,12 @@ Thanks to Mike for being ace.</p>
             // Keep localStorage clean by stripping large base64 URLs
             const stateToSave = JSON.parse(JSON.stringify(appState));
             stateToSave.vehicles.forEach(v => {
-                v.imageUrl = v.imageUrl ? "db_stored" : null; 
+                if (v.imageUrl) {
+                    // Linked file paths and URLs (non-base64) are saved directly in state
+                    v.imageUrl = v.imageUrl.startsWith("data:") ? "db_stored" : v.imageUrl;
+                } else {
+                    v.imageUrl = null;
+                }
             });
             localStorage.setItem("gaslands_manager_state", JSON.stringify(stateToSave));
             if (syncVehicles && typeof debouncedSyncVehicles === "function") debouncedSyncVehicles();
@@ -10265,23 +10284,27 @@ Thanks to Mike for being ace.</p>
                         `;
                     }
 
-                    // Render card image slot in garage
+                    // Render card image slot in garage (supports MP4 video, animated GIF, images)
                     let imageSlotHtml = "";
                     if (vehicle.imageUrl && vehicle.imageUrl !== "db_stored") {
                         imageSlotHtml = `
-                            <div style="position: relative; width: 100%; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border);">
-                                <img src="${vehicle.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">
-                                <button class="btn" style="position: absolute; bottom: 8px; right: 8px; padding: 0.25rem 0.5rem; font-size: 0.65rem; background: rgba(15, 23, 42, 0.85);" onclick="triggerImageUpload('${vehicle.id}')">🔄 Swap Image</button>
+                            <div style="position: relative; width: 100%; height: 160px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center;">
+                                ${renderVehicleMediaHtml(vehicle, true)}
+                                <div style="position: absolute; bottom: 8px; right: 8px; display: flex; gap: 4px;">
+                                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.65rem; background: rgba(15, 23, 42, 0.85);" onclick="triggerImageUpload('${vehicle.id}')" title="Upload local image or video file">📁 Upload</button>
+                                    <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.65rem; background: rgba(15, 23, 42, 0.85);" onclick="promptLinkMedia('${vehicle.id}')" title="Link MP4 video or animated GIF file location">🔗 Link</button>
+                                </div>
                                 <button class="btn btn-danger" style="position: absolute; bottom: 8px; left: 8px; padding: 0.25rem 0.5rem; font-size: 0.65rem; background: rgba(15, 23, 42, 0.85);" onclick="clearVehicleImage('${vehicle.id}')">Remove</button>
                             </div>
                         `;
                     } else {
                         imageSlotHtml = `
                             <div style="width: 100%; height: 120px; border: 1px dashed var(--card-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; background: rgba(0,0,0,0.15);">
-                                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Image</span>
-                                <div style="display: flex; gap: 0.35rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif;">No Chassis Media</span>
+                                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; justify-content: center;">
                                     <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;" onclick="goToPromptTab('${vehicle.id}')">🤖 AI Prompt</button>
                                     <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;" onclick="triggerImageUpload('${vehicle.id}')">📁 Upload</button>
+                                    <button class="btn" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;" onclick="promptLinkMedia('${vehicle.id}')" title="Link MP4 video, animated GIF, or image file path">🔗 Link File/URL</button>
                                 </div>
                             </div>
                         `;
@@ -10378,7 +10401,7 @@ Thanks to Mike for being ace.</p>
                         </div>
 
                         ${imageSlotHtml}
-                        <input type="file" id="image-upload-input-${vehicle.id}" style="display: none;" onchange="handleImageUpload(event, '${vehicle.id}')" accept="image/*">
+                        <input type="file" id="image-upload-input-${vehicle.id}" style="display: none;" onchange="handleImageUpload(event, '${vehicle.id}')" accept="image/*,video/mp4,video/webm,.gif,.mp4,.webm">
                         
                         ${statsBadgesHtml}
                         ${driverArchetypeHtml}
@@ -10490,16 +10513,13 @@ Thanks to Mike for being ace.</p>
                                     </button>
                                 </div>
                                 <div class="play-chassis-image-box">
-                                    ${vehicle.imageUrl && vehicle.imageUrl !== "db_stored" ? 
-                                        `<img src="${vehicle.imageUrl}" alt="${vehicle.name}">` : 
-                                        `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Image</span>`
-                                    }
+                                    ${renderVehicleMediaHtml(vehicle)}
                                 </div>
                             </div>
                         `;
                     } else {
                         playActionsAndImageHtml = `
-                            <div class="play-actions-image-row">
+                            <div class="play-actions-image-row v2-row">
                                 <div class="play-action-buttons-col v2-col" style="grid-auto-rows: 25px;">
                                     <button type="button" class="play-action-btn btn-fire ${vehicle.onFire ? 'active' : ''}" onclick="toggleStatus('${vehicle.id}', 'onFire')" title="Toggle On Fire status">
                                         🔥 Fire
@@ -10967,6 +10987,53 @@ Thanks to Mike for being ace.</p>
             }
         }
 
+
+        // Vehicle Media Helpers (MP4 Video, Animated GIF, Image)
+        function isVideoMedia(url) {
+            if (!url) return false;
+            const clean = url.split('?')[0].split('#')[0].toLowerCase();
+            return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.mov') || clean.endsWith('.m4v') || url.startsWith('data:video/');
+        }
+
+        function renderVehicleMediaHtml(vehicle, isGarage = false) {
+            const url = vehicle.imageUrl;
+            if (!url || url === "db_stored") {
+                return `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Media</span>`;
+            }
+            if (isVideoMedia(url)) {
+                // Per rules: ALWAYS mute sound on video with muted attribute, volume=0, autoplay, loop, playsinline
+                return `<video src="${url}" autoplay loop muted playsinline onloadedmetadata="this.muted=true; this.volume=0;" style="width: 100%; height: 100%; max-height: 100%; object-fit: contain; pointer-events: none; display: block;"></video>`;
+            } else {
+                return `<img src="${url}" alt="${vehicle.name}" style="width: 100%; height: 100%; max-height: 100%; object-fit: contain; display: block;">`;
+            }
+        }
+
+        function promptLinkMedia(vehicleId) {
+            const v = appState.vehicles.find(car => car.id === vehicleId);
+            if (!v) return;
+            const current = (v.imageUrl && v.imageUrl !== 'db_stored') ? v.imageUrl : '';
+            const input = prompt(
+                "Enter file location or URL for vehicle media (MP4 video, animated GIF, or image):\n" +
+                "Examples: 'cars/war_rig.mp4', 'media/interceptor.gif', 'https://example.com/car.mp4'",
+                current
+            );
+            if (input !== null) {
+                const trimmed = input.trim();
+                if (trimmed) {
+                    v.imageUrl = trimmed;
+                    delete v.thumbnail;
+                    delete v.thumbnailPng;
+                    saveImageToDB(vehicleId, trimmed);
+                    renderVehicles();
+                    saveState();
+                    if (window.showAppToast) {
+                        const isVid = isVideoMedia(trimmed);
+                        window.showAppToast(isVid ? `🎥 Muted MP4 video linked to ${v.name}` : `🔗 Media linked to ${v.name}`);
+                    }
+                }
+            }
+        }
+
         // Image uploading
         function triggerImageUpload(vehicleId) {
             const el = document.getElementById(`image-upload-input-${vehicleId}`);
@@ -10976,10 +11043,55 @@ Thanks to Mike for being ace.</p>
         function handleImageUpload(event, vehicleId) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
+            const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
+            const isVideo = file.type.startsWith('video/') || file.name.toLowerCase().endsWith('.mp4') || file.name.toLowerCase().endsWith('.webm');
+
+            if (isVideo) {
+                // MP4 / WebM cannot be converted to canvas base64 without immense storage
+                // Prompt user to link the file location with file.name pre-filled
+                const entered = prompt(
+                    `Video file detected: "${file.name}".\n\nMP4/video files must be linked to a file location or URL.\nEnter the path or URL for this video:`,
+                    file.name
+                );
+                if (entered && entered.trim()) {
+                    const v = appState.vehicles.find(car => car.id === vehicleId);
+                    if (v) {
+                        v.imageUrl = entered.trim();
+                        delete v.thumbnail;
+                        delete v.thumbnailPng;
+                        saveImageToDB(vehicleId, entered.trim());
+                        renderVehicles();
+                        saveState();
+                        if (window.showAppToast) window.showAppToast(`🎥 Muted video linked: ${file.name}`);
+                    }
+                }
+                return;
+            }
+
+            if (isGif) {
+                // Preserve full animated GIF frames by reading directly as Data URL (skipping canvas background keyer)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const rawDataUrl = e.target.result;
+                    const v = appState.vehicles.find(car => car.id === vehicleId);
+                    if (v) {
+                        v.imageUrl = rawDataUrl;
+                        delete v.thumbnail;
+                        delete v.thumbnailPng;
+                        saveImageToDB(vehicleId, rawDataUrl);
+                        renderVehicles();
+                        saveState();
+                        if (window.showAppToast) window.showAppToast(`🎞️ Animated GIF added!`);
+                    }
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            // Static images (PNG, JPG, WebP) -> apply background transparency keyer
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Apply transparency mask removing white/black background pixels
                 removeWhiteBackground(e.target.result, function(maskedDataUrl) {
                     const v = appState.vehicles.find(car => car.id === vehicleId);
                     if (v) {
