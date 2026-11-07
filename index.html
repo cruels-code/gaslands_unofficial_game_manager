@@ -4557,6 +4557,8 @@ Thanks to Mike for being ace.</p>
                     <ul style="margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
                         <li><strong>Side-by-Side Play Card Action Column:</strong> Replaced the wide full-width image banner with an integrated side-by-side action row. All 6 action and status buttons (Activate, Give Way, Evade, Fire, Ghost, Distracted) are organized in a clean vertical column with guaranteed identical dimensions next to the vehicle chassis image.</li>
                         <li><strong>Zero-Scroll Space Optimization:</strong> Eliminated stacked button bars, saving ~25px per vehicle card for an optimal fit on 1080p, 1440p, 3000x2000, and 4K screens.</li>
+                        <li><strong>Chassis Media &amp; Video Support:</strong> Locked image box height to strictly match the action button column, and added support for muted MP4 videos and animated GIFs linked via file location or URL.</li>
+                        <li><strong>V3 AI Prompt Enhancements:</strong> Added high-detail visual miniature modeling descriptors for all Gaslands V3 Beta weapons and upgrades, including welded armor Spikes, Wheel Scythes, Scrap Cannon, BFG, Thunder Sticks, Harpoon, and more.</li>
                     </ul>
                 </div>
 
@@ -12674,22 +12676,102 @@ Thanks to Mike for being ace.</p>
 
             function isCrewWeapon(weapon) {
                 if (!weapon) return false;
-                if (weapon.category === "Crew Fired") return true;
-                if (weapon.special && weapon.special.toLowerCase().includes("crew fired")) return true;
+                if (weapon.category === "Crew Fired" || weapon.category === "Hand") return true;
+                if (weapon.special && (weapon.special.toLowerCase().includes("crew fired") || weapon.special.toLowerCase().includes("360º"))) return true;
                 const name = (weapon.name || "").toLowerCase().trim();
                 const crewList = [
                     "handgun", "hand gun", "pistol", "magnum", "grenade", "grenades",
                     "gas grenade", "gas grenades", "molotov", "molotovs", "molotov cocktail",
                     "molotov cocktails", "shotgun", "blunderbuss", "steel net", "steel nets",
-                    "submachine gun", "sub-machine gun", "smg", "rifle"
+                    "submachine gun", "sub-machine gun", "smg", "rifle", "bazooka", "thunder sticks", "thunderstick", "thundersticks"
                 ];
                 return crewList.some(c => name === c || name.startsWith(c + " ") || name.endsWith(" " + c));
+            }
+
+            // High-detail post-apocalyptic miniatures modeling visual descriptor for weapons and upgrades (V3 Beta + Refuelled)
+            function getVisualDescriptor(name, facing = "") {
+                const n = (name || "").toLowerCase().trim();
+                const facingStr = (facing && facing !== "360°") ? `${facing.toLowerCase()}-mounted ` : "";
+                
+                const visualMap = {
+                    // Upgrades & Defensive Modifiers (including V3 Spikes, Wheel Scythes, Wall of Amps)
+                    "spikes": "menacing jagged steel armor spikes welded along the exterior chassis panels, bumpers, and wheel arches",
+                    "wheel scythes": "spinning lethal bladed scythes protruding outward from the wheel hubs",
+                    "wall of amplifiers": "towering vertical stack of rugged PA speakers, amplifier cabinets, and horn tweeters mounted over the rear chassis (Mad Max Doof Wagon style)",
+                    "grabber arm": "articulated hydraulic heavy scrap grabber claw arm mounted to the chassis",
+                    "rubber bumpers": "heavy-duty industrial shock-absorbing rubber push bumpers fitted flush to the front and rear",
+                    "siren": "roof-mounted mechanical air raid emergency siren with flashing warning beacon",
+                    "experimental nuclear engine": "exposed roaring nuclear turbine engine with glowing green coolant pipes and heavy lead radiation shielding",
+                    "magnetic jammer": "roof-mounted EMP magnetic interference antenna dish with sparking grounding cables",
+                    "tank tracks": "heavy continuous all-terrain steel tank tread tracks replacing the standard road wheels",
+                    "trailer (lightweight)": "hitched articulated lightweight combat cargo trailer with reinforced steel sides and matching wheels",
+                    "trailer (middleweight)": "hitched heavy-duty articulated combat trailer with twin axles and thick armor plating",
+                    "trailer (heavyweight)": "hitched massive armored articulated semi-trailer with dual heavy axles and blast shielding",
+                    "roll cage": "heavy-duty external welded tubular steel roll-cage exo-skeleton reinforcing the cab and roof frame",
+                    "ram": "heavy reinforced steel ramming bumper welded flush to the vehicle body",
+                    "exploding ram": "explosive ramming prow packed with demolition charges welded directly flush to the front bumper",
+                    "ramshackle hull plating": "rugged patchwork of welded steel scrap plates and bolted sheet metal armor reinforcing the chassis",
+                    "armour plating": "thick bolted ballistic steel armor plates with riveted seams and protective window louvres",
+                    "extra armour": "additional layered high-tensile steel armor plating across the doors and quarter panels",
+                    "microplate armour": "dense interlocking lightweight ballistic microplate armor fitted flush to the bodywork",
+                    "heavy frame": "reinforced heavy structural steel chassis girder reinforcements",
+                    "nitro booster": "twin pressurized nitrous oxide NOS bottles with braided steel fuel lines and visible pressure gauges",
+                    "supercharger": "heavy chrome engine supercharger blower scoop protruding high through the hood",
+                    "v10 engine": "massive roaring twin-turbo V10 engine block with open flame-spitting exhaust headers",
+                    "turret mount": "360-degree rotating armored ball turret ring",
+                    "magnetic clamps": "heavy electromagnetic clamp assemblies along the lower chassis rails",
+                    "improvised sludge thrower": "dual-barrel sludge delivery tubes with pressurized chemical tanks",
+                    
+                    // V3 New & Enhanced Weapons
+                    "scrap cannon": `${facingStr}salvaged heavy scrap cannon with a flared welded blunderbuss muzzle`,
+                    "harpoon": `${facingStr}heavy pneumatic harpoon ballista launcher with thick coiled steel winch cable and barbed spear`,
+                    "bfg": `${facingStr}colossal oversized super-heavy siege cannon with massive hydraulic recoil dampeners and thick rifled barrel`,
+                    "combat laser": `${facingStr}high-tech heavy combat laser cannon with external cooling heat-sinks and high-voltage power conduit cables`,
+                    "arc lightning gun": `${facingStr}Tesla-style electrical arc lightning projector with exposed copper induction coils and capacitor banks`,
+                    "grav gun": `${facingStr}gravitational distortion emitter cannon featuring concentric magnetic rings and glowing focus emitter`,
+                    "wrecking ball": "heavy industrial crane boom assembly hoisting a massive chained spiked steel wrecking ball",
+                    "sentry gun": "automated swivel sentry gun turret with optical target tracker and dual ammo drums",
+                    "minefield projector": `${facingStr}multi-tube mortar projector assembly designed to blanket areas with magnetic contact mines`,
+                    "sonic cannon": `${facingStr}heavy acoustic sonic cannon with a wide parabolic dish resonance emitter`,
+                    "photon cannon": `${facingStr}directed photon beam cannon with armored focusing lenses and heatsink fins`,
+                    "plasma cannon": `${facingStr}superheated plasma cannon with magnetic containment rails and glowing energy coils`,
+                    "steel net dropper": "rear-mounted compressed-air canister launcher loaded with heavy weighted steel entanglement nets",
+                    "sub-orbital death ray beacon": "orbital laser targeting uplink antenna dish with flashing targeting strobe",
+                    "kinetic super booster": `${facingStr}heavy kinetic impulse accelerator cannon with reinforced barrel housing`,
+                    
+                    // Hand/Crew Weapons
+                    "thunder sticks": "explosive-tipped thunderstick demolition spears",
+                    "bazooka": "shoulder-fired anti-tank rocket bazooka",
+                    "handgun": "heavy semi-automatic pistol",
+                    "magnum": "high-caliber heavy revolver handgun",
+                    "shotgun": "sawed-off 12-gauge double-barrel combat shotgun",
+                    "submachine gun": "compact tactical submachine gun with extended box magazine",
+                    "grenades": "bandolier of fragmentation stick grenades",
+                    "molotov cocktails": "glass bottle molotov cocktails with burning rag fuses",
+                    
+                    // Common Mounted & Dropped Weapons
+                    "machine gun": `${facingStr}heavy .50 caliber machine gun with perforated cooling barrel jacket and curved ammo belt box`,
+                    "heavy machine gun": `${facingStr}twin-barrel heavy machine gun with rugged blast suppressor and linked ammo hopper`,
+                    "mini-gun": `${facingStr}six-barrel motorized Gatling rotary mini-gun with high-speed ammunition feed chutes`,
+                    "flamethrower": `${facingStr}heavy combat flamethrower with armored fuel line, pilot flame nozzle, and pressurized fuel tanks`,
+                    "rockets": `${facingStr}quad-tube rocket launcher pod loaded with fin-stabilized high-explosive warheads`,
+                    "missiles": `${facingStr}heavy armor-piercing anti-vehicle missile launcher rail with guidance optics`,
+                    "mortar": `${facingStr}short-barreled heavy explosive mortar tube angled upward with reinforced baseplate`,
+                    "oil slick dropper": "rear-mounted undercarriage oil reservoir nozzle for laying slick oil patches",
+                    "caltrop dropper": "rear-mounted steel chute for deploying tire-shredding triangular iron caltrops",
+                    "glue dropper": "rear-mounted high-pressure twin nozzles for spraying thick adhesive containment sludge",
+                    "mine dropper": "rear-mounted release rack holding magnetic disc-shaped contact landmines",
+                    "napalm dropper": "rear-mounted pressurized tank and nozzle deploying flaming sticky napalm canisters",
+                    "smoke dropper": "rear-mounted dual exhaust canisters capable of billowing dense tactical smoke screens"
+                };
+
+                return visualMap[n] || (facingStr ? `${facingStr}${n}` : n);
             }
 
             function formatWeaponName(w) {
                 if (!w) return "";
                 const wl = w.toLowerCase().trim();
-                if (wl.endsWith("s") && !wl.endsWith("blunderbuss")) {
+                if (wl.startsWith("a ") || wl.startsWith("an ") || wl.startsWith("explosive-") || wl.startsWith("shoulder-") || wl.startsWith("bandolier") || wl.startsWith("glass") || (wl.endsWith("s") && !wl.endsWith("blunderbuss") && !wl.endsWith("laser"))) {
                     return wl;
                 }
                 if (/^[aeiou]/.test(wl)) {
@@ -12706,17 +12788,16 @@ Thanks to Mike for being ace.</p>
             (v.weapons || []).forEach(w => {
                 if (w.name === "Ram" || w.name === "Exploding Ram") hasRam = true;
                 if (isCrewWeapon(w)) {
-                    crewWeapons.push(w.name.toLowerCase());
+                    crewWeapons.push(getVisualDescriptor(w.name));
                 } else if (w.name.toLowerCase() !== "rc car bombs") {
-                    const facing = (w.facing && w.facing !== "360°") ? `${w.facing.toLowerCase()}-mounted ` : "";
-                    loadout.push(`${facing}${w.name.toLowerCase()}`);
+                    loadout.push(getVisualDescriptor(w.name, w.facing));
                 }
             });
 
             (v.upgrades || []).forEach(u => {
                 const uName = u.name.toLowerCase();
                 if (uName !== "extra crewmember") {
-                    loadout.push(uName);
+                    loadout.push(getVisualDescriptor(u.name));
                 }
             });
             
