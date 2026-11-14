@@ -1143,7 +1143,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 4000;
+            z-index: 10002;
             background: rgba(0, 0, 0, 0.65);
             cursor: default;
         }
@@ -1157,48 +1157,45 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        .dice3d-close-btn {
+        .dice3d-top-hud {
             position: absolute;
-            top: 16px;
-            left: 20px;
-            z-index: 4010;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 0.35rem 0.85rem;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            background: rgba(20, 20, 25, 0.82);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #f8fafc;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .dice3d-close-btn:hover {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #ef4444;
-            color: #ffffff;
-        }
-        .dice3d-group-labels {
-            position: absolute;
-            top: 112px;
+            top: 24px;
             left: 50%;
             transform: translateX(-50%);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            z-index: 4010;
+            min-width: 360px;
+            max-width: calc(100vw - 24px);
+            pointer-events: none;
+        }
+        .dice3d-group-labels {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             gap: 3rem;
+            width: 100%;
+            height: 34px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.35s ease;
-            z-index: 4005;
             white-space: nowrap;
         }
         .dice3d-group-labels.visible { opacity: 1; }
         .dice3d-group-badge {
+            box-sizing: border-box;
+            height: 34px;
+            min-width: 156px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 2px;
-            padding: 0.3rem 0.9rem;
+            padding: 0 0.95rem;
             border-radius: 999px;
             text-transform: uppercase;
             box-shadow: 0 4px 15px rgba(0,0,0,0.45);
@@ -1215,7 +1212,7 @@
         }
         .dice3d-result-strip {
             position: absolute;
-            bottom: 64px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(10, 20, 8, 0.88);
@@ -1252,30 +1249,164 @@
         .dice3d-trng.trng-ok    { background: rgba(80,200,80,0.12); border: 1px solid rgba(80,200,80,0.3); color: #80e080; }
         .dice3d-trng.trng-local { background: rgba(200,150,40,0.12); border: 1px solid rgba(200,150,40,0.3); color: #e0b040; }
         .dice3d-clear-btn {
-            position: absolute;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 4010;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 700;
-            padding: 0.45rem 1.35rem;
-            border-radius: 999px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.88), rgba(153, 27, 27, 0.92));
-            border: 1px solid rgba(252, 165, 165, 0.65);
+            box-sizing: border-box;
+            width: 100%;
+            height: 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(153, 27, 27, 0.95));
+            border: 2px solid rgba(252, 165, 165, 0.75);
             color: #ffffff;
             cursor: pointer;
-            box-shadow: 0 4px 18px rgba(220, 38, 38, 0.4);
-            transition: all 0.15s ease;
             pointer-events: auto;
+            box-shadow: 0 6px 22px rgba(220, 38, 38, 0.45);
+            transition: all 0.15s ease;
         }
         .dice3d-clear-btn:hover {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.98), rgba(185, 28, 28, 0.98));
             border-color: #ffffff;
-            transform: translateX(-50%) scale(1.04);
+            transform: scale(1.02);
+        }
+        .dice3d-clear-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            line-height: 1.1;
+        }
+        .dice3d-clear-callsign {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #fde68a;
+            line-height: 1.1;
+            text-transform: none;
+        }
+        .dice3d-spend-chart {
+            --dice3d-die-px: 72px;
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            right: 20px;
+            top: 53%;
+            transform: translateY(-50%);
+            width: 268px;
+            background: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            z-index: 4008;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .dice3d-spend-chart.visible {
+            display: flex;
+        }
+        .dice3d-spend-header {
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 108px 1fr;
+            align-items: center;
+            height: 34px;
+            background: #5a5a5a;
+            color: #ffffff;
+            font-family: 'Inter', 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0 12px;
+        }
+        .dice3d-spend-header .spend-col-title {
+            text-align: center;
+        }
+        .dice3d-spend-header .effect-col-title {
+            padding-left: 6px;
+        }
+        .dice3d-spend-row {
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 108px 1fr;
+            align-items: center;
+            height: var(--dice3d-die-px);
+            min-height: var(--dice3d-die-px);
+            max-height: var(--dice3d-die-px);
+            padding: 0 12px;
+            background: #ffffff;
+            color: #555555;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.02rem;
+            font-weight: 500;
+            position: relative;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+        }
+        .dice3d-spend-row.alt-row {
+            background: #ebebeb;
+        }
+        .dice3d-spend-row.drag-hover {
+            background: #fef08a;
+            box-shadow: inset 5px 0 0 #eab308;
+        }
+        .dice3d-spend-row.has-assigned-dice {
+            background: #f0fdf4;
+            box-shadow: inset 5px 0 0 #22c55e;
+        }
+        .dice3d-spend-row.alt-row.has-assigned-dice {
+            background: #dcfce7;
+            box-shadow: inset 5px 0 0 #22c55e;
+        }
+        .dice3d-spend-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 3px;
+            padding-right: 10px;
+        }
+        .dice3d-spend-slash {
+            color: #111111;
+            font-weight: 700;
+            font-size: 1.2rem;
+            line-height: 1;
+            margin: 0 1px;
+        }
+        .dice3d-effect-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+            padding-left: 4px;
+            white-space: nowrap;
+            color: #555555;
+            font-weight: 500;
+        }
+        .spend-die-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .spend-hazard-icon {
+            width: 22px;
+            height: 20px;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        @media (max-width: 768px) {
+            .dice3d-trng { top: 6px; right: 10px; }
+            .dice3d-top-hud { top: 34px; min-width: 0; }
+            .dice3d-group-labels { gap: 1rem; }
+            .dice3d-group-badge { min-width: 130px; padding: 0 0.7rem; font-size: 0.68rem; }
+            .dice3d-spend-chart { right: 8px; width: 216px; }
+            .dice3d-spend-header, .dice3d-spend-row { grid-template-columns: 92px 1fr; padding: 0 8px; font-size: 0.88rem; }
+            .spend-die-icon { width: 18px; height: 18px; }
+            .spend-hazard-icon { width: 18px; height: 16px; }
         }
 
         /* Game Turn & Phase Tracker */
@@ -3695,7 +3826,7 @@
 
                 <div class="mode-toggle">
                     <button class="mode-btn active" id="garage-mode-btn" onclick="switchMode('garage')">Garage</button>
-                    <button class="mode-btn" id="play-mode-btn" onclick="switchMode('play')">Play Mode</button>
+                    <button class="mode-btn" id="play-mode-btn" onclick="switchMode('play'); if (typeof syncTopBarHandlingMax === 'function') syncTopBarHandlingMax(true);">Play Mode</button>
                     <button class="mode-btn" id="rivals-mode-btn" onclick="switchMode('rivals')">Rivals</button>
                     <button class="mode-btn" id="prompt-mode-btn" onclick="switchMode('prompt')">AI Prompt</button>
                     <button class="mode-btn" id="rules-mode-btn" onclick="switchMode('rules')">Rules</button>
@@ -3790,22 +3921,26 @@
                 <!-- Throw Dice controls -->
                 <div class="play-dice-controls" id="play-dice-controls" style="display:flex; align-items:center; gap:0.35rem; margin-left:auto; flex-shrink:0; flex-wrap:nowrap;">
                     <div id="dice-toast-notification" class="dice-toast"></div>
-                    <select id="dice-type" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer; max-width: 140px;">
+                    <select id="dice-type" onchange="onDiceConfigChanged('type')" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer; max-width: 140px;">
                         <option value="skid" selected>Skid Dice</option>
                         <option value="d6">Standard D6</option>
                     </select>
-                    <select id="throw-dice-count" onchange="showDiceConfigToast()" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer;">
-                        <option value="1">1 Die</option>
-                        <option value="2">2 Dice</option>
-                        <option value="3" selected>3 Dice</option>
-                        <option value="4">4 Dice</option>
-                        <option value="5">5 Dice</option>
-                        <option value="6">6 Dice</option>
-                        <option value="7">7 Dice</option>
-                        <option value="8">8 Dice</option>
-                        <option value="9">9 Dice</option>
-                        <option value="10">10 Dice</option>
-                    </select>
+                    <div style="display:inline-flex; align-items:center; gap:0.2rem;">
+                        <button type="button" id="top-dice-dec-btn" onclick="adjustTopBarDiceCount(-1)" title="Decrease dice count" style="background:#111; border:1px solid rgba(255,255,255,0.18); color:var(--text-primary); border-radius:5px; width:24px; height:26px; font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">-</button>
+                        <select id="throw-dice-count" onchange="onDiceConfigChanged('count')" style="background:#000; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); border-radius:6px; padding:0.3rem 0.45rem; font-family:'Orbitron',sans-serif; font-size:0.72rem; cursor:pointer;">
+                            <option value="1">1 Die</option>
+                            <option value="2">2 Dice</option>
+                            <option value="3" selected>3 Dice</option>
+                            <option value="4">4 Dice</option>
+                            <option value="5">5 Dice</option>
+                            <option value="6">6 Dice</option>
+                            <option value="7">7 Dice</option>
+                            <option value="8">8 Dice</option>
+                            <option value="9">9 Dice</option>
+                            <option value="10">10 Dice</option>
+                        </select>
+                        <button type="button" id="top-dice-inc-btn" onclick="adjustTopBarDiceCount(1)" title="Increase dice count" style="background:#111; border:1px solid rgba(255,255,255,0.18); color:var(--text-primary); border-radius:5px; width:24px; height:26px; font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">+</button>
+                    </div>
                     <button id="api-key-btn" onclick="setRandomOrgApiKey()" style="font-family:'Orbitron',sans-serif; font-size:0.95rem; padding:0.25rem 0.5rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.4); color:var(--text-primary); cursor:pointer; transition:all 0.2s;" title="Set Random.org API Key">
                         🔑
                     </button>
@@ -4124,11 +4259,79 @@
     <!-- ===== 3D DICE OVERLAY ===== -->
     <div id="dice3d-overlay">
         <canvas id="dice3d-canvas"></canvas>
-        <button type="button" id="dice3d-close-btn" class="dice3d-close-btn" onclick="event.stopPropagation(); dismissDice3DOverlay();">✕ REMOVE DICE</button>
-        <div id="dice3d-group-labels" class="dice3d-group-labels"></div>
+        <div id="dice3d-top-hud" class="dice3d-top-hud">
+            <div id="dice3d-group-labels" class="dice3d-group-labels">
+                <span class="dice3d-group-badge focus-badge">⚪ FOCUS (0)</span>
+                <span class="dice3d-group-badge fury-badge">⚫ FURY (0)</span>
+            </div>
+            <button type="button" id="dice3d-clear-btn" class="dice3d-clear-btn" onclick="event.stopPropagation(); dismissDice3DOverlay();">
+                <span class="dice3d-clear-title">CLEAR</span>
+                <span id="dice3d-roller-callsign" class="dice3d-clear-callsign"></span>
+            </button>
+        </div>
+        <div id="dice3d-spend-chart" class="dice3d-spend-chart" aria-label="Handling Dice Spend Chart">
+            <div class="dice3d-spend-header">
+                <span class="spend-col-title">SPEND</span>
+                <span class="effect-col-title">EFFECT</span>
+            </div>
+            <div class="dice3d-spend-row" data-row-index="0" data-action="shift_gear">
+                <div class="dice3d-spend-cell">
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <span class="dice3d-spend-slash">/</span>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </div>
+                <div class="dice3d-effect-cell">
+                    <span>Shift Gear +</span>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                </div>
+            </div>
+            <div class="dice3d-spend-row alt-row" data-row-index="1" data-action="discard_hazard">
+                <div class="dice3d-spend-cell">
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <span class="dice3d-spend-slash">/</span>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </div>
+                <div class="dice3d-effect-cell">
+                    <span>Discard (</span>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <span>)</span>
+                </div>
+            </div>
+            <div class="dice3d-spend-row" data-row-index="2" data-action="slide">
+                <div class="dice3d-spend-cell">
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </div>
+                <div class="dice3d-effect-cell">
+                    <span>Slide +</span>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                </div>
+            </div>
+            <div class="dice3d-spend-row alt-row" data-row-index="3" data-action="drift">
+                <div class="dice3d-spend-cell">
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </div>
+                <div class="dice3d-effect-cell">
+                    <span>Drift +</span>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                </div>
+            </div>
+            <div class="dice3d-spend-row" data-row-index="4" data-action="boost">
+                <div class="dice3d-spend-cell">
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </div>
+                <div class="dice3d-effect-cell">
+                    <span>Boost +</span>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                </div>
+            </div>
+        </div>
         <div id="dice3d-result" class="dice3d-result-strip"></div>
         <div id="dice3d-trng-badge" class="dice3d-trng"></div>
-        <button type="button" id="dice3d-clear-btn" class="dice3d-clear-btn" onclick="event.stopPropagation(); dismissDice3DOverlay();">✕ REMOVE DICE</button>
     </div>
 
     <!-- Modal for adding items -->
@@ -5598,6 +5801,11 @@ Thanks to Mike for being ace.</p>
                         <option value="d6">Standard D6</option>
                     `;
                     diceSelect.value = (prev === "d6") ? "d6" : "skid";
+                }
+                if (typeof syncTopBarHandlingMax === "function") {
+                    const useDefault = diceSelect.value === "handling" && !diceSelect.dataset.initialized;
+                    syncTopBarHandlingMax(useDefault);
+                    diceSelect.dataset.initialized = "1";
                 }
             }
         }
@@ -7754,10 +7962,12 @@ Thanks to Mike for being ace.</p>
 
             broadcastRoll(rollData) {
                 if (!this.canBroadcastTable() || !rollData) return;
+                const callSign = rollData.callSign || (window.ChatManager && typeof window.ChatManager.getUsername === "function" ? window.ChatManager.getUsername() : null) || rollData.teamName || appState.teamName || "Anonymous Driver";
                 this.broadcast({
                     type: "dice_roll",
                     rollId: rollData.rollId || null,
-                    teamName: rollData.teamName || appState.teamName || "Anonymous Driver",
+                    callSign: callSign,
+                    teamName: rollData.teamName || callSign,
                     diceType: rollData.diceType || "skid",
                     gear: rollData.gear || 1,
                     count: rollData.count || (rollData.results ? rollData.results.length : 1),
@@ -7776,12 +7986,16 @@ Thanks to Mike for being ace.</p>
                         this._seenRollIds.delete(first);
                     }
                 }
+                const callSign = payload.callSign || (window.ChatManager && typeof window.ChatManager.getUsername === "function" ? window.ChatManager.getUsername() : null) || payload.teamName || appState.teamName || "Anonymous Driver";
                 this.broadcast({
                     type: "dice_roll_3d_start",
                     rollId: payload.rollId,
-                    teamName: payload.teamName || appState.teamName || "Anonymous Driver",
+                    callSign: callSign,
+                    teamName: payload.teamName || callSign,
                     diceType: payload.diceType || "handling",
                     gear: payload.gear || 1,
+                    whiteKnuckles: !!payload.whiteKnuckles,
+                    vehicleId: payload.vehicleId || null,
                     count: payload.count || (payload.diceSpecs ? payload.diceSpecs.length : 1),
                     activeVehicleName: payload.activeVehicleName || null,
                     trng: !!payload.trng,
@@ -7802,6 +8016,10 @@ Thanks to Mike for being ace.</p>
                     y: payload.y,
                     z: payload.z,
                     dragging: !!payload.dragging,
+                    hoverRow: typeof payload.hoverRow === "number" ? payload.hoverRow : null,
+                    assignedRow: typeof payload.assignedRow === "number" ? payload.assignedRow : null,
+                    assignedSlot: typeof payload.assignedSlot === "number" ? payload.assignedSlot : null,
+                    assignedAction: payload.assignedAction || null,
                     positions: Array.isArray(payload.positions) ? payload.positions : null,
                     timestamp: Date.now()
                 });
@@ -8018,7 +8236,7 @@ Thanks to Mike for being ace.</p>
             handleRemoteDiceRoll(data) {
                 if (!data) return;
                 if (data.rollId && this._seenRollIds && this._seenRollIds.has(data.rollId)) return;
-                const teamLabel = escapeHtml(data.teamName || "Driver");
+                const teamLabel = escapeHtml(data.callSign || data.teamName || "Driver");
                 const results = Array.isArray(data.results) ? data.results : [];
                 const diceType = data.diceType || "skid";
                 const gear = parseInt(data.gear, 10) || 1;
@@ -8307,6 +8525,7 @@ Thanks to Mike for being ace.</p>
         }
 
         const ChatManager = {
+            _sessionUsername: null,
             isOpen: false,
             isMaximized: false,
             prevBounds: null,
@@ -8372,6 +8591,7 @@ Thanks to Mike for being ace.</p>
             },
 
             getUsername() {
+                if (this._sessionUsername && this._sessionUsername.trim()) return this._sessionUsername.trim();
                 const saved = localStorage.getItem("gaslands_chat_username");
                 if (saved && saved.trim()) return saved.trim();
                 return (appState.teamName && appState.teamName.trim()) ? appState.teamName.trim().replace(/\s+/g, '_').slice(0, 20) : "RoadWarrior";
@@ -8380,6 +8600,7 @@ Thanks to Mike for being ace.</p>
             setUsername(newNick, broadcastChange = true) {
                 const oldNick = this.getUsername();
                 const cleaned = (newNick || "").trim().replace(/[^a-zA-Z0-9_\-\[\]]/g, '').slice(0, 20) || "Driver";
+                this._sessionUsername = cleaned;
                 localStorage.setItem("gaslands_chat_username", cleaned);
                 this.updateNickDisplay();
                 this.refreshNicklist();
@@ -9809,7 +10030,8 @@ Thanks to Mike for being ace.</p>
                 const countSelect = document.getElementById("throw-dice-count");
                 if (countSelect) {
                     countSelect.value = e.key === "0" ? "10" : e.key;
-                    showDiceConfigToast();
+                    if (typeof onDiceConfigChanged === "function") onDiceConfigChanged("count");
+                    else showDiceConfigToast();
                 }
             } else if (e.key === "s" || e.key === "S") {
                 const typeSelect = document.getElementById("dice-type");
@@ -10032,7 +10254,9 @@ Thanks to Mike for being ace.</p>
             const v = appState.vehicles.find(car => car.id === id);
             if (!v) return;
             v.activated = !v.activated;
+            window._activeRollVehicleId = v.activated ? null : v.id;
             renderVehicles();
+            if (typeof syncTopBarHandlingMax === "function") syncTopBarHandlingMax(true);
             saveState();
         }
 
@@ -10115,25 +10339,229 @@ Thanks to Mike for being ace.</p>
             saveState();
         }
 
-        function triggerHandlingDiceRoll(gear) {
-            const activeVeh = appState.vehicles.find(car => !car.wrecked && !car.activated) || appState.vehicles[0];
-            const diceCount = activeVeh ? (activeVeh.handling || 3) : 3;
+        function getActiveRollVehicle(explicitVehicleId = null) {
+            if (typeof appState === "undefined" || !Array.isArray(appState.vehicles) || appState.vehicles.length === 0) {
+                return null;
+            }
+            if (explicitVehicleId) {
+                const explicit = appState.vehicles.find(car => car.id === explicitVehicleId);
+                if (explicit) return explicit;
+            }
+            if (window._activeRollVehicleId) {
+                const focused = appState.vehicles.find(car => car.id === window._activeRollVehicleId && !car.wrecked);
+                if (focused) return focused;
+            }
+            return appState.vehicles.find(car => !car.wrecked && !car.activated) || appState.vehicles[0];
+        }
+
+        function getVehicleEffectiveMaxHull(vehicle) {
+            if (!vehicle) return 10;
+            const baseInfo = (typeof getVehicleBaseType === "function" ? getVehicleBaseType(vehicle.type) : null) || { hull: 10, handling: 3 };
+            let currentMaxHull = baseInfo.hull || 10;
+            if (vehicle.isPrisonCar && vehicle.type === "Car") {
+                currentMaxHull = baseInfo.hull - 2;
+            }
+            (vehicle.upgrades || []).forEach(u => {
+                if (u && (u.name === "Armour Plating" || u.name === "Ramshackle Hull Plating" || u.name === "MicroPlate Armour")) {
+                    currentMaxHull += 2;
+                }
+            });
+            return currentMaxHull;
+        }
+
+        function getVehicleEffectiveHandling(vehicle) {
+            if (!vehicle) return 3;
+            const baseInfo = (typeof getVehicleBaseType === "function" ? getVehicleBaseType(vehicle.type) : null) || { hull: 10, handling: 3 };
+            let currentHandling = (typeof baseInfo.handling === "number") ? baseInfo.handling : (vehicle.handling || 3);
+            if ((vehicle.upgrades || []).some(u => u && u.name === "Tank Tracks")) currentHandling += 1;
+            if ((vehicle.perks || []).some(p => p && p.name === "Expertise")) currentHandling += 1;
+            if (typeof isV3 === "function" && isV3()) {
+                if (typeof appState !== "undefined" && appState.sponsor === "Chivo" && (!vehicle.hazard || vehicle.hazard === 0)) {
+                    currentHandling += 1;
+                }
+                const currentMaxHull = getVehicleEffectiveMaxHull(vehicle);
+                if ((currentMaxHull - (vehicle.damage || 0)) < (currentMaxHull / 2) && (vehicle.perks || []).some(p => p && p.name === "Lock In")) {
+                    currentHandling += 1;
+                }
+                if ((vehicle.perks || []).some(p => p && p.name === "Kiss My Asphalt")) {
+                    if (vehicle.gear === 5) currentHandling += 1;
+                    else if (vehicle.gear >= 6) currentHandling += 2;
+                }
+            }
+            return Math.max(1, Math.min(10, currentHandling));
+        }
+
+        function getVehicleHandlingDiceToRoll(vehicle) {
+            const maxHandling = getVehicleEffectiveHandling(vehicle);
+            if (!vehicle || typeof vehicle.handlingDiceCount !== "number" || isNaN(vehicle.handlingDiceCount)) {
+                return maxHandling;
+            }
+            return Math.max(1, Math.min(maxHandling, Math.round(vehicle.handlingDiceCount)));
+        }
+
+        function adjustVehicleHandlingDice(vehicleId, delta) {
+            const v = (typeof appState !== "undefined" && Array.isArray(appState.vehicles))
+                ? appState.vehicles.find(car => car.id === vehicleId)
+                : null;
+            if (!v) return;
+            window._activeRollVehicleId = v.id;
+            const maxHandling = getVehicleEffectiveHandling(v);
+            const current = getVehicleHandlingDiceToRoll(v);
+            const next = Math.max(1, Math.min(maxHandling, current + delta));
+            v.handlingDiceCount = next;
+            syncTopBarHandlingMax(true);
+            renderVehicles();
+            saveState();
+        }
+
+        function syncTopBarHandlingMax(useVehicleDefault = false) {
+            const typeSel = document.getElementById("dice-type");
+            const countSel = document.getElementById("throw-dice-count");
+            const decBtn = document.getElementById("top-dice-dec-btn");
+            const incBtn = document.getElementById("top-dice-inc-btn");
+            if (!countSel) return;
+
+            const isHandling = !!(typeSel && typeSel.value === "handling");
+            const activeVeh = getActiveRollVehicle();
+            const maxAllowed = (isHandling && activeVeh) ? getVehicleEffectiveHandling(activeVeh) : 10;
+
+            Array.from(countSel.options || []).forEach(opt => {
+                const val = parseInt(opt.value, 10) || 1;
+                opt.disabled = val > maxAllowed;
+            });
+
+            let curVal = parseInt(countSel.value, 10) || 1;
+            if (isHandling && activeVeh) {
+                if (useVehicleDefault) {
+                    curVal = getVehicleHandlingDiceToRoll(activeVeh);
+                } else {
+                    curVal = Math.max(1, Math.min(maxAllowed, curVal));
+                }
+            } else {
+                curVal = Math.max(1, Math.min(10, curVal));
+            }
+            countSel.value = String(curVal);
+
+            if (decBtn) {
+                decBtn.disabled = curVal <= 1;
+                decBtn.style.opacity = curVal <= 1 ? "0.45" : "1";
+                decBtn.style.cursor = curVal <= 1 ? "not-allowed" : "pointer";
+            }
+            if (incBtn) {
+                incBtn.disabled = curVal >= maxAllowed;
+                incBtn.style.opacity = curVal >= maxAllowed ? "0.45" : "1";
+                incBtn.style.cursor = curVal >= maxAllowed ? "not-allowed" : "pointer";
+                incBtn.title = isHandling && activeVeh
+                    ? `Increase Handling dice (max ${maxAllowed} for ${activeVeh.name || "vehicle"})`
+                    : "Increase dice count";
+            }
+        }
+
+        function adjustTopBarDiceCount(delta) {
+            const typeSel = document.getElementById("dice-type");
+            const countSel = document.getElementById("throw-dice-count");
+            if (!countSel) return;
+
+            const isHandling = !!(typeSel && typeSel.value === "handling");
+            const activeVeh = getActiveRollVehicle();
+            const maxAllowed = (isHandling && activeVeh) ? getVehicleEffectiveHandling(activeVeh) : 10;
+            const current = parseInt(countSel.value, 10) || 1;
+            const next = Math.max(1, Math.min(maxAllowed, current + delta));
+            countSel.value = String(next);
+
+            if (isHandling && activeVeh) {
+                window._activeRollVehicleId = activeVeh.id;
+                activeVeh.handlingDiceCount = next;
+                syncTopBarHandlingMax(false);
+                renderVehicles();
+                saveState();
+            } else {
+                syncTopBarHandlingMax(false);
+            }
+            if (typeof showDiceConfigToast === "function") showDiceConfigToast();
+        }
+
+        function onDiceConfigChanged(source = "count") {
+            const typeSel = document.getElementById("dice-type");
+            const countSel = document.getElementById("throw-dice-count");
+            const isHandling = !!(typeSel && typeSel.value === "handling");
+            const activeVeh = getActiveRollVehicle();
+
+            if (source === "type") {
+                if (isHandling && activeVeh && countSel) {
+                    countSel.value = String(getVehicleHandlingDiceToRoll(activeVeh));
+                }
+                syncTopBarHandlingMax(false);
+            } else if (isHandling && activeVeh && countSel) {
+                const maxHandling = getVehicleEffectiveHandling(activeVeh);
+                const requested = parseInt(countSel.value, 10) || 1;
+                const clamped = Math.max(1, Math.min(maxHandling, requested));
+                countSel.value = String(clamped);
+                activeVeh.handlingDiceCount = clamped;
+                syncTopBarHandlingMax(false);
+                renderVehicles();
+                saveState();
+            } else {
+                syncTopBarHandlingMax(false);
+            }
+            if (typeof showDiceConfigToast === "function") showDiceConfigToast();
+        }
+
+        function triggerHandlingDiceRoll(vehicleIdOrGear, explicitGear = null) {
+            const activeVeh = (typeof vehicleIdOrGear === "string")
+                ? getActiveRollVehicle(vehicleIdOrGear)
+                : getActiveRollVehicle();
+            if (activeVeh) window._activeRollVehicleId = activeVeh.id;
+
+            const maxHandling = activeVeh ? getVehicleEffectiveHandling(activeVeh) : 3;
+            const diceCount = activeVeh ? getVehicleHandlingDiceToRoll(activeVeh) : 3;
+            const clampedCount = Math.max(1, Math.min(maxHandling, diceCount));
+            const rollGear = (typeof explicitGear === "number" && !isNaN(explicitGear))
+                ? explicitGear
+                : ((typeof vehicleIdOrGear === "number" && !isNaN(vehicleIdOrGear))
+                    ? vehicleIdOrGear
+                    : (activeVeh ? (activeVeh.gear || 1) : 1));
+            const hasWK = !!(activeVeh && (activeVeh.perks || []).some(p => p && p.name === "White Knuckles"));
+
             const countSel = document.getElementById("throw-dice-count");
             const typeSel = document.getElementById("dice-type");
             if (typeSel) typeSel.value = "handling";
-            if (countSel) countSel.value = String(Math.min(10, Math.max(1, diceCount)));
-            if (typeof throwSkidDice3D === "function") throwSkidDice3D();
+            if (countSel) countSel.value = String(Math.min(10, clampedCount));
+            syncTopBarHandlingMax(false);
+            if (typeof throwSkidDice3D === "function") {
+                throwSkidDice3D({
+                    vehicleId: activeVeh ? activeVeh.id : null,
+                    gear: rollGear,
+                    diceType: "handling",
+                    count: clampedCount,
+                    whiteKnuckles: hasWK
+                });
+            }
         }
 
         function triggerWipeoutRoll(vehicleId) {
-            const v = appState.vehicles.find(car => car.id === vehicleId);
+            const v = getActiveRollVehicle(vehicleId);
             if (!v) return;
+            window._activeRollVehicleId = v.id;
             const hazardCount = Math.max(6, v.hazard || 6);
+            const clampedCount = Math.min(10, Math.max(1, hazardCount));
+            const rollGear = v.gear || 1;
+            const hasWK = !!((v.perks || []).some(p => p && p.name === "White Knuckles"));
+
             const countSel = document.getElementById("throw-dice-count");
             const typeSel = document.getElementById("dice-type");
             if (typeSel) typeSel.value = "wipeout";
-            if (countSel) countSel.value = String(Math.min(10, Math.max(1, hazardCount)));
-            if (typeof throwSkidDice3D === "function") throwSkidDice3D();
+            if (countSel) countSel.value = String(clampedCount);
+            syncTopBarHandlingMax(false);
+            if (typeof throwSkidDice3D === "function") {
+                throwSkidDice3D({
+                    vehicleId: v.id,
+                    gear: rollGear,
+                    diceType: "wipeout",
+                    count: clampedCount,
+                    whiteKnuckles: hasWK
+                });
+            }
         }
 
 
@@ -11889,9 +12317,16 @@ Thanks to Mike for being ace.</p>
 
                             <!-- Gearbox -->
                             <div class="gearbox">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.35rem; flex-wrap:wrap;">
                                     <span style="font-size: 0.72rem; font-weight:bold; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">ACTIVE GEAR SHIFT</span>
-                                    ${isV3() ? `<button class="btn btn-sm" onclick="triggerHandlingDiceRoll(${vehicle.gear})" style="font-size:0.68rem; padding:0.1rem 0.4rem; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; cursor:pointer;">🎯 Roll Handling</button>` : ''}
+                                    ${isV3() ? `
+                                        <div class="handling-dice-controls" style="display:inline-flex; align-items:center; gap:0.25rem;">
+                                            <button type="button" class="btn btn-sm handling-dec-btn" data-vehicle-id="${vehicle.id}" onclick="adjustVehicleHandlingDice('${vehicle.id}', -1)" ${getVehicleHandlingDiceToRoll(vehicle) <= 1 ? 'disabled' : ''} title="Decrease handling dice (min 1)" style="font-size:0.75rem; font-weight:bold; padding:0.08rem 0.38rem; min-width:22px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.22); color:#f8fafc; cursor:${getVehicleHandlingDiceToRoll(vehicle) <= 1 ? 'not-allowed' : 'pointer'}; opacity:${getVehicleHandlingDiceToRoll(vehicle) <= 1 ? '0.45' : '1'};">-</button>
+                                            <span class="handling-dice-readout" data-vehicle-id="${vehicle.id}" style="font-size:0.68rem; font-family:'Orbitron',sans-serif; color:#86efac; min-width:2.1rem; text-align:center;" title="Handling dice to roll / Max vehicle Handling">${getVehicleHandlingDiceToRoll(vehicle)}/${getVehicleEffectiveHandling(vehicle)}</span>
+                                            <button type="button" class="btn btn-sm handling-inc-btn" data-vehicle-id="${vehicle.id}" onclick="adjustVehicleHandlingDice('${vehicle.id}', 1)" ${getVehicleHandlingDiceToRoll(vehicle) >= getVehicleEffectiveHandling(vehicle) ? 'disabled' : ''} title="Increase handling dice (max ${getVehicleEffectiveHandling(vehicle)})" style="font-size:0.75rem; font-weight:bold; padding:0.08rem 0.38rem; min-width:22px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.22); color:#f8fafc; cursor:${getVehicleHandlingDiceToRoll(vehicle) >= getVehicleEffectiveHandling(vehicle) ? 'not-allowed' : 'pointer'}; opacity:${getVehicleHandlingDiceToRoll(vehicle) >= getVehicleEffectiveHandling(vehicle) ? '0.45' : '1'};">+</button>
+                                            <button type="button" class="btn btn-sm handling-roll-btn" data-vehicle-id="${vehicle.id}" onclick="triggerHandlingDiceRoll('${vehicle.id}', ${vehicle.gear})" style="font-size:0.68rem; padding:0.1rem 0.42rem; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; cursor:pointer; font-weight:bold;">🎯 Roll Handling (${getVehicleHandlingDiceToRoll(vehicle)})</button>
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 <div class="gear-selector" style="margin-top:0.2rem; padding: 0.2rem;">${gearButtonsHtml}</div>
                             </div>
@@ -12701,6 +13136,7 @@ Thanks to Mike for being ace.</p>
         function toggleHullDamage(id, index) {
             const v = appState.vehicles.find(car => car.id === id);
             if (v) {
+                window._activeRollVehicleId = v.id;
                 const baseInfo = getVehicleBaseType(v.type) || { hull: 10 };
                 let maxHull = baseInfo.hull;
                 if (v.isPrisonCar && v.type === "Car") {
@@ -12751,6 +13187,7 @@ Thanks to Mike for being ace.</p>
         function toggleHazard(id, val) {
             const v = appState.vehicles.find(car => car.id === id);
             if (v) {
+                window._activeRollVehicleId = v.id;
                 if (val === 0) {
                     v.hazard = 0;
                 } else if (val <= v.hazard) {
@@ -12783,8 +13220,14 @@ Thanks to Mike for being ace.</p>
         function setGear(id, gearVal) {
             const v = appState.vehicles.find(car => car.id === id);
             if (v) {
+                window._activeRollVehicleId = v.id;
                 v.gear = gearVal;
+                if (typeof v.handlingDiceCount === "number" && typeof getVehicleEffectiveHandling === "function") {
+                    const maxH = getVehicleEffectiveHandling(v);
+                    if (v.handlingDiceCount > maxH) v.handlingDiceCount = maxH;
+                }
                 renderVehicles();
+                if (typeof syncTopBarHandlingMax === "function") syncTopBarHandlingMax(true);
                 saveState();
             }
         }
@@ -14171,9 +14614,14 @@ Thanks to Mike for being ace.</p>
         // Global bridge — called by the Throw Dice button (in turn-phase-tracker)
         
         function triggerHandlingPushIt() {
-            const activeVeh = (typeof appState !== 'undefined' && appState.vehicles) ? 
-                (appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0]) : null;
+            const targetId = window._lastRollVehicleId || window._activeRollVehicleId || null;
+            const activeVeh = (typeof getActiveRollVehicle === 'function')
+                ? getActiveRollVehicle(targetId)
+                : ((typeof appState !== 'undefined' && appState.vehicles)
+                    ? (appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0])
+                    : null);
             if (activeVeh) {
+                window._activeRollVehicleId = activeVeh.id;
                 activeVeh.hazard = (activeVeh.hazard || 0) + 1;
                 if (activeVeh.hazard > 10) {
                     if (isV3()) activeVeh.damage = (activeVeh.damage || 0) + (activeVeh.hazard - 10);
@@ -14183,13 +14631,33 @@ Thanks to Mike for being ace.</p>
                 saveState();
                 if (window.showAppToast) window.showAppToast(`⚡ ${activeVeh.name} Pushed It! Gained 1 Hazard token.`);
             }
-            if (typeof throwSkidDice3D === 'function') throwSkidDice3D();
+            const opts = window._lastRollOpts || (activeVeh ? {
+                vehicleId: activeVeh.id,
+                gear: activeVeh.gear || 1,
+                whiteKnuckles: !!((activeVeh.perks || []).some(p => p && p.name === 'White Knuckles'))
+            } : null);
+            if (typeof throwSkidDice3D === 'function') throwSkidDice3D(opts);
         }
     
-        function throwSkidDice3D() {
-            const n = parseInt(document.getElementById('throw-dice-count').value, 10);
+        function throwSkidDice3D(rollOpts = null) {
+            const typeSel = document.getElementById('dice-type');
+            const countSel = document.getElementById('throw-dice-count');
+            const diceType = (rollOpts && rollOpts.diceType) || (typeSel ? typeSel.value : 'skid');
+            let n = (rollOpts && typeof rollOpts.count === 'number')
+                ? rollOpts.count
+                : (countSel ? parseInt(countSel.value, 10) : 3);
+
+            const targetVeh = (typeof getActiveRollVehicle === 'function')
+                ? getActiveRollVehicle(rollOpts && rollOpts.vehicleId)
+                : null;
+            if (diceType === 'handling' && targetVeh && typeof getVehicleEffectiveHandling === 'function') {
+                const maxH = getVehicleEffectiveHandling(targetVeh);
+                n = Math.max(1, Math.min(maxH, parseInt(n, 10) || 1));
+                if (countSel) countSel.value = String(n);
+            }
+
             if (window._dice3dReady) {
-                window._throwDice3D(n);
+                window._throwDice3D(n, rollOpts);
             } else {
                 alert('3D dice are still loading — please try again in a moment.');
             }
@@ -14417,7 +14885,7 @@ Thanks to Mike for being ace.</p>
     }
 
     function isDieFury(value, diceType, gear) {
-        if (diceType !== 'handling') return false;
+        if (diceType !== 'handling' && diceType !== 'wipeout') return false;
         const g = parseInt(gear, 10) || 1;
         return value === 1 || value < g;
     }
@@ -14445,6 +14913,8 @@ Thanks to Mike for being ace.</p>
     let activeRollGear = 1;
     let activeRollTeamName = 'Anonymous Driver';
     let activeRollIsRemote = false;
+    let activeRollWhiteKnuckles = false;
+    let activeRollVehicleId = null;
 
     // Pointer / drag interaction state
     let raycaster = null;
@@ -14462,6 +14932,154 @@ Thanks to Mike for being ace.</p>
     function renderOnce() {
         if (renderer && scene && camera) {
             renderer.render(scene, camera);
+        }
+    }
+
+    function getDiePixelWidth() {
+        const overlay = document.getElementById('dice3d-overlay');
+        const h = (overlay && overlay.clientHeight) || window.innerHeight || 800;
+        const fov = (camera ? camera.fov : 45) * Math.PI / 180;
+        const camY = camera ? camera.position.y : 15;
+        const visibleHeightAtDie = 2 * Math.tan(fov / 2) * (camY - 0.54);
+        return Math.max(36, Math.round((1.08 / visibleHeightAtDie) * h));
+    }
+
+    function screenToDicePlane(clientX, clientY) {
+        const canvas = document.getElementById('dice3d-canvas');
+        if (!canvas || !camera) return null;
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
+        const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+        const ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+        const rc = new THREE.Raycaster();
+        const hit = new THREE.Vector3();
+        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.54);
+        rc.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+        if (!rc.ray.intersectPlane(plane, hit)) return null;
+        return { x: hit.x, y: 0.54, z: hit.z };
+    }
+
+    function diceWorldToScreen(worldX, worldY, worldZ) {
+        const canvas = document.getElementById('dice3d-canvas');
+        if (!canvas || !camera) return null;
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
+        const proj = new THREE.Vector3(worldX, worldY, worldZ).project(camera);
+        return {
+            x: rect.left + (proj.x + 1) * 0.5 * rect.width,
+            y: rect.top + (-proj.y + 1) * 0.5 * rect.height
+        };
+    }
+
+    function getSpendRowSlotWorldPos(rowIndex, slotIndex = 0) {
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        const rowEl = chartEl ? chartEl.querySelector(`.dice3d-spend-row[data-row-index="${rowIndex}"]`) : null;
+        if (!chartEl || !rowEl) return null;
+        const chartRect = chartEl.getBoundingClientRect();
+        const rowRect = rowEl.getBoundingClientRect();
+        if (!chartRect.width || !rowRect.height) return null;
+        const diePx = getDiePixelWidth();
+        const targetScreenX = chartRect.left - (diePx * 0.58) - (slotIndex * diePx * 1.06);
+        const targetScreenY = (rowRect.top + rowRect.bottom) / 2;
+        const pt = screenToDicePlane(targetScreenX, targetScreenY);
+        if (!pt) return null;
+        return {
+            x: pt.x,
+            y: 0.54,
+            z: pt.z,
+            rowIndex: Number(rowIndex),
+            slotIndex: Number(slotIndex),
+            action: rowEl.dataset.action || null
+        };
+    }
+
+    function findHoveredSpendRow(worldX, worldZ) {
+        if (activeRollDiceType !== 'handling') return null;
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        if (!chartEl || !chartEl.classList.contains('visible')) return null;
+        const rows = Array.from(chartEl.querySelectorAll('.dice3d-spend-row'));
+        if (!rows.length) return null;
+        const screen = diceWorldToScreen(worldX, 0.54, worldZ);
+        if (!screen) return null;
+        const chartRect = chartEl.getBoundingClientRect();
+        const firstRect = rows[0].getBoundingClientRect();
+        const lastRect = rows[rows.length - 1].getBoundingClientRect();
+        const diePx = getDiePixelWidth();
+        if (screen.x < chartRect.left - diePx * 3.5 || screen.x > chartRect.right + 12) return null;
+        if (screen.y < firstRect.top - diePx * 0.45 || screen.y > lastRect.bottom + diePx * 0.45) return null;
+
+        let bestRow = null;
+        let bestDist = Infinity;
+        rows.forEach((rowEl) => {
+            const r = rowEl.getBoundingClientRect();
+            const centerY = (r.top + r.bottom) / 2;
+            const dist = Math.abs(screen.y - centerY);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestRow = rowEl;
+            }
+        });
+        if (!bestRow) return null;
+        return {
+            rowIndex: parseInt(bestRow.dataset.rowIndex, 10),
+            action: bestRow.dataset.action || null
+        };
+    }
+
+    function updateSpendChartHoverUI(hoverRowIndex = null) {
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        if (!chartEl) return;
+        chartEl.querySelectorAll('.dice3d-spend-row').forEach((rowEl) => {
+            const idx = parseInt(rowEl.dataset.rowIndex, 10);
+            rowEl.classList.toggle('drag-hover', hoverRowIndex !== null && idx === hoverRowIndex);
+        });
+    }
+
+    function updateSpendChartAssignedUI() {
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        if (!chartEl) return;
+        const assignedSet = new Set();
+        diceObjs.forEach((d) => {
+            if (typeof d.assignedRow === 'number') assignedSet.add(d.assignedRow);
+        });
+        chartEl.querySelectorAll('.dice3d-spend-row').forEach((rowEl) => {
+            const idx = parseInt(rowEl.dataset.rowIndex, 10);
+            rowEl.classList.toggle('has-assigned-dice', assignedSet.has(idx));
+        });
+    }
+
+    function repackSpendRowSlots(rowIndex) {
+        if (typeof rowIndex !== 'number' || isNaN(rowIndex)) return;
+        const rowDice = diceObjs
+            .filter((d) => d.assignedRow === rowIndex)
+            .sort((a, b) => (b.mesh.position.x - a.mesh.position.x) || (a.index - b.index));
+        rowDice.forEach((d, idx) => {
+            d.assignedSlot = idx;
+            const pos = getSpendRowSlotWorldPos(rowIndex, idx);
+            if (pos) {
+                d.mesh.position.set(pos.x, 0.54, pos.z);
+                d.body.position.set(pos.x, 0.54, pos.z);
+            }
+        });
+    }
+
+    function updateSpendChartMetrics() {
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        if (!chartEl) return;
+        const overlay = document.getElementById('dice3d-overlay');
+        const show = activeRollDiceType === 'handling' && overlay && overlay.classList.contains('active');
+        chartEl.style.setProperty('--dice3d-die-px', `${getDiePixelWidth()}px`);
+        chartEl.classList.toggle('visible', !!show);
+        if (show && diceObjs.length) {
+            diceObjs.forEach((d) => {
+                if (typeof d.assignedRow === 'number') {
+                    const pos = getSpendRowSlotWorldPos(d.assignedRow, d.assignedSlot || 0);
+                    if (pos) {
+                        d.mesh.position.set(pos.x, 0.54, pos.z);
+                        d.body.position.set(pos.x, 0.54, pos.z);
+                    }
+                }
+            });
         }
     }
 
@@ -14532,6 +15150,8 @@ Thanks to Mike for being ace.</p>
                     draggedDie.mesh.position.set(nx, 0.85, nz);
                     draggedDie.body.position.set(nx, 0.54, nz);
                     dragMoved = true;
+                    const hovered = findHoveredSpendRow(nx, nz);
+                    updateSpendChartHoverUI(hovered ? hovered.rowIndex : null);
                     renderOnce();
 
                     const now = performance.now();
@@ -14544,7 +15164,8 @@ Thanks to Mike for being ace.</p>
                                 x: nx,
                                 y: 0.85,
                                 z: nz,
-                                dragging: true
+                                dragging: true,
+                                hoverRow: hovered ? hovered.rowIndex : null
                             });
                         }
                     }
@@ -14562,6 +15183,24 @@ Thanks to Mike for being ace.</p>
             if (draggedDie) {
                 draggedDie.mesh.position.y = 0.54;
                 draggedDie.body.position.y = 0.54;
+                updateSpendChartHoverUI(null);
+
+                const hovered = findHoveredSpendRow(draggedDie.mesh.position.x, draggedDie.mesh.position.z);
+                const prevRow = draggedDie.assignedRow;
+                if (hovered) {
+                    draggedDie.assignedRow = hovered.rowIndex;
+                    draggedDie.assignedAction = hovered.action;
+                    if (typeof prevRow === 'number' && prevRow !== hovered.rowIndex) {
+                        repackSpendRowSlots(prevRow);
+                    }
+                    repackSpendRowSlots(hovered.rowIndex);
+                } else if (typeof prevRow === 'number') {
+                    draggedDie.assignedRow = null;
+                    draggedDie.assignedSlot = null;
+                    draggedDie.assignedAction = null;
+                    repackSpendRowSlots(prevRow);
+                }
+                updateSpendChartAssignedUI();
                 renderOnce();
 
                 if (window.NetworkManager && typeof window.NetworkManager.broadcastDiceMove === 'function') {
@@ -14572,11 +15211,17 @@ Thanks to Mike for being ace.</p>
                         y: 0.54,
                         z: draggedDie.mesh.position.z,
                         dragging: false,
+                        assignedRow: typeof draggedDie.assignedRow === 'number' ? draggedDie.assignedRow : null,
+                        assignedSlot: typeof draggedDie.assignedSlot === 'number' ? draggedDie.assignedSlot : null,
+                        assignedAction: draggedDie.assignedAction || null,
                         positions: diceObjs.map(d => ({
                             index: d.index,
                             x: d.mesh.position.x,
                             y: 0.54,
-                            z: d.mesh.position.z
+                            z: d.mesh.position.z,
+                            assignedRow: typeof d.assignedRow === 'number' ? d.assignedRow : null,
+                            assignedSlot: typeof d.assignedSlot === 'number' ? d.assignedSlot : null,
+                            assignedAction: d.assignedAction || null
                         }))
                     });
                 }
@@ -14670,22 +15315,30 @@ Thanks to Mike for being ace.</p>
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
 
-        // Dynamically adjust invisible physics walls to exactly match screen edges
+        // Dynamically adjust invisible physics walls to keep dice clear of top HUD & bottom result strip
         if (wallBodies && wallBodies.length === 4) {
             // Calculate visible screen bounds at y=0 based on camera distance (15) and FOV
             const vFov = camera.fov * Math.PI / 180;
             const visibleHeight = 2 * Math.tan(vFov / 2) * 15;
             const visibleWidth  = visibleHeight * camera.aspect;
+            const viewH = Math.max(window.innerHeight || 0, 400);
+            const topHudPx = window.innerWidth <= 768 ? 132 : 148;
+            const bottomHudPx = window.innerWidth <= 768 ? 80 : 88;
+            const topInsetWorld = (topHudPx / viewH) * visibleHeight;
+            const bottomInsetWorld = (bottomHudPx / viewH) * visibleHeight;
 
-            // Subtract 0.6 so the dice bounce right when they touch the screen edge
-            const zBound = (visibleHeight / 2) - 0.6;
+            // Subtract 0.6 so dice bounce inside visible edges without overlapping HUD overlays
+            const halfH = visibleHeight / 2;
+            const topZBound = Math.max(2.0, halfH - 0.6 - topInsetWorld);
+            const bottomZBound = Math.max(2.0, halfH - 0.6 - bottomInsetWorld);
             const xBound = (visibleWidth / 2) - 0.6;
 
-            wallBodies[0].position.set(xBound, 0, 0);   // Right wall
-            wallBodies[1].position.set(-xBound, 0, 0);  // Left wall
-            wallBodies[2].position.set(0, 0, zBound);   // Bottom wall
-            wallBodies[3].position.set(0, 0, -zBound);  // Top wall
+            wallBodies[0].position.set(xBound, 0, 0);          // Right wall
+            wallBodies[1].position.set(-xBound, 0, 0);         // Left wall
+            wallBodies[2].position.set(0, 0, bottomZBound);    // Bottom wall (+Z)
+            wallBodies[3].position.set(0, 0, -topZBound);      // Top wall (-Z)
         }
+        updateSpendChartMetrics();
     }
 
     /* ------------------------------------------------------------------ */
@@ -14763,14 +15416,17 @@ Thanks to Mike for being ace.</p>
             ? -spread / 2 + (spread / (totalDice - 1)) * spawnIndex
             : 0;
 
-        // Calculate safe spawn Z based on dynamic bottom wall
+        // Calculate safe spawn Z based on dynamic bottom wall (above bottom result strip)
         const vFov = camera.fov * Math.PI / 180;
         const visibleHeight = 2 * Math.tan(vFov / 2) * 15;
-        const zBound = (visibleHeight / 2) - 0.6;
+        const viewH = Math.max(window.innerHeight || 0, 400);
+        const bottomHudPx = window.innerWidth <= 768 ? 80 : 88;
+        const bottomInsetWorld = (bottomHudPx / viewH) * visibleHeight;
+        const bottomZBound = Math.max(2.0, (visibleHeight / 2) - 0.6 - bottomInsetWorld);
 
-        // Spawn right at the bottom edge (+Z) slightly elevated
+        // Spawn right inside the bottom wall (+Z) slightly elevated
         const spawnY  = (typeof spec.spawnY === 'number') ? spec.spawnY : (6 + Math.random() * 2);
-        const spawnZ  = zBound - 0.5;
+        const spawnZ  = bottomZBound - 0.5;
         mesh.position.set(xOffset, spawnY, spawnZ);
         scene.add(mesh);
 
@@ -14821,7 +15477,10 @@ Thanks to Mike for being ace.</p>
             settled: false,
             settleT: 0,
             sortStartPos: null,
-            sortTargetPos: null
+            sortTargetPos: null,
+            assignedRow: null,
+            assignedSlot: null,
+            assignedAction: null
         };
     }
 
@@ -14869,7 +15528,7 @@ Thanks to Mike for being ace.</p>
 
         if (!isPortrait) {
             const focusCenterX = furyList.length ? -2.35 : -1.2;
-            const furyCenterX  = focusList.length ?  2.35 :  1.2;
+            const furyCenterX  = focusList.length ? (diceType === 'handling' ? 2.05 : 2.35) : 1.2;
             layoutGroup(focusList, focusCenterX, -0.35, 3);
             layoutGroup(furyList,  furyCenterX,  -0.35, 3);
         } else {
@@ -14968,14 +15627,16 @@ Thanks to Mike for being ace.</p>
                     d.mesh.position.y = 0.54;
                     d.body.position.set(d.mesh.position.x, 0.54, d.mesh.position.z);
                 });
-                if (activeRollDiceType === 'handling') {
+                if (activeRollDiceType === 'handling' || activeRollDiceType === 'wipeout') {
                     computeSortedDicePositions(diceObjs, activeRollDiceType, activeRollGear);
                     rollPhase = 'sorting';
                     sortStartTime = now / 1000;
                 } else {
                     const labelsEl = document.getElementById('dice3d-group-labels');
                     if (labelsEl) {
-                        labelsEl.innerHTML = '';
+                        labelsEl.innerHTML =
+                            '<span class="dice3d-group-badge focus-badge">⚪ FOCUS (0)</span>' +
+                            '<span class="dice3d-group-badge fury-badge">⚫ FURY (0)</span>';
                         labelsEl.classList.remove('visible');
                     }
                     diceObjs.forEach(d => {
@@ -15137,8 +15798,13 @@ Thanks to Mike for being ace.</p>
 
         let parts = [];
         const currentGear = activeRollGear || 1;
-        if (isRemote && activeRollTeamName) {
-            parts.push(`<span style="color:#38bdf8; font-weight:bold; font-family:'Orbitron',sans-serif;">📡 ${typeof escapeHtml === 'function' ? escapeHtml(activeRollTeamName) : activeRollTeamName}</span>`);
+        if (activeRollTeamName) {
+            const safeRoller = typeof escapeHtml === 'function' ? escapeHtml(activeRollTeamName) : activeRollTeamName;
+            parts.push(
+                isRemote
+                    ? `<span style="color:#38bdf8; font-weight:bold; font-family:'Orbitron',sans-serif;">📡 ${safeRoller}</span>`
+                    : `<span style="color:#fde68a; font-weight:bold; font-family:'Orbitron',sans-serif;">🎲 ${safeRoller}</span>`
+            );
         }
 
         if (diceType === 'handling') {
@@ -15162,21 +15828,26 @@ Thanks to Mike for being ace.</p>
             }
         } else if (diceType === 'wipeout') {
             let fury = 0;
+            let focus = 0;
             sortedDice.forEach(d => {
                 const val = d.value;
                 if (val === 1 || val < currentGear) {
                     fury++;
                     rollResultStrings.push(`<span style="color:#ef4444; font-weight:bold;">${val} (🔥 Fury)</span>`);
                 } else {
-                    rollResultStrings.push(`<span style="color:#94a3b8;">${val}</span>`);
+                    focus++;
+                    rollResultStrings.push(`<span style="color:#ffffff; font-weight:bold;">${val} (Focus)</span>`);
                 }
             });
-            if (fury < 3) {
-                parts.push(`<span style="color:#4ade80; font-weight:bold; font-family:'Orbitron',sans-serif;">🛡️ HOLD IT TOGETHER! (${fury} Fury &lt; 3)</span>`);
+            const furyThreshold = activeRollWhiteKnuckles ? 4 : 3;
+            parts.push(`<span style="color:#ffffff; font-weight:bold; margin-right:6px;">⚪ ${focus} Focus</span>`);
+            parts.push(`<span style="color:#f87171; font-weight:bold; margin-right:8px;">⚫ ${fury} Fury</span>`);
+            if (fury < furyThreshold) {
+                parts.push(`<span style="color:#4ade80; font-weight:bold; font-family:'Orbitron',sans-serif;">🛡️ HOLD IT TOGETHER! (Gear ${currentGear}: ${fury} Fury &lt; ${furyThreshold})</span>`);
             } else {
                 const moveDist = currentGear <= 2 ? 'Short' : (currentGear <= 4 ? 'Medium' : 'Long');
                 const crunchDmg = currentGear <= 2 ? 1 : (currentGear <= 4 ? 2 : 3);
-                parts.push(`<span style="color:#ef4444; font-weight:bold; font-family:'Orbitron',sans-serif;">💥 WIPEOUT! (${fury} Fury &ge; 3. Move: ${moveDist} Straight. Crunch: ${crunchDmg} Dmg)</span>`);
+                parts.push(`<span style="color:#ef4444; font-weight:bold; font-family:'Orbitron',sans-serif;">💥 WIPEOUT! (Gear ${currentGear}: ${fury} Fury &ge; ${furyThreshold}. Move: ${moveDist} Straight. Crunch: ${crunchDmg} Dmg)</span>`);
             }
         } else if (diceType === 'attack') {
             let normalHits = 0;
@@ -15223,7 +15894,8 @@ Thanks to Mike for being ace.</p>
             const badge = document.getElementById('dice3d-trng-badge');
             if (badge) badge.textContent = `📡 ${activeRollTeamName || 'Driver'} Rolled`;
             window.pushDiceLogEntry(`<span style="color:#38bdf8;">[${safeTeam} ${sortedDice.length}×${typeUpper}]</span> ${resultJoined}`);
-            if (typeof showNetworkToast === 'function') {
+            const overlayActive = document.getElementById('dice3d-overlay')?.classList.contains('active');
+            if (!overlayActive && typeof showNetworkToast === 'function') {
                 showNetworkToast(`🎲 <strong>${safeTeam}</strong> rolled ${sortedDice.length}× ${typeUpper}: ${resultJoined}`, 5500);
             }
         } else {
@@ -15233,11 +15905,15 @@ Thanks to Mike for being ace.</p>
 
             try {
                 if (window.NetworkManager && window.NetworkManager.canBroadcastTable()) {
+                    const callSign = activeRollTeamName || getRollerCallSign();
                     window.NetworkManager.broadcastRoll({
                         rollId: activeRollId,
-                        teamName: (typeof appState !== 'undefined' && appState.teamName) ? appState.teamName : "Anonymous Driver",
+                        callSign: callSign,
+                        teamName: callSign,
                         diceType: diceType,
                         gear: currentGear,
+                        whiteKnuckles: activeRollWhiteKnuckles,
+                        vehicleId: activeRollVehicleId,
                         count: sortedDice.length,
                         results: sortedDice.map(d => ({ value: d.value, outcome: d.outcome })),
                         resultText: resultJoined
@@ -15253,22 +15929,37 @@ Thanks to Mike for being ace.</p>
         strip.classList.add('visible');
     }
 
+    function getRollerCallSign() {
+        if (window.ChatManager && typeof window.ChatManager.getUsername === 'function') {
+            const u = window.ChatManager.getUsername();
+            if (u && String(u).trim()) return String(u).trim();
+        }
+        const saved = (localStorage.getItem('gaslands_chat_username') || '').trim();
+        if (saved) return saved;
+        if (typeof appState !== 'undefined' && appState.teamName && appState.teamName.trim()) {
+            return appState.teamName.trim();
+        }
+        return 'RoadWarrior';
+    }
+
     /* ------------------------------------------------------------------ */
     /*  Public: throw N dice (local or remote synchronized playback)        */
     /* ------------------------------------------------------------------ */
-    async function throwDice(n, remoteData = null) {
+    async function throwDice(n, remoteData = null, localOpts = null) {
         const isRemote = !!remoteData;
         const btn = document.getElementById('throw-dice-btn');
         if (!isRemote && btn) { btn.disabled = true; btn.textContent = 'Rolling…'; }
 
-        let nums, trng, rollId, diceType, gear, teamName, diceSpecs;
+        let nums, trng, rollId, diceType, gear, teamName, diceSpecs, whiteKnuckles = false, vehicleId = null;
 
         if (isRemote) {
-            rollId   = remoteData.rollId || ('r_' + Date.now().toString(36));
-            diceType = remoteData.diceType || 'handling';
-            gear     = parseInt(remoteData.gear, 10) || 1;
-            teamName = remoteData.teamName || 'Rival Driver';
-            trng     = !!remoteData.trng;
+            rollId        = remoteData.rollId || ('r_' + Date.now().toString(36));
+            diceType      = remoteData.diceType || 'handling';
+            gear          = parseInt(remoteData.gear, 10) || 1;
+            teamName      = remoteData.callSign || remoteData.teamName || 'Rival Driver';
+            trng          = !!remoteData.trng;
+            whiteKnuckles = !!(remoteData.whiteKnuckles || remoteData.hasWhiteKnuckles);
+            vehicleId     = remoteData.vehicleId || null;
             if (Array.isArray(remoteData.diceSpecs) && remoteData.diceSpecs.length > 0) {
                 diceSpecs = remoteData.diceSpecs;
                 nums = diceSpecs.map(s => Number(s.value) || 1);
@@ -15281,11 +15972,38 @@ Thanks to Mike for being ace.</p>
             n = diceSpecs.length;
         } else {
             rollId = 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
-            diceType = document.getElementById('dice-type') ? document.getElementById('dice-type').value : 'skid';
-            const activeVeh = (typeof appState !== 'undefined' && appState.vehicles) ?
-                (appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0]) : null;
-            gear = activeVeh ? (activeVeh.gear || 1) : 1;
-            teamName = (typeof appState !== 'undefined' && appState.teamName) ? appState.teamName : 'Anonymous Driver';
+            diceType = (localOpts && localOpts.diceType) || (document.getElementById('dice-type') ? document.getElementById('dice-type').value : 'skid');
+            let targetVeh = null;
+            if (typeof getActiveRollVehicle === 'function') {
+                targetVeh = getActiveRollVehicle(localOpts && localOpts.vehicleId);
+            } else if (typeof appState !== 'undefined' && appState.vehicles) {
+                targetVeh = appState.vehicles.find(v => !v.wrecked && !v.activated) || appState.vehicles[0];
+            }
+            if (!(localOpts && localOpts.vehicleId) && !window._activeRollVehicleId && diceType === 'wipeout' && typeof appState !== 'undefined' && Array.isArray(appState.vehicles)) {
+                const hazVeh = appState.vehicles
+                    .slice()
+                    .sort((a, b) => (b.hazard || 0) - (a.hazard || 0))
+                    .find(v => !v.wrecked && (v.hazard || 0) >= 6);
+                if (hazVeh) targetVeh = hazVeh;
+            }
+            vehicleId = (localOpts && localOpts.vehicleId) || (targetVeh ? targetVeh.id : null);
+            gear = (localOpts && typeof localOpts.gear === 'number' && !isNaN(localOpts.gear))
+                ? localOpts.gear
+                : (targetVeh ? (targetVeh.gear || 1) : 1);
+            whiteKnuckles = (localOpts && typeof localOpts.whiteKnuckles === 'boolean')
+                ? localOpts.whiteKnuckles
+                : !!(targetVeh && (targetVeh.perks || []).some(p => p && p.name === 'White Knuckles'));
+
+            if (diceType === 'handling' && targetVeh && typeof getVehicleEffectiveHandling === 'function') {
+                const maxH = getVehicleEffectiveHandling(targetVeh);
+                n = Math.max(1, Math.min(maxH, parseInt(n, 10) || 1));
+                const countSel = document.getElementById('throw-dice-count');
+                if (countSel) countSel.value = String(n);
+            }
+
+            window._lastRollVehicleId = vehicleId;
+            window._lastRollOpts = { vehicleId, gear, diceType, whiteKnuckles };
+            teamName = getRollerCallSign();
 
             const res = await fetchRolls(n);
             nums = res.nums;
@@ -15293,20 +16011,25 @@ Thanks to Mike for being ace.</p>
             diceSpecs = nums.map((val, idx) => generateDieSpec(val, idx));
         }
 
-        activeRollId       = rollId;
-        activeRollDiceType = diceType;
-        activeRollGear     = gear;
-        activeRollTeamName = teamName;
-        activeRollIsRemote = isRemote;
+        activeRollId            = rollId;
+        activeRollDiceType      = diceType;
+        activeRollGear          = gear;
+        activeRollTeamName      = teamName;
+        activeRollIsRemote      = isRemote;
+        activeRollWhiteKnuckles = whiteKnuckles;
+        activeRollVehicleId     = vehicleId;
 
         // Broadcast synchronized 3D throw immediately before starting physics animation
         if (!isRemote && window.NetworkManager && typeof window.NetworkManager.broadcastDiceRoll3DStart === 'function' && window.NetworkManager.canBroadcastTable()) {
             try {
                 window.NetworkManager.broadcastDiceRoll3DStart({
                     rollId: rollId,
+                    callSign: teamName,
                     teamName: teamName,
                     diceType: diceType,
                     gear: gear,
+                    whiteKnuckles: whiteKnuckles,
+                    vehicleId: vehicleId,
                     count: n,
                     trng: trng,
                     diceSpecs: diceSpecs,
@@ -15323,6 +16046,13 @@ Thanks to Mike for being ace.</p>
         // Show overlay
         const overlay = document.getElementById('dice3d-overlay');
         overlay.classList.add('active');
+        updateSpendChartHoverUI(null);
+        updateSpendChartAssignedUI();
+
+        const callsignEl = document.getElementById('dice3d-roller-callsign');
+        if (callsignEl) {
+            callsignEl.textContent = `🎲 ${teamName}`;
+        }
 
         // Update TRNG / remote driver badge
         const badge = document.getElementById('dice3d-trng-badge');
@@ -15330,17 +16060,19 @@ Thanks to Mike for being ace.</p>
             badge.textContent = `📡 ${teamName} Rolling…`;
             badge.className = 'dice3d-trng trng-ok';
         } else {
-            badge.textContent = trng ? '\u2713 True Random (Random.org)' : '\u26a0 CSPRNG (local)';
+            badge.textContent = `🎲 ${teamName} • ` + (trng ? '\u2713 True Random (Random.org)' : '\u26a0 CSPRNG (local)');
             badge.className   = 'dice3d-trng ' + (trng ? 'trng-ok' : 'trng-local');
         }
 
-        // Reset result strip & group labels
+        // Reset result strip & group labels (keep placeholder badges so CLEAR button preserves Focus+Fury width)
         const strip = document.getElementById('dice3d-result');
         strip.innerHTML = '';
         strip.classList.remove('visible');
         const labelsEl = document.getElementById('dice3d-group-labels');
         if (labelsEl) {
-            labelsEl.innerHTML = '';
+            labelsEl.innerHTML =
+                '<span class="dice3d-group-badge focus-badge">⚪ FOCUS (0)</span>' +
+                '<span class="dice3d-group-badge fury-badge">⚫ FURY (0)</span>';
             labelsEl.classList.remove('visible');
         }
 
@@ -15348,6 +16080,7 @@ Thanks to Mike for being ace.</p>
         initScene();
         initPhysics();
         resizeRenderer(); // Must happen AFTER initPhysics so it can move the wall bodies
+        updateSpendChartMetrics();
 
         // Clear old dice cleanly
         draggedDie = null;
@@ -15390,6 +16123,13 @@ Thanks to Mike for being ace.</p>
         if (rollPhase === 'rolling' || rollPhase === 'settling' || rollPhase === 'sorting') return;
         const overlay = document.getElementById('dice3d-overlay');
         overlay.classList.remove('active');
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        if (chartEl) {
+            chartEl.classList.remove('visible');
+            chartEl.querySelectorAll('.dice3d-spend-row').forEach((r) => {
+                r.classList.remove('drag-hover', 'has-assigned-dice');
+            });
+        }
         if (animId) { cancelAnimationFrame(animId); animId = null; }
         stopBgAnimInterval();
         draggedDie = null;
@@ -15422,15 +16162,32 @@ Thanks to Mike for being ace.</p>
         if (!moveData || !diceObjs.length) return;
         if (moveData.rollId && activeRollId && moveData.rollId !== activeRollId) return;
 
+        if (typeof updateSpendChartHoverUI === 'function') {
+            updateSpendChartHoverUI(moveData.dragging && typeof moveData.hoverRow === 'number' ? moveData.hoverRow : null);
+        }
+
         if (Array.isArray(moveData.positions)) {
             moveData.positions.forEach(p => {
                 const target = diceObjs.find(d => d.index === p.index) || diceObjs[p.index];
                 if (target) {
+                    target.assignedRow = (typeof p.assignedRow === 'number') ? p.assignedRow : null;
+                    target.assignedSlot = (typeof p.assignedSlot === 'number') ? p.assignedSlot : null;
+                    target.assignedAction = p.assignedAction || null;
                     const py = (typeof p.y === 'number') ? p.y : 0.54;
-                    target.mesh.position.set(p.x, py, p.z);
-                    target.body.position.set(p.x, 0.54, p.z);
+                    let px = p.x;
+                    let pz = p.z;
+                    if (typeof target.assignedRow === 'number' && activeRollDiceType === 'handling') {
+                        const slotPos = getSpendRowSlotWorldPos(target.assignedRow, target.assignedSlot || 0);
+                        if (slotPos) {
+                            px = slotPos.x;
+                            pz = slotPos.z;
+                        }
+                    }
+                    target.mesh.position.set(px, py, pz);
+                    target.body.position.set(px, 0.54, pz);
                 }
             });
+            if (typeof updateSpendChartAssignedUI === 'function') updateSpendChartAssignedUI();
         } else if (typeof moveData.dieIndex === 'number') {
             const target = diceObjs.find(d => d.index === moveData.dieIndex) || diceObjs[moveData.dieIndex];
             if (target && typeof moveData.x === 'number' && typeof moveData.z === 'number') {
@@ -15458,9 +16215,36 @@ Thanks to Mike for being ace.</p>
                 isFury: !!d.isFury,
                 x: d.mesh ? d.mesh.position.x : 0,
                 y: d.mesh ? d.mesh.position.y : 0,
-                z: d.mesh ? d.mesh.position.z : 0
+                z: d.mesh ? d.mesh.position.z : 0,
+                assignedRow: typeof d.assignedRow === 'number' ? d.assignedRow : null,
+                assignedSlot: typeof d.assignedSlot === 'number' ? d.assignedSlot : null,
+                assignedAction: d.assignedAction || null
             }))
         }),
+        getSpendChartState: () => {
+            const chartEl = document.getElementById('dice3d-spend-chart');
+            if (!chartEl) return { visible: false, diePixelWidth: getDiePixelWidth(), chartRect: null, rows: [] };
+            const rows = Array.from(chartEl.querySelectorAll('.dice3d-spend-row')).map((rowEl) => {
+                const r = rowEl.getBoundingClientRect();
+                return {
+                    rowIndex: parseInt(rowEl.dataset.rowIndex, 10),
+                    action: rowEl.dataset.action || null,
+                    height: r.height,
+                    top: r.top,
+                    bottom: r.bottom,
+                    left: r.left,
+                    right: r.right,
+                    hasAssigned: rowEl.classList.contains('has-assigned-dice'),
+                    dragHover: rowEl.classList.contains('drag-hover')
+                };
+            });
+            return {
+                visible: chartEl.classList.contains('visible'),
+                diePixelWidth: getDiePixelWidth(),
+                chartRect: chartEl.getBoundingClientRect().toJSON(),
+                rows
+            };
+        },
         getCamera: () => camera,
         getOverlayRect: () => {
             const c = document.getElementById('dice3d-canvas');
@@ -15480,8 +16264,9 @@ Thanks to Mike for being ace.</p>
             console.error('[Dice3D] Cannon.js failed to load from CDN. Check your internet connection.');
             return;
         }
-        window._throwDice3D = (n) => throwDice(n, null);
+        window._throwDice3D = (n, localOpts = null) => throwDice(n, null, localOpts);
         window._dice3dReady = true;
+        if (typeof syncTopBarHandlingMax === 'function') syncTopBarHandlingMax(true);
 
         window.dice3dOverlayClick = function() {};
 
