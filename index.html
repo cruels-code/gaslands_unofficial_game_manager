@@ -726,6 +726,31 @@
             pointer-events: none;
         }
 
+        .play-dashboard-card.wiped-out {
+            border-top-color: #f59e0b;
+            opacity: 0.78;
+        }
+
+        .play-dashboard-card.wiped-out:not(.wrecked)::after {
+            content: "WIPEOUT";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 4px solid #f59e0b;
+            color: #f59e0b;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            padding: 0.5rem 2rem;
+            background: rgba(9, 13, 22, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.45), 0 0 20px rgba(0,0,0,0.85);
+            z-index: 10;
+            letter-spacing: 4px;
+            pointer-events: none;
+        }
+
         /* Status Toggles Bar (Themed Wasteland Chips) */
         .play-dashboard-card .card-header,
         .play-card-header {
@@ -817,10 +842,10 @@
         /* Play Mode Actions & Chassis Image Side-by-Side Row */
         .play-actions-image-row {
             display: flex;
-            align-items: stretch;
+            align-items: center;
             gap: 0.5rem;
             width: 100%;
-            height: 170px; /* Locked height matching the 6-button action column */
+            height: 155px; /* Locked height matching Rivals image height & 6-button column */
             margin-top: 0.35rem;
             margin-bottom: 0.35rem;
             box-sizing: border-box;
@@ -830,12 +855,13 @@
             height: 86px; /* Locked height matching the 3-button column in v2 */
         }
 
-        .play-action-buttons-col {
+        .play-action-buttons-col,
+        .play-stats-col {
             display: grid;
             grid-template-columns: 1fr;
             grid-template-rows: repeat(6, 1fr);
-            gap: 4px;
-            width: 132px;
+            gap: 3px;
+            width: 118px;
             height: 100%;
             flex-shrink: 0;
             box-sizing: border-box;
@@ -843,6 +869,38 @@
 
         .play-action-buttons-col.v2-col {
             grid-template-rows: repeat(3, 1fr);
+        }
+
+        .play-stat-chip {
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 2px 4px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7px;
+            font-family: 'Orbitron', sans-serif;
+            box-sizing: border-box;
+            min-width: 0;
+        }
+
+        .play-stat-chip .stat-lbl {
+            font-size: 0.56rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .play-stat-chip .stat-val {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
         }
 
         .play-action-btn {
@@ -962,6 +1020,15 @@
             box-sizing: border-box;
         }
 
+        .play-actions-image-row:not(.v2-row) .play-chassis-image-box {
+            flex: 1 1 0%;
+            min-width: 0;
+            max-width: 219px;
+            height: 155px;
+            max-height: 155px;
+            margin: 0 auto;
+        }
+
         .play-chassis-image-box img,
         .play-chassis-image-box video {
             width: 100%;
@@ -1001,7 +1068,7 @@
 
         .rivals-media-telemetry-row {
             display: grid;
-            grid-template-columns: minmax(88px, 1fr) minmax(145px, 210px) minmax(74px, auto);
+            grid-template-columns: minmax(88px, 1fr) 175px minmax(74px, auto);
             gap: 0.6rem;
             align-items: center;
             width: 100%;
@@ -1012,7 +1079,8 @@
         }
 
         .rivals-media-telemetry-row .rivals-chassis-image-box {
-            max-width: 210px;
+            width: 175px;
+            max-width: 100%;
             height: 155px;
             max-height: 155px;
         }
@@ -3578,15 +3646,32 @@
             }
 
             .play-dashboard-card .status-toggles .btn,
-            .play-dashboard-card .status-chip,
-                        .play-action-buttons-col {
+            .play-dashboard-card .status-chip {
                 width: 120px !important;
                 grid-auto-rows: 24px !important;
                 gap: 3px !important;
             }
+            .play-action-buttons-col,
+            .play-stats-col {
+                width: 96px !important;
+                grid-template-rows: repeat(6, 1fr) !important;
+                gap: 3px !important;
+            }
+            .play-action-buttons-col.v2-col {
+                grid-template-rows: repeat(3, 1fr) !important;
+            }
             .play-action-btn {
-                font-size: 0.62rem !important;
+                font-size: 0.55rem !important;
                 padding: 0 2px !important;
+            }
+            .play-stat-chip {
+                padding: 0 5px !important;
+            }
+            .play-stat-chip .stat-lbl {
+                font-size: 0.5rem !important;
+            }
+            .play-stat-chip .stat-val {
+                font-size: 0.64rem !important;
             }
 
             .play-dashboard-card .play-status-chip {
@@ -7184,6 +7269,7 @@ Thanks to Mike for being ace.</p>
                                     "vehicle-card",
                                     "rivals-card",
                                     isWrecked ? "wrecked" : "",
+                                    v.wipedOut ? "wiped-out" : "",
                                     isFire ? "on-fire-card" : "",
                                     isGhost ? "ghost-card" : "",
                                     isDistracted ? "distracted-card" : "",
@@ -12258,6 +12344,14 @@ Thanks to Mike for being ace.</p>
                                     ${renderVehicleMediaHtml(vehicle)}
                                     ${vehicle.onFire ? `<canvas id="fire-canvas-${vehicle.id}" class="fire-canvas"></canvas>` : ''}
                                 </div>
+                                <div class="play-stats-col" aria-label="Vehicle Stats">
+                                    <div class="play-stat-chip"><span class="stat-lbl">Hull</span><span class="stat-val">${currentMaxHull}</span></div>
+                                    <div class="play-stat-chip"><span class="stat-lbl">Armour</span><span class="stat-val" style="color:#60a5fa;">${currentArmour}</span></div>
+                                    <div class="play-stat-chip"><span class="stat-lbl">Weight</span><span class="stat-val" style="color:#f59e0b;">${currentWeight}</span></div>
+                                    <div class="play-stat-chip"><span class="stat-lbl">Handling</span><span class="stat-val">${currentHandling}</span></div>
+                                    <div class="play-stat-chip"><span class="stat-lbl">Max Gear</span><span class="stat-val">${currentMaxGear}</span></div>
+                                    <div class="play-stat-chip"><span class="stat-lbl">Crew</span><span class="stat-val">${currentCrew}</span></div>
+                                </div>
                             </div>
                         `;
                     } else {
@@ -12471,20 +12565,9 @@ Thanks to Mike for being ace.</p>
 
                     // (Activation bar integrated into playActionsAndImageHtml)
 
-                    // Stats Badges for Play Mode
+                    // Stats Badges for Play Mode (V3 stats live in .play-stats-col beside image)
                     let playStatsBadgesHtml = "";
-                    if (isV3()) {
-                        playStatsBadgesHtml = `
-                            <div class="stats-badge-grid" style="grid-template-columns: repeat(6, 1fr);">
-                                <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
-                                <div class="stat-badge"><span class="label">Armour</span><span class="val" style="color:#60a5fa;">${currentArmour}</span></div>
-                                <div class="stat-badge"><span class="label">Weight</span><span class="val" style="color:#f59e0b;">${currentWeight}</span></div>
-                                <div class="stat-badge"><span class="label">Handling</span><span class="val">${currentHandling}</span></div>
-                                <div class="stat-badge"><span class="label">Max Gear</span><span class="val">${currentMaxGear}</span></div>
-                                <div class="stat-badge"><span class="label">Crew</span><span class="val">${currentCrew}</span></div>
-                            </div>
-                        `;
-                    } else {
+                    if (!isV3()) {
                         playStatsBadgesHtml = `
                             <div class="stats-badge-grid">
                                 <div class="stat-badge"><span class="label">Hull</span><span class="val">${currentMaxHull}</span></div>
@@ -12526,6 +12609,7 @@ Thanks to Mike for being ace.</p>
                     
                     let cardClasses = ["vehicle-card", "play-dashboard-card"];
                     if (isWreckedState) cardClasses.push("wrecked");
+                    if (vehicle.wipedOut) cardClasses.push("wiped-out");
                     if (vehicle.onFire) cardClasses.push("on-fire-card");
                     if (vehicle.distracted) cardClasses.push("distracted-card");
                     if (vehicle.ghostRider) cardClasses.push("ghost-card");
