@@ -971,6 +971,133 @@
             display: block;
         }
 
+        .rivals-card .rivals-chassis-image-box {
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 282px;
+            height: 170px;
+            max-height: 170px;
+            margin: 0 auto;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .rivals-card .rivals-chassis-image-box img,
+        .rivals-card .rivals-chassis-image-box video {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .rivals-media-telemetry-row {
+            display: grid;
+            grid-template-columns: minmax(88px, 1fr) minmax(145px, 210px) minmax(74px, auto);
+            gap: 0.6rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .rivals-media-telemetry-row.no-media {
+            grid-template-columns: 1fr auto;
+        }
+
+        .rivals-media-telemetry-row .rivals-chassis-image-box {
+            max-width: 210px;
+            height: 155px;
+            max-height: 155px;
+        }
+
+        .rivals-telemetry-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .rivals-telemetry-right {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            align-items: stretch;
+            justify-content: center;
+            min-width: 74px;
+        }
+
+        .rivals-stat-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.38rem 0.45rem;
+            border-radius: 7px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .rivals-stat-pill .stat-val {
+            font-size: 0.98rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--accent-cyan);
+        }
+
+        .rivals-stat-pill .stat-lbl {
+            font-size: 0.56rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .rivals-stat-pill.hull-critical .stat-val {
+            color: var(--danger-red);
+        }
+
+        .rivals-stat-pill.wipeout-active {
+            background: rgba(239, 68, 68, 0.18);
+            border-color: rgba(239, 68, 68, 0.7);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+        }
+
+        .rivals-stat-pill.wipeout-active .stat-val {
+            font-size: 0.66rem;
+            color: #fca5a5;
+            letter-spacing: 0.4px;
+        }
+
+        .rivals-stat-pill.wipeout-safe .stat-val {
+            font-size: 0.64rem;
+            color: #86efac;
+            opacity: 0.75;
+        }
+
+        @media (max-width: 480px) {
+            .rivals-media-telemetry-row {
+                grid-template-columns: 1fr auto;
+            }
+            .rivals-media-telemetry-row .rivals-chassis-image-box {
+                grid-column: 1 / -1;
+                max-width: 282px;
+                height: 160px;
+                max-height: 160px;
+                order: -1;
+            }
+        }
+
         /* Dashboard Gearbox */
         .gearbox {
             display: flex;
@@ -1025,6 +1152,12 @@
             gap: 0.4rem;
         }
 
+        .play-trackers-row .hull-tracker > div:first-child,
+        .play-trackers-row .hazard-tracker > div:first-child {
+            min-height: 24px;
+            align-items: center;
+        }
+
         .hull-points-grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
@@ -1074,18 +1207,18 @@
 
         .hazard-dots-row {
             display: flex;
-            gap: 0.4rem;
-            background: rgba(0,0,0,0.2);
-            padding: 0.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.02);
+            gap: 0.25rem;
+            background: transparent;
+            padding: 0;
+            border-radius: 5px;
+            border: none;
             align-items: center;
             justify-content: space-between;
         }
 
         .hazard-dots {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
+            grid-template-columns: repeat(11, 1fr);
             gap: 0.25rem;
             flex-grow: 1;
         }
@@ -1099,6 +1232,48 @@
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
+            box-sizing: border-box;
+        }
+
+        .hazard-wipeout-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 0.78rem;
+            line-height: 1;
+            color: #cbd5e1;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .hazard-wipeout-btn:hover {
+            border-color: rgba(239, 68, 68, 0.75);
+            color: #ffffff;
+        }
+
+        .hazard-wipeout-btn.pulsing {
+            animation: wipeout-pulse var(--wo-pulse-dur, 2s) ease-in-out infinite;
+        }
+
+        .hazard-wipeout-btn.wiped-out {
+            background: rgba(239, 68, 68, 0.45);
+            border-color: #ef4444;
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), inset 0 0 8px rgba(239, 68, 68, 0.55) !important;
+        }
+
+        @keyframes wipeout-pulse {
+            0%, 100% {
+                box-shadow: var(--wo-glow-dim, 0 0 6px rgba(239, 68, 68, 0.4));
+                border-color: rgba(239, 68, 68, 0.55);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: var(--wo-glow-bright, 0 0 16px rgba(239, 68, 68, 0.9));
+                border-color: #ef4444;
+                transform: scale(1.06);
+            }
         }
 
         .hazard-dot.active {
@@ -1295,40 +1470,68 @@
             right: 20px;
             top: 53%;
             transform: translateY(-50%);
-            width: 268px;
-            background: #ffffff;
-            border-radius: 6px;
+            width: 274px;
+            background: linear-gradient(165deg, rgba(24, 30, 20, 0.94) 0%, rgba(13, 17, 9, 0.96) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65);
-            border: 2px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.78), 0 0 18px var(--glow-shadow, rgba(217, 119, 6, 0.2));
+            border: 1px solid var(--card-border, rgba(212, 197, 169, 0.25));
             z-index: 4008;
-            pointer-events: none;
+            pointer-events: auto;
+            touch-action: none;
+            cursor: grab;
             user-select: none;
             -webkit-user-select: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
         .dice3d-spend-chart.visible {
             display: flex;
         }
+        .dice3d-spend-chart.dragging-chart {
+            cursor: grabbing;
+            border-color: var(--glow-color, #d97706);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, 0.88), 0 0 26px var(--glow-shadow, rgba(217, 119, 6, 0.45));
+        }
+        #dice3d-overlay.die-dragging .dice3d-spend-chart {
+            pointer-events: none;
+        }
         .dice3d-spend-header {
             box-sizing: border-box;
             display: grid;
-            grid-template-columns: 108px 1fr;
+            grid-template-columns: 108px 1fr 22px;
             align-items: center;
-            height: 34px;
-            background: #5a5a5a;
-            color: #ffffff;
-            font-family: 'Inter', 'Orbitron', sans-serif;
-            font-size: 0.78rem;
+            height: 36px;
+            background: linear-gradient(180deg, rgba(43, 56, 36, 0.96) 0%, rgba(27, 34, 22, 0.98) 100%);
+            border-bottom: 1px solid var(--glow-color, #d97706);
+            color: var(--text-primary, #f5eedc);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.74rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            padding: 0 12px;
+            padding: 0 10px 0 12px;
+            cursor: grab;
+        }
+        .dice3d-spend-chart.dragging-chart .dice3d-spend-header {
+            cursor: grabbing;
         }
         .dice3d-spend-header .spend-col-title {
             text-align: center;
         }
         .dice3d-spend-header .effect-col-title {
             padding-left: 6px;
+            color: #fde68a;
+        }
+        .dice3d-spend-drag-grip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            color: var(--glow-color, #d97706);
+            font-size: 1rem;
+            line-height: 1;
+            opacity: 0.88;
         }
         .dice3d-spend-row {
             box-sizing: border-box;
@@ -1339,28 +1542,32 @@
             min-height: var(--dice3d-die-px);
             max-height: var(--dice3d-die-px);
             padding: 0 12px;
-            background: #ffffff;
-            color: #555555;
-            font-family: 'Inter', sans-serif;
+            background: rgba(20, 26, 17, 0.78);
+            border-bottom: 1px solid rgba(212, 197, 169, 0.1);
+            color: var(--text-primary, #f5eedc);
+            font-family: 'Outfit', 'Inter', sans-serif;
             font-size: 1.02rem;
-            font-weight: 500;
+            font-weight: 600;
             position: relative;
             transition: background 0.15s ease, box-shadow 0.15s ease;
         }
+        .dice3d-spend-row:last-child {
+            border-bottom: none;
+        }
         .dice3d-spend-row.alt-row {
-            background: #ebebeb;
+            background: rgba(34, 44, 29, 0.84);
         }
         .dice3d-spend-row.drag-hover {
-            background: #fef08a;
-            box-shadow: inset 5px 0 0 #eab308;
+            background: rgba(217, 119, 6, 0.3);
+            box-shadow: inset 4px 0 0 var(--glow-color, #f59e0b);
         }
         .dice3d-spend-row.has-assigned-dice {
-            background: #f0fdf4;
-            box-shadow: inset 5px 0 0 #22c55e;
+            background: rgba(34, 197, 94, 0.22);
+            box-shadow: inset 4px 0 0 #22c55e;
         }
         .dice3d-spend-row.alt-row.has-assigned-dice {
-            background: #dcfce7;
-            box-shadow: inset 5px 0 0 #22c55e;
+            background: rgba(34, 197, 94, 0.28);
+            box-shadow: inset 4px 0 0 #22c55e;
         }
         .dice3d-spend-cell {
             display: flex;
@@ -1370,9 +1577,9 @@
             padding-right: 10px;
         }
         .dice3d-spend-slash {
-            color: #111111;
+            color: var(--text-muted, #a89f8c);
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             line-height: 1;
             margin: 0 1px;
         }
@@ -1383,8 +1590,8 @@
             gap: 5px;
             padding-left: 4px;
             white-space: nowrap;
-            color: #555555;
-            font-weight: 500;
+            color: var(--text-primary, #f5eedc);
+            font-weight: 600;
         }
         .spend-die-icon {
             width: 22px;
@@ -1403,8 +1610,9 @@
             .dice3d-top-hud { top: 34px; min-width: 0; }
             .dice3d-group-labels { gap: 1rem; }
             .dice3d-group-badge { min-width: 130px; padding: 0 0.7rem; font-size: 0.68rem; }
-            .dice3d-spend-chart { right: 8px; width: 216px; }
-            .dice3d-spend-header, .dice3d-spend-row { grid-template-columns: 92px 1fr; padding: 0 8px; font-size: 0.88rem; }
+            .dice3d-spend-chart { right: 8px; width: 224px; }
+            .dice3d-spend-header { grid-template-columns: 92px 1fr 18px; padding: 0 8px; font-size: 0.68rem; }
+            .dice3d-spend-row { grid-template-columns: 92px 1fr; padding: 0 8px; font-size: 0.88rem; }
             .spend-die-icon { width: 18px; height: 18px; }
             .spend-hazard-icon { width: 18px; height: 16px; }
         }
@@ -2437,16 +2645,20 @@
         }
     
         .fire-canvas {
+            position: absolute !important;
+            inset: 0 !important;
             width: 100% !important;
+            height: 100% !important;
             left: 0 !important;
             right: 0 !important;
-            height: 75% !important;
+            top: 0 !important;
             bottom: 0 !important;
-            top: auto !important;
             display: block;
-            opacity: 0.78 !important;
-            mask-image: linear-gradient(to top, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            pointer-events: none;
+            z-index: 4;
+            opacity: 0.82 !important;
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%);
         }
         .rivals-card .glitch-canvas {
             width: 100% !important;
@@ -2777,13 +2989,16 @@
         /* --------------------------------------------------------------------------
            1. TOUCH & GLOBAL MOBILE FOUNDATION
            -------------------------------------------------------------------------- */
-        button, .btn, .mode-btn, .play-action-btn, .gear-btn, .hull-point-box, .hazard-dot, .selection-item, .card-dropdown-bar, [onclick] {
+        button, .btn, .mode-btn, .play-action-btn, .gear-btn, .hull-point-box, .hazard-dot, .hazard-wipeout-btn, .dice3d-clear-btn, .selection-item, .card-dropdown-bar, [role="button"], [onclick], a, label, input, select, textarea {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+        }
+        button, .btn, .mode-btn, .play-action-btn, .gear-btn, .hull-point-box, .hazard-dot, .hazard-wipeout-btn, .dice3d-clear-btn, .selection-item, .card-dropdown-bar, [role="button"], [onclick] {
             user-select: none;
             -webkit-user-select: none;
         }
-        button:active, .btn:active, .mode-btn:active, .play-action-btn:active, .gear-btn:active, .hull-point-box:active, .hazard-dot:active, .card-dropdown-bar:active {
+        button:active, .btn:active, .mode-btn:active, .play-action-btn:active, .gear-btn:active, .hull-point-box:active, .hazard-dot:active, .hazard-wipeout-btn:active, .dice3d-clear-btn:active, .selection-item:active, .card-dropdown-bar:active, [role="button"]:active, [onclick]:active,
+        .touch-active {
             transform: scale(0.96);
             filter: brightness(1.18);
             transition: transform 0.04s ease, filter 0.04s ease;
@@ -3404,7 +3619,9 @@
             .play-dashboard-card .hazard-dots-row {
                 display: flex !important;
                 gap: 4px !important;
-                padding: 0.4rem 0.5rem !important;
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
                 flex-wrap: wrap !important;
                 width: 100% !important;
             }
@@ -4273,60 +4490,61 @@
             <div class="dice3d-spend-header">
                 <span class="spend-col-title">SPEND</span>
                 <span class="effect-col-title">EFFECT</span>
+                <span class="dice3d-spend-drag-grip" title="Drag to reposition chart">⠿</span>
             </div>
             <div class="dice3d-spend-row" data-row-index="0" data-action="shift_gear">
                 <div class="dice3d-spend-cell">
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                     <span class="dice3d-spend-slash">/</span>
-                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#f5f3eb" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 </div>
                 <div class="dice3d-effect-cell">
                     <span>Shift Gear +</span>
-                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#f59e0b"/></svg>
                 </div>
             </div>
             <div class="dice3d-spend-row alt-row" data-row-index="1" data-action="discard_hazard">
                 <div class="dice3d-spend-cell">
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                     <span class="dice3d-spend-slash">/</span>
-                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#f5f3eb" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 </div>
                 <div class="dice3d-effect-cell">
                     <span>Discard (</span>
-                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#f59e0b"/></svg>
                     <span>)</span>
                 </div>
             </div>
             <div class="dice3d-spend-row" data-row-index="2" data-action="slide">
                 <div class="dice3d-spend-cell">
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 </div>
                 <div class="dice3d-effect-cell">
                     <span>Slide +</span>
-                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#f59e0b"/></svg>
                 </div>
             </div>
             <div class="dice3d-spend-row alt-row" data-row-index="3" data-action="drift">
                 <div class="dice3d-spend-cell">
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#ffffff" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon focus-icon" viewBox="0 0 22 22" aria-label="Focus"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#f5f3eb" stroke="#111111" stroke-width="1.8"/><path d="M6.2 11L11 6.3L15.8 11 M6.2 15.6L11 10.9L15.8 15.6" stroke="#111111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 </div>
                 <div class="dice3d-effect-cell">
                     <span>Drift +</span>
-                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#f59e0b"/></svg>
                 </div>
             </div>
             <div class="dice3d-spend-row" data-row-index="4" data-action="boost">
                 <div class="dice3d-spend-cell">
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1" y="1" width="20" height="20" rx="4.5" fill="#0b0b0b"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <svg class="spend-die-icon fury-icon" viewBox="0 0 22 22" aria-label="Fury"><rect x="1.2" y="1.2" width="19.6" height="19.6" rx="4.5" fill="#111111" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/><path d="M6 8.5L11 13.8L16 8.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 </div>
                 <div class="dice3d-effect-cell">
                     <span>Boost +</span>
-                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#5a5a5a"/></svg>
+                    <svg class="spend-hazard-icon" viewBox="0 0 22 20" aria-label="Hazard"><path d="M11 2L20.5 18H1.5L11 2Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><line x1="11" y1="7.5" x2="11" y2="12.8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="15.5" r="1.15" fill="#f59e0b"/></svg>
                 </div>
             </div>
         </div>
@@ -6922,8 +7140,15 @@ Thanks to Mike for being ace.</p>
                                     hazardPipsHtml += `<div class="rivals-pip ${filled ? 'filled-hazard' : ''}"></div>`;
                                 }
 
-                                const mediaHtml = (v.imageUrl && v.imageUrl !== "db_stored" && typeof renderVehicleMediaHtml === "function")
-                                    ? `<div class="play-chassis-image-box" style="width:100%; height:115px; border-radius:8px; overflow:hidden;">${renderVehicleMediaHtml(v)}</div>`
+                                const hasMedia = !!(v.imageUrl && v.imageUrl !== "db_stored" && typeof renderVehicleMediaHtml === "function");
+                                const mediaInnerHtml = hasMedia
+                                    ? renderVehicleMediaHtml(v)
+                                    : `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Media</span>`;
+                                const fireCanvasHtml = isFire
+                                    ? `<canvas id="${fireCanvasId}" class="fire-canvas"></canvas>`
+                                    : "";
+                                const mediaHtml = (hasMedia || isFire)
+                                    ? `<div class="rivals-chassis-image-box">${mediaInnerHtml}${fireCanvasHtml}</div>`
                                     : "";
 
                                 let weaponsListHtml = "";
@@ -6965,9 +7190,14 @@ Thanks to Mike for being ace.</p>
                                     isActivated ? "activated-card" : ""
                                 ].filter(Boolean).join(" ");
 
+                                const wipeoutBadgeHtml = v.wipedOut
+                                    ? `<div class="rivals-stat-pill wipeout-active"><span class="stat-val">💥 WIPED OUT</span><span class="stat-lbl">Status</span></div>`
+                                    : (hazards >= wipeoutThreshold
+                                        ? `<div class="rivals-stat-pill wipeout-active"><span class="stat-val">${rivalRuleset === 'v3' ? '⚠️ WIPEOUT RISK' : '💥 WIPEOUT!'}</span><span class="stat-lbl">${hazards}/${wipeoutThreshold} Haz</span></div>`
+                                        : `<div class="rivals-stat-pill wipeout-safe"><span class="stat-val">SAFE</span><span class="stat-lbl">Wipeout Risk</span></div>`);
+
                                 return `
                                     <div class="${cardClasses}" style="position:relative; overflow:hidden;">
-                                        ${isFire ? `<canvas id="${fireCanvasId}" class="fire-canvas" style="position:absolute; bottom:0; left:0; width:100%; height:75%; pointer-events:none; border-bottom-left-radius:10px; border-bottom-right-radius:10px; z-index:10; opacity:0.78;"></canvas>` : ''}
                                         ${isDistracted ? `<canvas id="${glitchCanvasId}" class="glitch-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;"></canvas>` : ''}
                                         
                                         <div style="position:relative; z-index:2; display:flex; flex-direction:column; gap:0.55rem;">
@@ -6978,6 +7208,7 @@ Thanks to Mike for being ace.</p>
                                                 </div>
                                                 <div class="rivals-status-tags" style="margin-top:0; justify-content:flex-end;">
                                                     ${isWrecked ? `<span class="rivals-status-tag rivals-tag-wrecked">WRECKED${v.ignitionTokens ? ` (${v.ignitionTokens}🔥)` : ''}</span>` : ''}
+                                                    ${v.wipedOut ? '<span class="rivals-status-tag rivals-tag-wrecked">💥 WIPED OUT</span>' : ''}
                                                     ${isActivated ? '<span class="rivals-status-tag rivals-tag-gear">ACTIVATED</span>' : ''}
                                                     ${isFire ? '<span class="rivals-status-tag rivals-tag-fire">🔥 FIRE</span>' : ''}
                                                     ${isGhost ? '<span class="rivals-status-tag rivals-tag-ghost">👻 GHOST</span>' : ''}
@@ -6985,22 +7216,32 @@ Thanks to Mike for being ace.</p>
                                                 </div>
                                             </div>
 
-                                            ${mediaHtml}
+                                            <div class="rivals-media-telemetry-row ${mediaHtml ? '' : 'no-media'}">
+                                                <div class="rivals-telemetry-left">
+                                                    <div class="rivals-track">
+                                                        <div class="rivals-track-label">
+                                                            <span>Damage (${damageCount}/${maxHull})</span>
+                                                        </div>
+                                                        <div class="rivals-pips">${damagePipsHtml}</div>
+                                                    </div>
 
-                                            <div class="rivals-track">
-                                                <div class="rivals-track-label">
-                                                    <span>Damage (${damageCount} / ${maxHull})</span>
-                                                    <span>${currentHull} Hull Left</span>
+                                                    <div class="rivals-track">
+                                                        <div class="rivals-track-label">
+                                                            <span>Hazards (${hazards}/${wipeoutThreshold})</span>
+                                                        </div>
+                                                        <div class="rivals-pips">${hazardPipsHtml}</div>
+                                                    </div>
                                                 </div>
-                                                <div class="rivals-pips">${damagePipsHtml}</div>
-                                            </div>
 
-                                            <div class="rivals-track">
-                                                <div class="rivals-track-label">
-                                                    <span>Hazards (${hazards} / ${wipeoutThreshold})</span>
-                                                    <span>${hazards >= wipeoutThreshold ? (rivalRuleset === 'v3' ? '⚠️ WIPEOUT RISK' : '💥 WIPEOUT!') : ''}</span>
+                                                ${mediaHtml}
+
+                                                <div class="rivals-telemetry-right">
+                                                    <div class="rivals-stat-pill ${currentHull <= 2 ? 'hull-critical' : ''}">
+                                                        <span class="stat-val">${currentHull}</span>
+                                                        <span class="stat-lbl">Hull Left</span>
+                                                    </div>
+                                                    ${wipeoutBadgeHtml}
                                                 </div>
-                                                <div class="rivals-pips">${hazardPipsHtml}</div>
                                             </div>
 
                                             <div class="rivals-weapons-title">Equipped Weapons</div>
@@ -9901,30 +10142,48 @@ Thanks to Mike for being ace.</p>
          * on touchend for short taps (<14px movement, <350ms), bypassing synthetic delay.
          */
         function initFastTouchSensitivity() {
-            const INTERACTIVE_SEL = "button, .btn, .mode-btn, .play-action-btn, .gear-btn, .hull-point-box, .hazard-dot, .selection-item, .card-dropdown-bar, [onclick]";
+            const INTERACTIVE_SEL = "button, .btn, .mode-btn, .play-action-btn, .gear-btn, .hull-point-box, .hazard-dot, .hazard-wipeout-btn, .dice3d-clear-btn, .selection-item, .card-dropdown-bar, [role='button'], [onclick]";
             let activeTouch = null;
+
+            const clearActiveTouch = () => {
+                if (activeTouch && activeTouch.target && activeTouch.target.classList) {
+                    activeTouch.target.classList.remove("touch-active");
+                }
+                activeTouch = null;
+            };
 
             document.addEventListener("touchstart", (e) => {
                 if (!e.touches || e.touches.length !== 1) {
-                    activeTouch = null;
+                    clearActiveTouch();
                     return;
                 }
                 const target = e.target && e.target.closest ? e.target.closest(INTERACTIVE_SEL) : null;
-                if (!target || target.disabled || target.closest("input, select, textarea, option")) {
-                    activeTouch = null;
+                if (!target || target.disabled || target.getAttribute("aria-disabled") === "true" || target.closest("input, select, textarea, option")) {
+                    clearActiveTouch();
                     return;
                 }
                 const t = e.touches[0];
+                clearActiveTouch();
+                target.classList.add("touch-active");
                 activeTouch = { target, x: t.clientX, y: t.clientY, time: Date.now() };
             }, { passive: true });
 
-            document.addEventListener("touchcancel", () => {
-                activeTouch = null;
+            document.addEventListener("touchmove", (e) => {
+                if (!activeTouch || !e.touches || e.touches.length !== 1) {
+                    clearActiveTouch();
+                    return;
+                }
+                const t = e.touches[0];
+                if (Math.abs(t.clientX - activeTouch.x) >= 18 || Math.abs(t.clientY - activeTouch.y) >= 18) {
+                    clearActiveTouch();
+                }
             }, { passive: true });
+
+            document.addEventListener("touchcancel", clearActiveTouch, { passive: true });
 
             document.addEventListener("touchend", (e) => {
                 if (!activeTouch || !e.changedTouches || e.changedTouches.length === 0) {
-                    activeTouch = null;
+                    clearActiveTouch();
                     return;
                 }
                 const t = e.changedTouches[0];
@@ -9932,9 +10191,9 @@ Thanks to Mike for being ace.</p>
                 const dy = Math.abs(t.clientY - activeTouch.y);
                 const dt = Date.now() - activeTouch.time;
                 const target = activeTouch.target;
-                activeTouch = null;
+                clearActiveTouch();
 
-                if (dx < 14 && dy < 14 && dt < 350 && document.body.contains(target) && !target.disabled) {
+                if (dx < 18 && dy < 18 && dt < 450 && document.body.contains(target) && !target.disabled) {
                     const endTarget = e.target && e.target.closest ? e.target.closest(INTERACTIVE_SEL) : null;
                     if (endTarget === target) {
                         e.preventDefault();
@@ -11939,6 +12198,28 @@ Thanks to Mike for being ace.</p>
                         hazardDotsHtml += `<div class="hazard-dot ${classState}" onclick="toggleHazard('${vehicle.id}', ${i})"></div>`;
                     }
 
+                    const woHazards = Math.max(0, Math.min(10, vehicle.hazard || 0));
+                    let woClass = "hazard-dot hazard-wipeout-btn";
+                    let woStyle = "";
+                    if (vehicle.wipedOut) woClass += " wiped-out";
+                    if (woHazards >= 6) {
+                        const pulseDurations = { 6: 2.2, 7: 1.65, 8: 1.15, 9: 0.75, 10: 0.42 };
+                        const dimPx = 6 + (woHazards - 6) * 2;
+                        const brightPx = 14 + (woHazards - 6) * 4;
+                        const outerPx = 22 + (woHazards - 6) * 5;
+                        const dimAlpha = Math.min(1, 0.45 + (woHazards - 6) * 0.08).toFixed(2);
+                        const brightAlpha = Math.min(1, 0.82 + (woHazards - 6) * 0.045).toFixed(2);
+                        const outerAlpha = Math.min(1, 0.45 + (woHazards - 6) * 0.09).toFixed(2);
+                        woClass += " pulsing";
+                        woStyle = `--wo-pulse-dur:${pulseDurations[woHazards]}s;--wo-glow-dim:0 0 ${dimPx}px rgba(239,68,68,${dimAlpha});--wo-glow-bright:0 0 ${brightPx}px rgba(239,68,68,${brightAlpha}), 0 0 ${outerPx}px rgba(249,115,22,${outerAlpha});color:#fca5a5;`;
+                    } else if (woHazards > 0) {
+                        const glowPx = Math.round(3 + woHazards * 1.8);
+                        const glowAlpha = (0.2 + woHazards * 0.1).toFixed(2);
+                        const borderAlpha = (0.25 + woHazards * 0.08).toFixed(2);
+                        woStyle = `box-shadow:0 0 ${glowPx}px rgba(249,115,22,${glowAlpha});border-color:rgba(249,115,22,${borderAlpha});color:#fed7aa;`;
+                    }
+                    hazardDotsHtml += `<button type="button" class="${woClass}" style="${woStyle}" onclick="toggleWipedOut('${vehicle.id}')" title="${vehicle.wipedOut ? 'Wiped Out (click to clear)' : 'Toggle Wiped Out status'}">💥</button>`;
+
                     let gearButtonsHtml = "";
                     for (let i = 1; i <= 6; i++) {
                         let disabled = i > currentMaxGear ? "disabled" : "";
@@ -11975,6 +12256,7 @@ Thanks to Mike for being ace.</p>
                                 </div>
                                 <div class="play-chassis-image-box">
                                     ${renderVehicleMediaHtml(vehicle)}
+                                    ${vehicle.onFire ? `<canvas id="fire-canvas-${vehicle.id}" class="fire-canvas"></canvas>` : ''}
                                 </div>
                             </div>
                         `;
@@ -11997,6 +12279,7 @@ Thanks to Mike for being ace.</p>
                                         `<img src="${vehicle.imageUrl}" alt="${vehicle.name}">` : 
                                         `<span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-family:'Orbitron', sans-serif; letter-spacing: 0.5px;">No Chassis Image</span>`
                                     }
+                                    ${vehicle.onFire ? `<canvas id="fire-canvas-${vehicle.id}" class="fire-canvas"></canvas>` : ''}
                                 </div>
                             </div>
                         `;
@@ -12309,7 +12592,7 @@ Thanks to Mike for being ace.</p>
                                             <span style="font-family:'Orbitron', sans-serif; font-size:0.85rem; font-weight:bold; color: var(--glow-color);">${vehicle.hazard}/${hazardLimit}</span>
                                         </div>
                                     </div>
-                                    <div class="hazard-dots-row" style="padding: 0.25rem 0.35rem;">
+                                    <div class="hazard-dots-row">
                                         <div class="hazard-dots">${hazardDotsHtml}</div>
                                     </div>
                                 </div>
@@ -12370,10 +12653,6 @@ Thanks to Mike for being ace.</p>
                             </div>
                         </div>
 
-                        <!-- WebGL Fire shader overlay when on fire -->
-                        ${vehicle.onFire ? `
-                        <canvas id="fire-canvas-${vehicle.id}" class="fire-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 75%; pointer-events: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 10; opacity: 0.78;"></canvas>
-                        ` : ''}
                     `;
                     playContainer.appendChild(card);
                 }
@@ -13212,6 +13491,16 @@ Thanks to Mike for being ace.</p>
                 if (v.hazard < 0) {
                     v.hazard = 0;
                 }
+                renderVehicles();
+                saveState();
+            }
+        }
+
+        function toggleWipedOut(id) {
+            const v = appState.vehicles.find(car => car.id === id);
+            if (v) {
+                window._activeRollVehicleId = v.id;
+                v.wipedOut = !v.wipedOut;
                 renderVehicles();
                 saveState();
             }
@@ -14971,6 +15260,10 @@ Thanks to Mike for being ace.</p>
         };
     }
 
+    function isSpendChartSnapRight(chartRect, diePx) {
+        return chartRect.left < diePx * 2.2;
+    }
+
     function getSpendRowSlotWorldPos(rowIndex, slotIndex = 0) {
         const chartEl = document.getElementById('dice3d-spend-chart');
         const rowEl = chartEl ? chartEl.querySelector(`.dice3d-spend-row[data-row-index="${rowIndex}"]`) : null;
@@ -14979,7 +15272,12 @@ Thanks to Mike for being ace.</p>
         const rowRect = rowEl.getBoundingClientRect();
         if (!chartRect.width || !rowRect.height) return null;
         const diePx = getDiePixelWidth();
-        const targetScreenX = chartRect.left - (diePx * 0.58) - (slotIndex * diePx * 1.06);
+        const snapRightSide = isSpendChartSnapRight(chartRect, diePx);
+        const sideGapPx = diePx * 0.98;
+        const slotStepPx = diePx * 1.24;
+        const targetScreenX = snapRightSide
+            ? (chartRect.right + sideGapPx + (slotIndex * slotStepPx))
+            : (chartRect.left - sideGapPx - (slotIndex * slotStepPx));
         const targetScreenY = (rowRect.top + rowRect.bottom) / 2;
         const pt = screenToDicePlane(targetScreenX, targetScreenY);
         if (!pt) return null;
@@ -15005,7 +15303,7 @@ Thanks to Mike for being ace.</p>
         const firstRect = rows[0].getBoundingClientRect();
         const lastRect = rows[rows.length - 1].getBoundingClientRect();
         const diePx = getDiePixelWidth();
-        if (screen.x < chartRect.left - diePx * 3.5 || screen.x > chartRect.right + 12) return null;
+        if (screen.x < chartRect.left - diePx * 4.2 || screen.x > chartRect.right + diePx * 3.2) return null;
         if (screen.y < firstRect.top - diePx * 0.45 || screen.y > lastRect.bottom + diePx * 0.45) return null;
 
         let bestRow = null;
@@ -15050,9 +15348,17 @@ Thanks to Mike for being ace.</p>
 
     function repackSpendRowSlots(rowIndex) {
         if (typeof rowIndex !== 'number' || isNaN(rowIndex)) return;
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        const chartRect = chartEl ? chartEl.getBoundingClientRect() : null;
+        const snapRightSide = chartRect ? isSpendChartSnapRight(chartRect, getDiePixelWidth()) : false;
         const rowDice = diceObjs
             .filter((d) => d.assignedRow === rowIndex)
-            .sort((a, b) => (b.mesh.position.x - a.mesh.position.x) || (a.index - b.index));
+            .sort((a, b) => {
+                const dx = snapRightSide
+                    ? (a.mesh.position.x - b.mesh.position.x)
+                    : (b.mesh.position.x - a.mesh.position.x);
+                return dx || (a.index - b.index);
+            });
         rowDice.forEach((d, idx) => {
             d.assignedSlot = idx;
             const pos = getSpendRowSlotWorldPos(rowIndex, idx);
@@ -15070,6 +15376,18 @@ Thanks to Mike for being ace.</p>
         const show = activeRollDiceType === 'handling' && overlay && overlay.classList.contains('active');
         chartEl.style.setProperty('--dice3d-die-px', `${getDiePixelWidth()}px`);
         chartEl.classList.toggle('visible', !!show);
+        if (show && chartEl.style.left && chartEl.style.top && overlay) {
+            const overlayRect = overlay.getBoundingClientRect();
+            const chartRect = chartEl.getBoundingClientRect();
+            if (overlayRect.width && chartRect.width) {
+                const maxLeft = Math.max(8, overlayRect.width - chartRect.width - 8);
+                const maxTop = Math.max(8, overlayRect.height - chartRect.height - 8);
+                const curLeft = parseFloat(chartEl.style.left);
+                const curTop = parseFloat(chartEl.style.top);
+                if (!isNaN(curLeft)) chartEl.style.left = `${Math.max(8, Math.min(maxLeft, curLeft))}px`;
+                if (!isNaN(curTop)) chartEl.style.top = `${Math.max(8, Math.min(maxTop, curTop))}px`;
+            }
+        }
         if (show && diceObjs.length) {
             diceObjs.forEach((d) => {
                 if (typeof d.assignedRow === 'number') {
@@ -15081,6 +15399,111 @@ Thanks to Mike for being ace.</p>
                 }
             });
         }
+    }
+
+    function initSpendChartDragHandlers() {
+        const chartEl = document.getElementById('dice3d-spend-chart');
+        const overlay = document.getElementById('dice3d-overlay');
+        if (!chartEl || !overlay || chartEl.dataset.dragInit) return;
+        chartEl.dataset.dragInit = '1';
+
+        let chartDragActive = false;
+        let dragPointerId = null;
+        let startX = 0;
+        let startY = 0;
+        let startLeft = 0;
+        let startTop = 0;
+        let lastChartBroadcast = 0;
+
+        const syncAssignedDicePositions = (broadcast) => {
+            const hasAssigned = diceObjs.some((d) => typeof d.assignedRow === 'number');
+            if (!hasAssigned) return;
+            for (let r = 0; r < 5; r++) {
+                repackSpendRowSlots(r);
+            }
+            renderOnce();
+            if (broadcast && activeRollId && window.NetworkManager && typeof window.NetworkManager.broadcastDiceMove === 'function') {
+                window.NetworkManager.broadcastDiceMove({
+                    rollId: activeRollId,
+                    dragging: false,
+                    positions: diceObjs.map(d => ({
+                        index: d.index,
+                        x: d.mesh.position.x,
+                        y: 0.54,
+                        z: d.mesh.position.z,
+                        assignedRow: typeof d.assignedRow === 'number' ? d.assignedRow : null,
+                        assignedSlot: typeof d.assignedSlot === 'number' ? d.assignedSlot : null,
+                        assignedAction: d.assignedAction || null
+                    }))
+                });
+            }
+        };
+
+        chartEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        chartEl.addEventListener('pointerdown', (e) => {
+            if (e.button !== undefined && e.button !== 0) return;
+            if (!chartEl.classList.contains('visible')) return;
+            const overlayRect = overlay.getBoundingClientRect();
+            const chartRect = chartEl.getBoundingClientRect();
+            if (!overlayRect.width || !chartRect.width) return;
+
+            startLeft = chartRect.left - overlayRect.left;
+            startTop = chartRect.top - overlayRect.top;
+            chartEl.style.left = `${startLeft}px`;
+            chartEl.style.top = `${startTop}px`;
+            chartEl.style.right = 'auto';
+            chartEl.style.bottom = 'auto';
+            chartEl.style.transform = 'none';
+
+            chartDragActive = true;
+            dragPointerId = (typeof e.pointerId === 'number') ? e.pointerId : null;
+            startX = e.clientX;
+            startY = e.clientY;
+            chartEl.classList.add('dragging-chart');
+            if (chartEl.setPointerCapture && dragPointerId !== null) {
+                try { chartEl.setPointerCapture(dragPointerId); } catch (_) {}
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!chartDragActive) return;
+            if (dragPointerId !== null && typeof e.pointerId === 'number' && e.pointerId !== dragPointerId) return;
+            const overlayRect = overlay.getBoundingClientRect();
+            const chartRect = chartEl.getBoundingClientRect();
+            const maxLeft = Math.max(8, overlayRect.width - chartRect.width - 8);
+            const maxTop = Math.max(8, overlayRect.height - chartRect.height - 8);
+            const nextLeft = Math.max(8, Math.min(maxLeft, startLeft + (e.clientX - startX)));
+            const nextTop = Math.max(8, Math.min(maxTop, startTop + (e.clientY - startY)));
+            chartEl.style.left = `${nextLeft}px`;
+            chartEl.style.top = `${nextTop}px`;
+
+            const now = performance.now();
+            const shouldBroadcast = (now - lastChartBroadcast) > 45;
+            if (shouldBroadcast) lastChartBroadcast = now;
+            syncAssignedDicePositions(shouldBroadcast);
+        });
+
+        const endChartDrag = (e) => {
+            if (!chartDragActive) return;
+            if (dragPointerId !== null && typeof e.pointerId === 'number' && e.pointerId !== dragPointerId) return;
+            chartDragActive = false;
+            chartEl.classList.remove('dragging-chart');
+            if (chartEl.releasePointerCapture && dragPointerId !== null) {
+                try { chartEl.releasePointerCapture(dragPointerId); } catch (_) {}
+            }
+            dragPointerId = null;
+            lastDragEndTime = performance.now();
+            syncAssignedDicePositions(true);
+            if (e && e.stopPropagation) e.stopPropagation();
+        };
+
+        window.addEventListener('pointerup', endChartDrag);
+        window.addEventListener('pointercancel', endChartDrag);
     }
 
     function initDiceDragHandlers(canvas) {
@@ -15116,6 +15539,7 @@ Thanks to Mike for being ace.</p>
             draggedDie = dieObj;
             pointerDownOnDie = true;
             dragMoved = false;
+            document.getElementById('dice3d-overlay')?.classList.add('die-dragging');
 
             if (raycaster.ray.intersectPlane(dragPlane, planeHit)) {
                 dragOffset.set(dieObj.mesh.position.x - planeHit.x, 0, dieObj.mesh.position.z - planeHit.z);
@@ -15227,6 +15651,7 @@ Thanks to Mike for being ace.</p>
                 }
 
                 draggedDie = null;
+                document.getElementById('dice3d-overlay')?.classList.remove('die-dragging');
                 lastDragEndTime = performance.now();
                 canvas.style.cursor = 'grab';
                 if (e && e.stopPropagation) e.stopPropagation();
@@ -15296,8 +15721,9 @@ Thanks to Mike for being ace.</p>
         felt.receiveShadow = true;
         scene.add(felt);
 
-        // Pointer drag handlers for 3D dice repositioning
+        // Pointer drag handlers for 3D dice repositioning & spend chart
         initDiceDragHandlers(canvas);
+        initSpendChartDragHandlers();
 
         // Resize handler
         resizeRenderer();
@@ -16122,10 +16548,10 @@ Thanks to Mike for being ace.</p>
     function dismissOverlay() {
         if (rollPhase === 'rolling' || rollPhase === 'settling' || rollPhase === 'sorting') return;
         const overlay = document.getElementById('dice3d-overlay');
-        overlay.classList.remove('active');
+        overlay.classList.remove('active', 'die-dragging');
         const chartEl = document.getElementById('dice3d-spend-chart');
         if (chartEl) {
-            chartEl.classList.remove('visible');
+            chartEl.classList.remove('visible', 'dragging-chart');
             chartEl.querySelectorAll('.dice3d-spend-row').forEach((r) => {
                 r.classList.remove('drag-hover', 'has-assigned-dice');
             });
