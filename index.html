@@ -15049,20 +15049,27 @@ Thanks to Mike for being ace.</p>
         const geo = new THREE.BoxGeometry(width, height, depth, segments, segments, segments);
         const pos = geo.attributes.position;
         const nor = geo.attributes.normal;
-        const p   = new THREE.Vector3();
-        const n   = new THREE.Vector3();
-        const hw  = width  / 2 - radius;
-        const hh  = height / 2 - radius;
-        const hd  = depth  / 2 - radius;
+        const orig = new THREE.Vector3();
+        const inner = new THREE.Vector3();
+        const n = new THREE.Vector3();
+        const hw = Math.max(0.001, width / 2 - radius);
+        const hh = Math.max(0.001, height / 2 - radius);
+        const hd = Math.max(0.001, depth / 2 - radius);
         for (let i = 0; i < pos.count; i++) {
-            p.fromBufferAttribute(pos, i);
-            // Clamp to inner box, then push out by radius along corner normal
-            p.x = Math.sign(p.x || 1) * Math.min(Math.abs(p.x), hw);
-            p.y = Math.sign(p.y || 1) * Math.min(Math.abs(p.y), hh);
-            p.z = Math.sign(p.z || 1) * Math.min(Math.abs(p.z), hd);
-            n.copy(p).normalize();
-            p.addScaledVector(n, radius);
-            pos.setXYZ(i, p.x, p.y, p.z);
+            orig.fromBufferAttribute(pos, i);
+            inner.set(
+                Math.max(-hw, Math.min(hw, orig.x)),
+                Math.max(-hh, Math.min(hh, orig.y)),
+                Math.max(-hd, Math.min(hd, orig.z))
+            );
+            n.subVectors(orig, inner);
+            if (n.lengthSq() > 1e-8) {
+                n.normalize();
+            } else {
+                n.fromBufferAttribute(nor, i).normalize();
+            }
+            orig.copy(inner).addScaledVector(n, radius);
+            pos.setXYZ(i, orig.x, orig.y, orig.z);
             nor.setXYZ(i, n.x, n.y, n.z);
         }
         pos.needsUpdate = true;
@@ -15191,7 +15198,7 @@ Thanks to Mike for being ace.</p>
             // Subtle rounded frame border so die edges read clearly
             drawRoundRectPath(ctx, 10, 10, S - 20, S - 20, 48);
             ctx.lineWidth = 10;
-            ctx.strokeStyle = isCritVariant ? '#f87171' : (isFuryVariant ? '#484848' : '#c8c4b8');
+            ctx.strokeStyle = isCritVariant ? '#f87171' : (isFuryVariant ? '#484848' : '#111111');
             ctx.stroke();
 
             // Draw classic D6 pips (dots)
@@ -15913,8 +15920,8 @@ Thanks to Mike for being ace.</p>
         const spawnIndex = spec.spawnIndex;
         const initialVariant = (diceType === 'skid') ? 'skid' : 'focus';
 
-        // --- Three.js mesh with perfectly flat box (matches physics box) ---
-        const geo  = new THREE.BoxGeometry(1.08, 1.08, 1.08);
+        // --- Three.js mesh with subtle rounded corners and edges ---
+        const geo  = makeRoundedBoxGeometry(1.08, 1.08, 1.08, 6, 0.085);
         const mats = getDieMaterials(diceType, initialVariant);
         const mesh = new THREE.Mesh(geo, mats);
         mesh.castShadow    = true;
