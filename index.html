@@ -5199,7 +5199,7 @@
 
     <!-- About Modal -->
     <div class="modal-overlay" id="about-modal" onclick="closeAboutModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 540px; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 540px; max-height: 88vh; overflow-y: auto; box-shadow: 0 0 35px rgba(245, 158, 11, 0.35); border-color: var(--glow-color);">
             <div class="modal-header">
                 <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; color: var(--glow-color); letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
                     <span>ℹ️</span> About Gaslands Game Manager
@@ -13343,6 +13343,17 @@ Thanks to Mike for being ace.</p>
             const oldFacing = w.facing;
 
             if (val === "Turret" && oldFacing !== "Turret") {
+                if (isV3()) {
+                    const hasTurretAlready = appState.vehicles.some(car =>
+                        (car.weapons || []).some(wp => wp.facing === "Turret") ||
+                        (car.upgrades || []).some(up => up.name === "Turret Mount")
+                    );
+                    if (hasTurretAlready) {
+                        alert(`Cannot mount ${w.name} in Turret: in V3 Beta, Turret Mount is a Rare Upgrade (maximum 1 per team).`);
+                        renderVehicles();
+                        return;
+                    }
+                }
                 const costDiff = isV3() ? 2 : (w.cost * 2);
                 const totalSpent = getTotalCansSpent();
                 if (totalSpent + costDiff > appState.budget) {
